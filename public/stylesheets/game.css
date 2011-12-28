@@ -1,0 +1,88 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body { line-height: 1; background:#000; }
+ol, ul { list-style: none; }
+blockquote, q { quotes: none; }
+blockquote:before, blockquote:after,
+q:before, q:after { content: ''; content: none; }
+table { border-collapse: collapse; border-spacing: 0; }
+
+h1, h2, p { color:#fff; margin-bottom:0.5em;}
+h1 { font-size:48px; font-family: 'Passion One', Helvetica, sans-serif; }
+h2 { font-size:24px; font-family: 'Enriqueta', Times, sans-serif; margin-bottom:20px; }
+p { line-height:1.5; font-family: 'Enriqueta', Times, sans-serif; }
+em { font-style:italic; }
+
+.screen { position:absolute; top:0; left:0; width:1024px; height:758px; background:url(../images/bg.jpg) no-repeat; display:none;}
+.screen_inner { margin:5% auto; width:80%; background:rgba(0,0,0,0.8); border-radius:10px; box-shadow:0 0 15px #000; padding:30px; border:2px dashed #fff; }
+
+#intro { display:block; }
+a, #intro p strong { color:#fc0; }
+#intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; }
+#intro blockquote { font-size:18px; padding:10px 20px; }
+.bttn.start_game { width:200px; height:30px; padding:10px; margin-top:10px; border:2px solid #fff; margin:0 auto; text-align:center; border-radius: 10px; }
+.bttn.disabled { opacity:0.5; }
+#intro .examples { display:block; clear:both; overflow:hidden; margin-bottom:10px; margin-left:200px; }
+#intro h1, #intro h2 { text-align:center; }
+.bttn, .buttons li { cursor:pointer; }
+
+#messages { position:absolute; top:250px; left:300px; text-align:center; width:350px; height:60px; z-index:6; }
+
+#map, .neighborhood, .street, .car, .intersection { position:absolute; }
+#map { top:0px; left:0px; width:100%; height:100%; }
+.neighborhood { top:0px; left:0px; background:#6f3; width:100%; height:100%; }
+.street { background:#999; }
+.street.horizontal.lanes_4 { width:100%; height: 100px; }
+.street.horizontal.lanes_2 { width:100%; height: 50px; }
+.street.vertical.lanes_2 { width:50px; height: 100%; }
+.street.vertical.lanes_4 { width:100px; height: 100%; }
+.street .side { border:1px dashed #ddd; position:absolute; top:0px; left:0px; }
+.street.horizontal .side { width:100%; height:48%; }
+.street.vertical .side { width:48%; height:100%; }
+.street.horizontal .right { top:48%; }
+.street.vertical .right { left:48%; }
+#cars { z-index:5; position:absolute; top:0px; left:0px; width:100%; height:100%; }
+#cars .car { position:absolute; } 
+
+#amber { top:200px; left:0px; }
+#baker { top:500px; left:0px; }
+#chang { top:0px; left:250px; }
+#debian { top:0px; left:650px; }
+
+.car { top:10px; left:10px; width:15px; height:30px; background:#900; }
+.van { width:15px; height: 45px; }
+.truck { width:15px; height: 60px; }
+.car.horizontal { -webkit-transform:rotate(-90deg); }
+.intersection { background:#777; width:50px; height:50px; }
+.stoplight { position:absolute; top:10px; left:10px; width:80px; height:80px; z-index:3; }
+.stoplight .light { position:absolute; width:32px; height:32px; top:0px; left:0px; background:url(../images/control_horizontal_go.png) no-repeat; }
+.stoplight .light.vertical { background-image:url(../images/control_vertical_go.png);top:0px; left:45px; }
+.intersection.big .stoplight { top:30px; }
+.intersection:hover { background:#555; }
+.intersection.amber { top:200px; height:100px; }
+.intersection.baker { top:500px; height:50px; }
+.intersection.chang { left:250px; width:100px; }
+.intersection.debian { left:650px; width:100px; }

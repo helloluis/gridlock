@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" manifest="rockspock.manifest?v=3">
+
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name = "viewport" content = "width = device-width, initial-scale = 1, user-scalable = no">
+
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/apple-touch-icon-h.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/apple-touch-icon-m.png" />
+  <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon-l.png" />
+  <link rel="shortcut icon" href="images/apple-touch-icon-l.png" />
+
+  <title>Gridlock | A Traffic Control game by @ryansumo &amp; @helloluis</title>
+  
+  <script src="javascripts/jquery-1.6.2.min.js"></script>
+  <script src="javascripts/jquery-ui-1.8.16.custom.min.js"></script>
+  <script src="javascripts/jquery-collision-1.0.1.js"></script>
+  <script src="javascripts/underscore.js"></script>
+  <script src="javascripts/jquery-timers.js"></script>
+  <script src="javascripts/map.js"></script>
+  <script src="javascripts/game.js"></script>
+
+  <link rel="stylesheet" href="stylesheets/game.css"/>
+
+</head>
+
+<body>
+
+<div id="intro" class="screen">
+  <div class="screen_inner">
+    
+    <h2 class="bttn start_game">Play!</h2>
+  </div>
+</div>
+
+<div id="game" class="screen">
+  
+  <div class="pause">Pause</div>
+  <div class="quit">Quit</div>
+
+  <div id="messages"></div>
+
+  <div id="score">0</div>
+
+  <div id="map">
+    <div class="neighborhood"></div>
+    <div id="amber" class="street horizontal lanes_4 way_2">
+      <div id="amber_left" class="side left"></div>
+      <div id="amber_right" class="side right"></div>
+    </div>
+    <div id="baker" class="street horizontal lanes_2 way_2">
+      <div id="baker_left" class="side left"></div>
+      <div id="baker_right" class="side right"></div>
+    </div>
+    <div id="chang" class="street vertical lanes_4 way_2">
+      <div id="chang_left" class="side left"></div>
+      <div id="chang_right" class="side right"></div>
+    </div>
+    <div id="debian" class="street vertical lanes_4 way_2">
+      <div id="debian_left" class="side left"></div>
+      <div id="debian_right" class="side right"></div>
+    </div>
+    <div class="intersection amber chang big">
+      <div class="stoplight">
+        <div class="control light horizontal"></div>
+        <div class="control light vertical"></div>
+      </div>
+    </div>
+    <div class="intersection amber debian big">
+      <div class="stoplight">
+        <div class="control light horizontal"></div>
+        <div class="control light vertical"></div>
+      </div>
+    </div>
+    <div class="intersection baker chang small">
+      <div class="stoplight">
+        <div class="control light horizontal"></div>
+        <div class="control light vertical"></div>
+      </div>
+    </div>
+    <div class="intersection baker debian small">
+      <div class="stoplight">
+        <div class="control light horizontal"></div>
+        <div class="control light vertical"></div>
+      </div>
+    </div>
+    <div id="cars"></div>
+  </div>
+  
+</div>
+
+<div id="credits" class="screen"></div>
+
+  <script>
+    $(function(){
+      Game.initialize(true);
+    });
+  </script>
+
+</body>
+</html>
