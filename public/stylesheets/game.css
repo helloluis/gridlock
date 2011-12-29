@@ -74,6 +74,11 @@ a, #intro p strong { color:#fc0; }
 .street.vertical .side { width:48%; height:100%; }
 .street.horizontal .right { top:48%; }
 .street.vertical .right { left:48%; }
+.street .lane { position:absolute; }
+.street.horizontal .lane { width:100%; height:50%; }
+.street.horizontal .lane2 { top:50%; }
+.street.vertical .lane { width:50%; height:100%; }
+.street.vertical .lane2 { left:50%; }
 #cars { z-index:5; position:absolute; top:0px; left:0px; width:100%; height:100%; }
 #cars .car { position:absolute; } 
 
@@ -82,10 +87,14 @@ a, #intro p strong { color:#fc0; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
-.car { top:10px; left:10px; width:15px; height:30px; background:#900; }
+.car { top:10px; left:10px; width:15px; height:35px; background-color:#900; background-repeat:no-repeat; }
 .van { width:15px; height: 45px; }
 .truck { width:15px; height: 60px; }
-.car.horizontal { width:30px; height:15px; }
+.car.horizontal { width:35px; height:15px; }
+.car.vertical.right { background:url(../images/car_vertical_right_yellow.png); }
+.car.horizontal.right { background:url(../images/car_horizontal_right_yellow.png); }
+.car.vertical.left { background:url(../images/car_vertical_left_blue.png); }
+.car.horizontal.left { background:url(../images/car_horizontal_left_blue.png); }
 .intersection { background:#777; width:50px; height:50px; }
 .stoplight { position:absolute; top:10px; left:10px; width:80px; height:80px; z-index:3; }
 .stoplight .light { position:absolute; width:32px; height:32px; top:0px; left:0px; background:url(../images/control_horizontal_go.png) no-repeat; }

@@ -1,12 +1,18 @@
 var STREETS = [
-  ["amber_right", "horizontal", 2],
-  ["amber_left", "horizontal", 2],
-  ["baker_right", "horizontal", 1],
-  ["baker_left", "horizontal", 1],
-  ['chang_right','vertical', 2],
-  ['chang_left','vertical',2],
-  ['dexter_right','vertical', 2],
-  ['dexter_left','vertical',2],
+  ["amber_right_lane1", "horizontal"],
+  ["amber_right_lane2", "horizontal"]//,
+  // ["amber_left_lane1", "horizontal"],
+  // ["amber_left_lane2", "horizontal"],
+  // ["baker_right", "horizontal"],
+  // ["baker_left", "horizontal"],
+  // ['chang_right_lane1','vertical'],
+  // ['chang_right_lane2','vertical'],
+  // ['chang_left_lane1','vertical'],
+  // ['chang_left_lane2','vertical'],
+  // ['dexter_right_lane1','vertical'],
+  // ['dexter_right_lane2','vertical'],
+  // ['dexter_left_lane1','vertical'],
+  // ['dexter_left_lane2','vertical'],
 ];
 
 /*

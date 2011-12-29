@@ -51,60 +51,78 @@
   <div id="map">
     <div class="neighborhood"></div>
     <div id="amber" class="street horizontal lanes_4 way_2">
-      <div id="amber_left" class="side left"></div>
-      <div id="amber_right" class="side right"></div>
+      <div id="amber_left" class="side left">
+        <div id="amber_left_lane1" class="lane lane1"></div>
+        <div id="amber_left_lane2" class="lane lane2"></div>
+      </div>
+      <div id="amber_right" class="side right">
+        <div id="amber_right_lane1" class="lane lane1"></div>
+        <div id="amber_right_lane2" class="lane lane2"></div>
+      </div>
     </div>
     <div id="baker" class="street horizontal lanes_2 way_2">
       <div id="baker_left" class="side left"></div>
       <div id="baker_right" class="side right"></div>
     </div>
     <div id="chang" class="street vertical lanes_4 way_2">
-      <div id="chang_left" class="side left"></div>
-      <div id="chang_right" class="side right"></div>
+      <div id="chang_left" class="side left">
+        <div id="chang_left_lane1" class="lane lane1"></div>
+        <div id="chang_left_lane2" class="lane lane2"></div>
+      </div>
+      <div id="chang_right" class="side right">
+        <div id="chang_right_lane1" class="lane lane1"></div>
+        <div id="chang_right_lane2" class="lane lane2"></div>
+      </div>
     </div>
     <div id="dexter" class="street vertical lanes_4 way_2">
-      <div id="dexter_left" class="side left"></div>
-      <div id="dexter_right" class="side right"></div>
-    </div>
-    <div class="intersection amber chang big">
-      <div class="stoplight">
-        <div class="control light horizontal"></div>
-        <div class="control light vertical"></div>
+      <div id="dexter_left" class="side left">
+        <div id="dexter_left_lane1" class="lane lane1"></div>
+        <div id="dexter_left_lane2" class="lane lane2"></div>
       </div>
-      <div class="barrier horizontal right amber_right"></div>
-      <div class="barrier vertical right chang_right"></div>
-      <div class="barrier horizontal left amber_left"></div>
-      <div class="barrier vertical left chang_left"></div>
-    </div>
-    <div class="intersection amber dexter big">
-      <div class="stoplight">
-        <div class="control light horizontal"></div>
-        <div class="control light vertical"></div>
+      <div id="dexter_right" class="side right">
+        <div id="dexter_right_lane1" class="lane lane1"></div>
+        <div id="dexter_right_lane2" class="lane lane2"></div>
       </div>
-      <div class="barrier horizontal right amber_right"></div>
-      <div class="barrier vertical right dexter_right"></div>
-      <div class="barrier horizontal left amber_left"></div>
-      <div class="barrier vertical left dexter_left"></div>
     </div>
-    <div class="intersection baker chang small">
+    <div class="intersection amber chang big" data-streets="amber chang">
       <div class="stoplight">
-        <div class="control light horizontal"></div>
-        <div class="control light vertical"></div>
+        <div class="control light horizontal" data-streets="amber"></div>
+        <div class="control light vertical"   data-streets="chang"></div>
       </div>
-      <div class="barrier horizontal right baker_right"></div>
-      <div class="barrier vertical right chang_right"></div>
-      <div class="barrier horizontal left baker_left"></div>
-      <div class="barrier vertical left chang_left"></div>
+      <div class="barrier horizontal right" data-streets="amber_right"></div>
+      <div class="barrier vertical right"   data-streets="chang_right"></div>
+      <div class="barrier horizontal left"  data-streets="amber_left"></div>
+      <div class="barrier vertical left"    data-streets="chang_left"></div>
     </div>
-    <div class="intersection baker dexter small">
+    <div class="intersection amber dexter big" data-streets="amber dexter">
       <div class="stoplight">
-        <div class="control light horizontal"></div>
-        <div class="control light vertical"></div>
+        <div class="control light horizontal" data-streets="amber"></div>
+        <div class="control light vertical"   data-streets="dexter"></div>
       </div>
-      <div class="barrier horizontal right baker_right"></div>
-      <div class="barrier vertical right dexter_right"></div>
-      <div class="barrier horizontal left baker_left"></div>
-      <div class="barrier vertical left dexter_left"></div>
+      <div class="barrier horizontal right" data-streets="amber_right"></div>
+      <div class="barrier vertical right"   data-streets="dexter_right"></div>
+      <div class="barrier horizontal left"  data-streets="amber_left"></div>
+      <div class="barrier vertical left"    data-streets="dexter_left"></div>
+    </div>
+    <div class="intersection baker chang small" data-streets="baker chang">
+      <div class="stoplight">
+        <div class="control light horizontal" data-streets="baker"></div>
+        <div class="control light vertical"   data-streets="chang"></div>
+      </div>
+      <div class="barrier horizontal right" data-streets="baker_right"></div>
+      <div class="barrier vertical right"   data-streets="chang_right"></div>
+      <div class="barrier horizontal left"  data-streets="baker_left"></div>
+      <div class="barrier vertical left"    data-streets="chang_left"></div>
+    </div>
+    <div class="intersection baker dexter small" data-streets="baker dexter">
+      <div class="stoplight">
+        <div class="control light baker horizontal" data-streets="baker"></div>
+        <div class="control light dexter vertical"  data-streets="dexter"></div>
+      </div>
+      <div class="barrier horizontal right" data-streets="baker_right"></div>
+      <div class="barrier vertical right"   data-streets="dexter_right"></div>
+      <div class="barrier horizontal left"  data-streets="baker_left"></div>
+      <div class="barrier vertical left"    data-streets="dexter_left"></div>
     </div>
     <div id="cars"></div>
   </div>
