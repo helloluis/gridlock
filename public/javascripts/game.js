@@ -44,23 +44,29 @@ Game = {
     Game.intro.show();
     Game.main.hide();
     Game.credits.hide();
-    Game.messages.hide();
+    Game.hide_message();
     Game.streets = [];
     Game.score = 0;
     
+    $(".restart").hide();
     $(".pause, .quit").addClass('disabled');
 
   },
 
   initialize_sounds : function() {
-    // Game.sounds.click  = new Audio("sounds/clook.mp3");
-    // Game.sounds.tick   = new Audio("sounds/tock.mp3");
-    // Game.sounds.buzzer = new Audio("sounds/beep_long.mp3");
+    Game.sounds.honk1  = new Audio("sounds/honk_short.mp3");
+    Game.sounds.honk2  = new Audio("sounds/honk_long.mp3");
   },
 
   initialize_buttons : function(){
     
     $(".start_game").click(function(){
+      Game.start();
+    });
+
+    $(".restart").click(function(){
+      Game.initialize_behaviours();
+      Game.initialize_streets();
       Game.start();
     });
     
@@ -92,11 +98,12 @@ Game = {
                             left   : barrier.offset().left, 
                             width  : barrier.width(), 
                             height : barrier.height(), 
-                            active : true,
+                            orientation  : barrier.hasClass('horizontal') ? 'horizontal' : 'vertical',
+                            active       : barrier.hasClass('horizontal') ? false : true,
                             intersection : barrier.parent().attr('data-streets') };
       Game.barriers.push( barrier_hash );
     });
-    console.log(Game.barriers);
+    //console.log(Game.barriers);
   },
 
   start : function(){
@@ -112,6 +119,14 @@ Game = {
 
     _.each(Game.streets,function(street){
       street.start();
+    });
+
+  },
+
+  stop_streets : function(){
+    
+    _.each(Game.streets,function(street){
+      street.stop();
     });
 
   },
@@ -133,9 +148,9 @@ Game = {
   },
 
   // if passed a callback, will delay for X seconds, then run it
-  show_message : function(text, subtle) {
+  show_message : function(html, subtle) {
     
-    Game.messages.html("<h2>" + text + "</h2>");
+    Game.messages.html(html).show();
     if (subtle===true) {
       Game.messages.addClass("subtle");
     } else {
@@ -145,7 +160,7 @@ Game = {
   },
 
   hide_message : function(){
-    Game.messages.animate({ opacity : 0 });
+    Game.messages.animate({ opacity : 0 }).hide();
   },
 
   start_countdown : function() {
@@ -179,17 +194,11 @@ Game = {
   },
 
   reset : function(return_to_intro){
+    
+    Game.stop_streets();
 
-    var home = $("<h1 class='bttn home'>Home</h1>").
-      click(function(){
-        Game.initialize_behaviours();
-      });
+    $(".restart").show();
 
-    Game.countdown.empty().append(home);
-
-    if (return_to_intro===true) {
-      Game.initialize_behaviours();
-    }
   },
 
   resume : function() {
@@ -207,12 +216,49 @@ Game = {
   },
 
   initialize_controls : function(){
-    $(".control").each(function(){
+    $(".stoplight").each(function(){
       var self          = $(this),
-          intersection  = $(this).parent(),
-          barriers      = $(".barrier[data-streets='" + self.attr('data-streets') + "_left'], .barrier[data-streets='" + self.attr('data-streets') + "_right']");
-      console.log(self.attr('data-streets'), barriers);
+          intersection  = $(this).parents(".intersection").attr('data-streets');
+      
+      self.click(function(){
+        
+        if (self.hasClass('horizontal')) {
+          self.removeClass('horizontal').addClass('vertical');
+        } else {
+          self.addClass('horizontal').removeClass('vertical');
+        }
+
+        var new_orientation = self.hasClass('horizontal') ? 'horizontal' : 'vertical';
+        // we go through the Game.barriers array and toggle the orientation of barrier,
+        // then iterate through Game.streets.barriers to find the specific barriers within 
+        // each matching street object
+        if (barriers = _.filter(Game.barriers, function(b){ return b.intersection==intersection; })) {
+          
+          _.each(barriers, function(barrier){
+            barrier.active = !(barrier.orientation==new_orientation);
+          });
+
+          _.each(Game.streets, function(street){
+            _.each(street.barriers, function(street_barrier){
+              if (street_barrier.intersection==intersection) {
+                street_barrier.active = !(street_barrier.orientation==new_orientation);
+              }
+            });
+          });
+        }
+
+      });
     });
+  },
+
+  end_with_frustration : function(){
+    Game.show_message("<h1>How Frustrating!</h1><p>Final Score: " + Game.score + "</p>");
+    Game.reset();
+  },
+
+  end_with_collision : function(){
+    Game.show_message("<h1>Boom!</h1><p>Final Score: " + Game.score + "</p>");
+    Game.reset();
   }
 
 };
@@ -228,6 +274,7 @@ var Street = function(){
   this.lanes       = 1;
   this.orientation = 'horizontal';
   this.frustration = 0;
+  this.max_frustration = 20;
   this.gap         = 5;
   this.cars        = [];
   this.stopped     = false;
@@ -261,16 +308,34 @@ var Street = function(){
                             left   : barrier.offset().left, 
                             width  : barrier.width(), 
                             height : barrier.height(), 
-                            active : true,
+                            orientation  : barrier.hasClass('horizontal') ? 'horizontal' : 'vertical',
+                            active       : barrier.hasClass('horizontal') ? false : true,
                             intersection : barrier.parent().attr('data-streets') };
       self.barriers.push( barrier_hash );
     });
-    console.log('street barriers', self.barriers);
+    //console.log('street barriers', self.barriers);
   };
 
   this.start = function(){
     this.initialize_barriers();
     this.maker.initialize(game, this);
+    this.initialize_frustration();
+  };
+
+  this.stop = function(){
+    $(".car." + this.name ).stopTime('frustrating').stopTime('driving').remove();
+    this.dom.stopTime('frustrating');
+    this.maker.stop();
+  };
+
+  this.initialize_frustration = function(){
+    var self = this;
+    self.dom.everyTime(1000, 'frustrating', function(){
+      //console.log(self.frustration);
+      if (self.frustration >= self.max_frustration) {
+        Game.end_with_frustration();
+      }
+    });
   };
 
 };
@@ -290,6 +355,10 @@ var Car = function(){
   this.lefthand        = false;
   this.origins         = {};
   this.destinations    = {};
+  this.travel_time     = 0; 
+  // travel time is the time in seconds it would take the car to travel from 
+  // origin to destination, assuming the road was completely open, multiplied by 2.
+  // the closer we approach the travel_time, the more frustrated the car driver becomes.
 
   this.initialize = function(name, game, street, orientation){
     
@@ -302,6 +371,7 @@ var Car = function(){
     this.initialize_speed();
     this.initialize_origins(); 
     this.render();
+    this.initialize_frustration();
 
     // the leader is the car directly in front of this current car.
     // on a two-lane street, we have to check the two older cars, just
@@ -351,6 +421,8 @@ var Car = function(){
       
       this.origins.top = this.destinations.top = b1;
 
+      this.travel_time = (Math.abs(this.destinations.left-this.origins.left)/this.speed)*2;
+
     } else {
 
       var a1 = this.street.dom.offset().top - 100,
@@ -371,7 +443,26 @@ var Car = function(){
       }
       
       this.destinations.left = this.origins.left = b1;
+
+      this.travel_time = Math.ceil((Math.abs(this.destinations.top-this.origins.top)/this.speed)*2);
+
     }
+
+  };
+
+  this.initialize_frustration = function(){
+    
+    var self = this;
+    
+    self.dom.everyTime( (self.travel_time/5)*1000, 'frustrating', function(){
+      self.frustration+=1;
+      self.street.frustration+=1;
+      if (self.frustration == 4) {
+        Game.sounds.honk1.play();
+      } else if (self.frustration >= 5) {
+        Game.sounds.honk2.play();
+      }
+    });
 
   };
 
@@ -386,8 +477,6 @@ var Car = function(){
       attr({ 'data-name' : this.name, 'data-speed' : this.speed, 'data-stopped' : false }).
       appendTo(Game.cars).
       css({ top: self.origins.top, left : self.origins.left });
-
-    //console.log('rendering', self.lefthand, self.origins.top, self.destinations.top, self.dom.offset().top);
 
     self.restart();
     self.go();
@@ -559,6 +648,7 @@ var Car = function(){
   };
 
   this.arrived = function(){
+    this.street.frustration -= this.frustration;
     this.dom.remove();
     Game.arrived( this );
   };
@@ -572,12 +662,13 @@ var Maker = function(){
     var self        = this;
     self.game       = game;
     self.street     = street;
-    self.frequency  = 2000; //+(Math.random()*5000);
+    self.frequency  = 3000; //+(Math.random()*5000);
     self.iterations = 0;
+    self.max_cars   = 2;
 
     _.delay(function(){
       
-      self.street.dom.everyTime(self.frequency, function(){
+      self.street.dom.everyTime(self.frequency, 'making', function(){
         self.make();
       });
 
@@ -595,7 +686,7 @@ var Maker = function(){
     //var num_cars = Math.ceil(Math.random()*self.iterations);
     //if (num_cars < 1) { num_cars = 1; }
 
-    if (Math.random() > 0.5) {
+    if (Math.random() > 0.5 && $(".car." + self.street.name).length < self.max_cars) {
       self.iterations+=1;
       for (var i=0; i < num_cars; i++) {
         var car  = new Car(),
@@ -606,6 +697,11 @@ var Maker = function(){
     }
     
 
+  };
+
+  this.stop = function(){
+    this.street.dom.stopTime('making');
+    this.iterations = 0;
   };
 
 };

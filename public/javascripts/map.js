@@ -1,6 +1,6 @@
 var STREETS = [
   ["amber_right_lane1", "horizontal"],
-  ["amber_right_lane2", "horizontal"]//,
+  // ["amber_right_lane2", "horizontal"],
   // ["amber_left_lane1", "horizontal"],
   // ["amber_left_lane2", "horizontal"],
   // ["baker_right", "horizontal"],
@@ -12,7 +12,7 @@ var STREETS = [
   // ['dexter_right_lane1','vertical'],
   // ['dexter_right_lane2','vertical'],
   // ['dexter_left_lane1','vertical'],
-  // ['dexter_left_lane2','vertical'],
+  // ['dexter_left_lane2','vertical']
 ];
 
 /*
