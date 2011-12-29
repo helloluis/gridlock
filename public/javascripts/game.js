@@ -274,7 +274,7 @@ var Street = function(){
   this.lanes       = 1;
   this.orientation = 'horizontal';
   this.frustration = 0;
-  this.max_frustration = 20;
+  this.max_frustration = 30;
   this.gap         = 5;
   this.cars        = [];
   this.stopped     = false;
@@ -664,7 +664,7 @@ var Maker = function(){
     self.street     = street;
     self.frequency  = 3000; //+(Math.random()*5000);
     self.iterations = 0;
-    self.max_cars   = 2;
+    self.max_cars   = 20;
 
     _.delay(function(){
       
