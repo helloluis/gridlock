@@ -100,6 +100,8 @@ a, #intro p strong { color:#fc0; }
 .stoplight:hover{opacity:1.0;cursor:pointer;}
 .stoplight.vertical { background-image:url(../images/control_vertical.png); }
 .explosion { position:absolute; z-index:8; background-image: url(../images/explosions.png); }
+.frustration { position:absolute; width:15px; height:15px; background-image: url(../images/frustration.png); z-index:9; }
+.frustration.major { background-image:url(../images/frustration_major.png); }
 /*.stoplight .light { position:absolute; width:32px; height:32px; top:0px; left:0px; background:url(../images/control_horizontal_go.png) no-repeat; z-index:7; opacity:0.5; }
 .stoplight .light:hover { opacity:1.0; }
 .stoplight .light.stopped { background-image:url(../images/control_horizontal_stop.png); }

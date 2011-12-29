@@ -129,6 +129,9 @@ Game = {
       street.stop();
     });
 
+    Game.sounds.honk1.pause();
+    Game.sounds.honk2.pause();
+
   },
 
   control_all_barriers : function(value){
@@ -324,6 +327,7 @@ var Street = function(){
 
   this.stop = function(){
     $(".car." + this.name ).stopTime('frustrating').stopTime('driving').remove();
+    $(".frustration").remove();
     this.dom.stopTime('frustrating');
     this.maker.stop();
   };
@@ -458,12 +462,41 @@ var Car = function(){
       self.frustration+=1;
       self.street.frustration+=1;
       if (self.frustration == 4) {
+        self.dom.addClass('frustrated');
+        self.add_frustration_cloud();
         Game.sounds.honk1.play();
       } else if (self.frustration >= 5) {
+        self.dom.addClass('very_frustrated');
+        self.add_frustration_cloud(true);
         Game.sounds.honk2.play();
       }
     });
 
+  };
+
+  this.add_frustration_cloud = function(very){
+    if (!this.moving) {
+
+      var top = this.orientation=='horizontal' ? 
+        this.dom.offset().top : 
+        ( this.lefthand ? (this.dom.offset().top + this.dom.height()) - 15 : this.dom.offset().top - 15 ); 
+
+      var left = this.orientation=='horizontal' ?
+        ( this.lefthand ? this.dom.offset().left - 15 : (this.dom.offset().left + this.dom.width()) - 15 ) : 
+        this.dom.offset().left;
+
+      var cloud = $("<div class='frustration'></div>").
+        css({ top : top, left : left }).
+        attr('data-car-name',this.name).
+        appendTo('#cars');
+      if (very===true) {
+        cloud.addClass('very');
+      }
+    }
+  };
+
+  this.remove_frustration_cloud = function(){
+    $(".frustration[data-car-name='" + this.name + "']").remove();
   };
 
   this.render = function(){
@@ -505,6 +538,7 @@ var Car = function(){
 
     self.moving = true;
     self.dom.attr('data-stopped', false);
+    self.remove_frustration_cloud();
   };
 
   this.calculate_speed = function(){
@@ -650,6 +684,7 @@ var Car = function(){
   this.arrived = function(){
     this.street.frustration -= this.frustration;
     this.dom.remove();
+    this.remove_frustration_cloud();
     Game.arrived( this );
   };
 
