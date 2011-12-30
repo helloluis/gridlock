@@ -99,9 +99,11 @@ a, #intro p strong { color:#fc0; }
 .stoplight { position:absolute; top:5px; left:30px; width:40px; height:40px; z-index:3; background:url(../images/control_horizontal.png); opacity:0.5;}
 .stoplight:hover{opacity:1.0;cursor:pointer;}
 .stoplight.vertical { background-image:url(../images/control_vertical.png); }
-.explosion { position:absolute; z-index:8; background-image: url(../images/explosions.png); }
+.explosion { position:absolute; z-index:8; background-image: url(../images/explosion.png); width:80px; height:80px; background-repeat:no-repeat; }
 .frustration { position:absolute; width:15px; height:15px; background-image: url(../images/frustration.png); z-index:9; }
 .frustration.major { background-image:url(../images/frustration_major.png); }
+#frustration { position:absolute; right:20px; bottom:20px; width:200px; height:20px; background:#690; overflow:hidden; }
+#frustration .bar { position:absolute; top:0; left:0; width:0; height:100%; background:#900; }
 /*.stoplight .light { position:absolute; width:32px; height:32px; top:0px; left:0px; background:url(../images/control_horizontal_go.png) no-repeat; z-index:7; opacity:0.5; }
 .stoplight .light:hover { opacity:1.0; }
 .stoplight .light.stopped { background-image:url(../images/control_horizontal_stop.png); }
