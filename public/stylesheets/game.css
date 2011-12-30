@@ -102,6 +102,7 @@ a, #intro p strong { color:#fc0; }
 .explosion { position:absolute; z-index:8; background-image: url(../images/explosion.png); width:80px; height:80px; background-repeat:no-repeat; }
 .frustration { position:absolute; width:15px; height:15px; background-image: url(../images/frustration.png); z-index:9; }
 .frustration.major { background-image:url(../images/frustration_major.png); }
+#frustration_label { position:absolute; right:20px; bottom:25px; text-align:left; width:190px; font-size:12px; color:#fff; z-index:2; }
 #frustration { position:absolute; right:20px; bottom:20px; width:200px; height:20px; background:#690; overflow:hidden; }
 #frustration .bar { position:absolute; top:0; left:0; width:0; height:100%; background:#900; }
 /*.stoplight .light { position:absolute; width:32px; height:32px; top:0px; left:0px; background:url(../images/control_horizontal_go.png) no-repeat; z-index:7; opacity:0.5; }
