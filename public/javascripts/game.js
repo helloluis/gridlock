@@ -2,6 +2,7 @@ Game = {
 
   wait        : 1500,
   scores      : 0,
+  started     : false,
   paused      : true,
   ended       : false,
   with_sound  : false,
@@ -82,6 +83,7 @@ Game = {
 
     $(".restart").click(function(){
       Game.initialize_behaviours();
+      Game.initialize_controls();
       Game.initialize_streets();
       Game.start();
     });
@@ -123,6 +125,7 @@ Game = {
   },
 
   start : function(){
+    Game.started = true;
     Game.ended = false;
     Game.intro.hide();
     Game.main.show();
@@ -142,16 +145,12 @@ Game = {
   },
 
   stop_streets : function(){
-    
+
     _.each(Game.streets,function(street){
       street.stop();
     });
     
-    $(".car").stopTime('frustrating').stopTime('driving');
     Game.map.stopTime('intersecting');
-
-    Game.sounds.honk1.pause();
-    Game.sounds.honk2.pause();
 
   },
 
@@ -266,39 +265,44 @@ Game = {
       var self          = $(this),
           intersection  = $(this).parents(".intersection").attr('data-streets');
       
-      self.click(function(){
-        
-        if (self.hasClass('horizontal')) {
-          self.removeClass('horizontal').addClass('vertical');
-        } else {
-          self.addClass('horizontal').removeClass('vertical');
-        }
+      self.
+        removeClass('vertical').
+        addClass('horizontal').
+        unbind('click').
+        click(function(){
+        if (Game.started) {
+          if (self.hasClass('horizontal')) {
+            self.removeClass('horizontal').addClass('vertical');
+          } else {
+            self.addClass('horizontal').removeClass('vertical');
+          }
 
-        var new_orientation = self.hasClass('horizontal') ? 'horizontal' : 'vertical';
-        // we go through the Game.barriers array and toggle the orientation of barrier,
-        // then iterate through Game.streets.barriers to find the specific barriers within 
-        // each matching street object
-        if (barriers = _.filter(Game.barriers, function(b){ return b.intersection==intersection; })) {
-          
-          _.each(barriers, function(barrier){
-            barrier.active = !(barrier.orientation==new_orientation);
-          });
-
-          _.each(Game.streets, function(street){
-            _.each(street.barriers, function(street_barrier){
-              if (street_barrier.intersection==intersection) {
-                street_barrier.active = !(street_barrier.orientation==new_orientation);
-              }
+          var new_orientation = self.hasClass('horizontal') ? 'horizontal' : 'vertical';
+          // we go through the Game.barriers array and toggle the orientation of barrier,
+          // then iterate through Game.streets.barriers to find the specific barriers within 
+          // each matching street object
+          if (barriers = _.filter(Game.barriers, function(b){ return b.intersection==intersection; })) {
+            
+            _.each(barriers, function(barrier){
+              barrier.active = !(barrier.orientation==new_orientation);
             });
-          });
-        }
 
+            _.each(Game.streets, function(street){
+              _.each(street.barriers, function(street_barrier){
+                if (street_barrier.intersection==intersection) {
+                  street_barrier.active = !(street_barrier.orientation==new_orientation);
+                }
+              });
+            });
+          } 
+        }
       });
     });
   },
 
   end_with_frustration : function(){
     if (!Game.ended) {
+      Game.started = false;
       Game.ended = true;
       Game.show_message("<h1>How Frustrating!</h1><p>Final Score: " + Game.score + "</p>");
       Game.reset();  
@@ -307,6 +311,7 @@ Game = {
 
   end_with_collision : function( exploding_car ){
     if (!Game.ended) {
+      Game.started = false;
       Game.ended = true;
       Game.generate_explosion( exploding_car );
       Game.show_message("<h1>Boom!</h1><p>Final Score: " + Game.score + "</p>");
@@ -468,9 +473,12 @@ var Car = function(car_hash){
     var other_cars    = $(".car." + this.street.name + "[data-name!='" + this.name + "']");
     
     if (other_cars.length) {
-      var myindex     = other_cars.length;
+      var myindex     = other_cars.length,
+          leader      = $(other_cars.get( myindex-1 ));
 
-      this.leaders    = [ $(other_cars.get( myindex-1 )) ];
+      this.leaders    = [[  leader, 
+                            leader.hasClass('horizontal') ? leader.height() : leader.width(), 
+                            leader.hasClass('horizontal') ? leader.width() : leader.height() ]];
       // console.log(this.leaders[0].attr('data-name'));
       // if (other_cars.length>1){
       //   this.leaders.push($(other_cars.get( myindex-2 )));      
@@ -489,7 +497,7 @@ var Car = function(car_hash){
   this.initialize_origins = function(){
     if (this.orientation == 'horizontal') {
       
-      var a1 = this.street.dom.offset().left - 50,
+      var a1 = this.street.dom.offset().left - 100,
           a2 = Game.map.width() + 50;
 
       if (this.street.lanes==2) {
@@ -542,31 +550,33 @@ var Car = function(car_hash){
     
     var self = this;
     
-    self.dom.everyTime( (self.travel_time/5)*1000, 'frustrating', function(){
+    self.dom.
+      stopTime('frustrating').
+      everyTime( (self.travel_time/5)*1000, 'frustrating', function(){
       
-      self.frustration_checks+=1;
-      
-      if (self.frustration_checks>self.frustration_threshold) {
-        self.frustration+=self.frustrates_by;
-        Game.frustration+=self.frustrates_by;  
-      }
+        self.frustration_checks+=1;
+        
+        if (self.frustration_checks>self.frustration_threshold) {
+          self.frustration+=self.frustrates_by;
+          Game.frustration+=self.frustrates_by;  
+        }
 
-      if (self.frustration == self.frustration_level1) {
-        self.dom.addClass('frustrated');
-        self.add_frustration_cloud();
-        if (Game.with_sounds) {
-          Game.sounds.honk1.play();  
+        if (self.frustration == self.frustration_level1) {
+          self.dom.addClass('frustrated');
+          self.add_frustration_cloud();
+          if (Game.with_sounds) {
+            Game.sounds.honk1.play();  
+          }
+          
+        } else if (self.frustration >= self.frustration_level2) {
+          self.dom.addClass('very_frustrated');
+          self.add_frustration_cloud(true);
+          if (Game.with_sounds) {
+            Game.sounds.honk2.play();  
+          }
+          
         }
-        
-      } else if (self.frustration >= self.frustration_level2) {
-        self.dom.addClass('very_frustrated');
-        self.add_frustration_cloud(true);
-        if (Game.with_sounds) {
-          Game.sounds.honk2.play();  
-        }
-        
-      }
-    });
+      });
 
   };
 
@@ -690,8 +700,8 @@ var Car = function(car_hash){
   this.is_colliding = function(){
     
     var off   = this.dom.offset(),
-        self1 = [off.left, off.left + this.dom.width()],
-        self2 = [off.top,  off.top + this.dom.height()];
+        self1 = [off.left, off.left + (this.orientation=='horizontal' ? this.dom.height() : this.dom.width())],
+        self2 = [off.top,  off.top + (this.orientation=='horizontal' ? this.dom.height() : this.dom.height())];
     
     if (intersection = this.is_at_intersection(self1, self2)) {
       //console.log('intersecting', intersection);
@@ -716,10 +726,10 @@ var Car = function(car_hash){
     if (this.leaders) {
       for (var i=0; i < this.leaders.length; i++) {
         if (this.leaders[i]!==null) {
-          var leader = this.leaders[i],
+          var leader = this.leaders[i][0],
               l_off  = leader.offset(),
-              p1     = [l_off.left, l_off.left + leader.width()],
-              p2     = [l_off.top,  l_off.top + leader.height()];
+              p1     = [l_off.left, l_off.left + this.leaders[i][1]],
+              p2     = [l_off.top,  l_off.top + this.leaders[i][2]];
 
           var horiz_match = this.compare_positions( self1, p1 ),
               vert_match  = this.compare_positions( self2, p2 );
@@ -829,14 +839,11 @@ var Car = function(car_hash){
       //console.log('driving to', self.destinations.left-self.dom.height(), self.dom.offset().left);
       if (self.has_arrived()) {
         
-        // console.log('arrived!');
-        self.dom.stopTime('driving').remove();
         self.arrived();
         
       } else {
-        //console.log('drive?');
+        
         if (!self.moving) {
-          //console.log('drive!');
           self.restart(true);
           self.go();
         }
@@ -849,7 +856,7 @@ var Car = function(car_hash){
     var self = this;
     if (self.orientation=='horizontal') {
       if (self.lefthand){ 
-        return self.dom.offset().left <= self.destinations.left;
+        return self.dom.offset().left <= self.destinations.left + self.dom.height();
       } else {
         return self.destinations.left - self.dom.height() <= self.dom.offset().left;
       }
@@ -868,7 +875,7 @@ var Car = function(car_hash){
 
   this.arrived = function(){
     Game.frustration -= this.frustration;
-    this.dom.remove();
+    this.dom.stopTime('frustrating').stopTime('driving').remove();
     this.remove_frustration_cloud();
     Game.arrived( this );
   };
@@ -887,7 +894,7 @@ var Maker = function(){
     self.iterations = 0;
     self.car_types  = {
       car         : { type : 'car', width : 15, height : 35, frustrates_by : 1,
-          colors  : [ 'blue', 'yellow', 'black' ]
+          colors  : [ 'blue', 'yellow', 'black', 'orange', 'green' ]
       },
       van         : { type : 'van', width : 15, height : 45, frustrates_by : 1 },
       bus         : { type : 'bus', width : 15, height : 65, frustrates_by : 1.5 },

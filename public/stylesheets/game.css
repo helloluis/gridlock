@@ -94,6 +94,8 @@ a, #intro p strong { color:#fc0; }
 .car.blue { background-image:url(../images/car_blue.png); }
 .car.black { background-image:url(../images/car_black.png); }
 .car.yellow { background-image:url(../images/car_yellow.png); }
+.car.orange { background-image:url(../images/car_orange.png); }
+.car.green { background-image:url(../images/car_green.png); }
 .car.horizontal.right { -webkit-transform:rotate(90deg); -webkit-transform-origin:0 0; }
 .car.horizontal.left { -webkit-transform:rotate(-90deg); -webkit-transform-origin:100% 0%;}
 .car.vertical.left { -webkit-transform:rotate(180deg); }
