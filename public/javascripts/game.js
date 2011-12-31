@@ -12,7 +12,7 @@ Game = {
   max_frustration : 250,
   enable_frustration : true,
   maker_freq  : 3000,
-  max_cars_per_street : 1,
+  max_cars_per_street : 15,
 
   initialize : function(auto_start){
     
@@ -829,7 +829,7 @@ var Car = function(car_hash){
       //console.log('driving to', self.destinations.left-self.dom.height(), self.dom.offset().left);
       if (self.has_arrived()) {
         
-        console.log('arrived!');
+        // console.log('arrived!');
         self.dom.stopTime('driving').remove();
         self.arrived();
         
