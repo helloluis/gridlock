@@ -10,8 +10,9 @@ Game = {
   barriers    : [],
   frustration : 0,
   max_frustration : 250,
+  enable_frustration : true,
   maker_freq  : 3000,
-  max_cars_per_street : 15,
+  max_cars_per_street : 1,
 
   initialize : function(auto_start){
     
@@ -33,6 +34,11 @@ Game = {
       Game.start();
     }
 
+  },
+
+  //TODO
+  initialize_parameters : function(){
+    document.location.hash.indexOf('nofrustration');
   },
 
   initialize_containers : function(){
@@ -415,30 +421,36 @@ var Street = function(){
 
 };
 
-var Car = function(){
+var Car = function(car_hash){
   
-  this.width           = 15;
-  this.height          = 35;
-  this.street          = false;
-  this.moving          = false;
-  this.frustration     = 0;
-  this.speed           = 60; // pixels per second
-  this.polling_rate    = 60;
-  this.at_intersection = false;
-  this.on_street       = false;
-  this.orientation     = 'horizontal';
-  this.lefthand        = false;
-  this.origins         = {};
-  this.destinations    = {};
-  this.travel_time     = 0; 
+  this.width                 = car_hash && car_hash.width ?  car_hash.width  : 15;
+  this.height                = car_hash && car_hash.height ? car_hash.height : 35;
+  this.color                 = car_hash && car_hash.colors ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
+  this.street                = false;
+  this.moving                = false;
+  this.frustration           = 0;
+  this.frustrates_by         = car_hash && car_hash.frustrates_by ? car_hash.frustrates_by : 1; // rate of frustration
+  this.frustration_checks    = 0;
+  this.frustration_threshold = 3;
+  this.frustration_level1    = 4;
+  this.frustration_level2    = 5;
+  this.speed                 = 60; // pixels per second
+  this.polling_rate          = 60;
+  this.at_intersection       = false;
+  this.on_street             = false;
+  this.orientation           = 'horizontal';
+  this.lefthand              = false;
+  this.origins               = {};
+  this.destinations          = {};
+  this.travel_time           = 0; 
   // travel time is the time in seconds it would take the car to travel from 
   // origin to destination, assuming the road was completely open, multiplied by 2.
   // the closer we approach the travel_time, the more frustrated the car driver becomes.
 
-  this.initialize = function(name, game, street, orientation){
+  this.initialize = function(name, street, orientation){
     
     this.name         = name;
-    this.game         = game;
+    this.game         = Game;
     this.street       = street;
     this.orientation  = orientation;
     this.lefthand     = street.lefthand;
@@ -530,16 +542,22 @@ var Car = function(){
     var self = this;
     
     self.dom.everyTime( (self.travel_time/5)*1000, 'frustrating', function(){
-      self.frustration+=1;
-      Game.frustration+=1;
-      if (self.frustration == 4) {
+      
+      self.frustration_checks+=1;
+      
+      if (self.frustration_checks>self.frustration_threshold) {
+        self.frustration+=self.frustrates_by;
+        Game.frustration+=self.frustrates_by;  
+      }
+
+      if (self.frustration == self.frustration_level1) {
         self.dom.addClass('frustrated');
         self.add_frustration_cloud();
         if (Game.with_sounds) {
           Game.sounds.honk1.play();  
         }
         
-      } else if (self.frustration >= 5) {
+      } else if (self.frustration >= self.frustration_level2) {
         self.dom.addClass('very_frustrated');
         self.add_frustration_cloud(true);
         if (Game.with_sounds) {
@@ -583,7 +601,7 @@ var Car = function(){
         speed    = (this.orientation=='horizontal' ? Game.map.width() : Game.map.height())/this.speed;
     
     self.dom = $("<div class='car'></div>").
-      addClass([this.orientation, this.street.name, this.lefthand ? 'left' : 'right'].join(' ')).
+      addClass([this.orientation, this.street.name, this.color, this.lefthand ? 'left' : 'right'].join(' ')).
       attr({ 'data-name' : this.name, 'data-speed' : this.speed, 'data-stopped' : false }).
       appendTo(Game.cars).
       css({ top: self.origins.top, left : self.origins.left });
@@ -675,6 +693,7 @@ var Car = function(){
         self2 = [off.top,  off.top + this.dom.height()];
     
     if (intersection = this.is_at_intersection(self1, self2)) {
+      //console.log('intersecting', intersection);
       if (collision = this.is_colliding_at_intersection(intersection, self1, self2)){
         return collision;
       }
@@ -730,6 +749,7 @@ var Car = function(){
 
   this.is_at_intersection = function(self1, self2) {
     if (this.street.intersections.length) {
+      //console.log('intersections',this.street.intersections);
       var offset = this.dom.offset();
       for (var i=0; i<this.street.intersections.length; i++) {
         var intersection = this.street.intersections[i];
@@ -743,8 +763,7 @@ var Car = function(){
             this.dom.addClass('intersecting ' + intersection.css);
             return intersection.css; 
           } else {
-            this.dom.removeClass('intersecting ' + intersection.css);
-            return false;  
+            this.dom.removeClass('intersecting ' + intersection.css);  
           }
       }
     }
@@ -865,6 +884,15 @@ var Maker = function(){
     self.frequency  = Game.maker_freq; //+(Math.random()*5000);
     self.max_cars   = Game.max_cars_per_street;
     self.iterations = 0;
+    self.car_types  = {
+      car         : { width : 15, height : 35, frustrates_by : 1,
+          colors  : [ 'blue', 'yellow' ]
+      },
+      van         : { width : 15, height : 45, frustrates_by : 1 },
+      bus         : { width : 15, height : 65, frustrates_by : 1.5 },
+      ambulance   : { width : 15, height : 45, frustrates_by : 2 }
+    };
+    self.car_odds = { 'van' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
 
     //debugger;
 
@@ -880,20 +908,37 @@ var Maker = function(){
 
   };
 
+  this.generate = function(){
+    var self = this,
+        rand = Math.random();
+    
+    if (rand < self.car_odds.ambulance) {
+      return self.car_types.ambulance;
+    } else if (rand < self.car_odds.bus) {
+      return self.car_types.bus;
+    } else if (rand < self.car_odds.van) {
+      return self.car_types.van;
+    } else {
+      return self.car_types.car;
+    }
+    
+  };
+
   this.make = function(){
     
-    var self = this,
-    num_cars = 1;
-
-    //var num_cars = Math.ceil(Math.random()*self.iterations);
-    //if (num_cars < 1) { num_cars = 1; }
+    var self     = this,
+        num_cars = 1;
 
     if (Math.random() > 0.5 && $(".car." + self.street.name).length < self.max_cars) {
       self.iterations+=1;
       for (var i=0; i < num_cars; i++) {
-        var car  = new Car(),
-            name = [self.street.name, self.iterations, i].join("-");
-        car.initialize(name, self.game, self.street, self.street.orientation);
+        
+        var car_hash = self.generate(),
+            car      = new Car(car_hash),
+            name     = [self.street.name, self.iterations, i].join("-");
+
+        car.initialize(name, self.street, self.street.orientation);
+
         self.street.cars.push( car ); 
       }
     }

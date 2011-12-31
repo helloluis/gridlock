@@ -87,14 +87,22 @@ a, #intro p strong { color:#fc0; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
-.car { top:10px; left:10px; width:15px; height:35px; background-color:#900; background-repeat:no-repeat; }
-.van { width:15px; height: 45px; }
-.truck { width:15px; height: 60px; }
-.car.horizontal { width:35px; height:15px; }
+.car { top:10px; left:10px; width:15px; height:35px; background-repeat:no-repeat; }
+.van { width:15px; height: 45px; background-color:#fc0; }
+.bus { width:15px; height: 60px; background-color:#369; }
+.ambulance { width:15px; height:45px; background-color:#900; }
+.car.blue { background-image:url(../images/car_blue.png); }
+.car.yellow { background-image:url(../images/car_yellow.png); }
+.car.horizontal.right { -webkit-transform:rotate(90deg); -webkit-transform-origin:0 0; }
+.car.horizontal.left { -webkit-transform:rotate(-90deg); -webkit-transform-origin:100% 0%;}
+.car.vertical.left { -webkit-transform:rotate(180deg); }
+.car.vertical.right { -webkit-transform:rotate(0deg); }
+/*.car.horizontal { width:35px; height:15px; }
 .car.vertical.right { background:url(../images/car_vertical_right_yellow.png); }
 .car.horizontal.right { background:url(../images/car_horizontal_right_yellow.png); }
 .car.vertical.left { background:url(../images/car_vertical_left_blue.png); }
 .car.horizontal.left { background:url(../images/car_horizontal_left_blue.png); }
+*/
 .intersection { width:50px; height:50px; z-index:6; }
 .stoplight { position:absolute; top:5px; left:30px; width:40px; height:40px; z-index:3; background:url(../images/control_horizontal.png); opacity:0.5;}
 .stoplight:hover{opacity:1.0;cursor:pointer;}
