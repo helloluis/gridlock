@@ -1,19 +1,23 @@
 Game = {
 
-  wait        : 1500,
-  scores      : 0,
-  started     : false,
-  paused      : true,
-  ended       : false,
-  with_sound  : false,
-  sounds      : {},
-  streets     : [],
-  barriers    : [],
-  frustration : 0,
+  wait            : 1500,
+  scores          : 0,
+  started         : false,
+  paused          : true,
+  ended           : false,
+  with_sound      : false,
+  sounds          : {},
+  streets         : [],
+  barriers        : [],
+  frustration     : 0,
   max_frustration : 100,
   enable_frustration : true,
-  maker_freq  : 3000,
+  maker_freq      : 3000,
   max_cars_per_street : 15,
+  db_name         : "gridlock",
+  high_score      : 0,
+  high_score_key  : "high_score",
+  high_score_key_full : ["gridlock", "high_score"].join("_"),
 
   initialize : function(auto_start){
     
@@ -31,6 +35,8 @@ Game = {
     
     Game.initialize_controls();
 
+    Game.initialize_high_score();
+
     if (auto_start===true) {
       Game.start();
     }
@@ -43,15 +49,16 @@ Game = {
   },
 
   initialize_containers : function(){
-    Game.intro        = $("#intro");
-    Game.main         = $("#game");
-    Game.map          = $("#map");
-    Game.cars         = $("#cars");
-    Game.credits      = $("#credits");
-    Game.messages     = $("#messages");
-    Game.score_cont   = $("#score");
-    Game.frus_cont    = $("#frustration");
-    Game.frus_bar     = $(".bar","#frustration");
+    Game.intro           = $("#intro");
+    Game.main            = $("#game");
+    Game.map             = $("#map");
+    Game.cars            = $("#cars");
+    Game.credits         = $("#credits");
+    Game.messages        = $("#messages");
+    Game.score_cont      = $("#score");
+    Game.frus_cont       = $("#frustration");
+    Game.frus_bar        = $(".bar","#frustration");
+    Game.high_score_cont = $("#high_score");
   },
 
   initialize_behaviours : function() {
@@ -124,9 +131,23 @@ Game = {
     //console.log(Game.barriers);
   },
 
+  initialize_high_score : function(){
+    if ($.jStorage.storageAvailable()) {
+      Game.high_score = $.jStorage.get(Game.high_score_key_full, 0);
+      Game.high_score_cont.text( Game.high_score );
+    }
+  },
+
+  store_high_score : function(new_score) {
+    if (new_score>Game.high_score) {
+      Game.high_score = new_score;
+      $.jStorage.set( Game.high_score_key_full, new_score );
+    }
+  },
+
   start : function(){
     Game.started = true;
-    Game.ended = false;
+    Game.ended   = false;
     Game.intro.hide();
     Game.main.show();
     Game.credits.hide();
@@ -304,6 +325,7 @@ Game = {
     if (!Game.ended) {
       Game.started = false;
       Game.ended = true;
+      Game.store_high_score(Game.score);
       Game.show_message("<h1>How Frustrating!</h1><p>Final Score: " + Game.score + "</p>");
       Game.reset();  
     }
@@ -314,6 +336,7 @@ Game = {
       Game.started = false;
       Game.ended = true;
       Game.generate_explosion( exploding_car );
+      Game.store_high_score(Game.score);
       Game.show_message("<h1>Boom!</h1><p>Final Score: " + Game.score + "</p>");
       Game.reset();  
     }
