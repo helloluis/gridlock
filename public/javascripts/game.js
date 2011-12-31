@@ -10,7 +10,7 @@ Game = {
   streets     : [],
   barriers    : [],
   frustration : 0,
-  max_frustration : 250,
+  max_frustration : 100,
   enable_frustration : true,
   maker_freq  : 3000,
   max_cars_per_street : 15,
