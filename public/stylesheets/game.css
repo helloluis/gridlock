@@ -88,10 +88,11 @@ a, #intro p strong { color:#fc0; }
 #dexter { top:0px; left:650px; }
 
 .car { top:10px; left:10px; width:15px; height:35px; background-repeat:no-repeat; }
-.van { width:15px; height: 45px; background-color:#fc0; }
-.bus { width:15px; height: 60px; background-color:#369; }
-.ambulance { width:15px; height:45px; background-color:#900; }
+.van { width:15px; height: 45px; background-image:url(../images/van.png); }
+.bus { width:15px; height: 60px; background-image:url(../images/bus.png); }
+.ambulance { width:15px; height:45px; background-image:url(../images/ambulance.png); }
 .car.blue { background-image:url(../images/car_blue.png); }
+.car.black { background-image:url(../images/car_black.png); }
 .car.yellow { background-image:url(../images/car_yellow.png); }
 .car.horizontal.right { -webkit-transform:rotate(90deg); -webkit-transform-origin:0 0; }
 .car.horizontal.left { -webkit-transform:rotate(-90deg); -webkit-transform-origin:100% 0%;}

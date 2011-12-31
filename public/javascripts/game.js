@@ -426,6 +426,7 @@ var Car = function(car_hash){
   this.width                 = car_hash && car_hash.width ?  car_hash.width  : 15;
   this.height                = car_hash && car_hash.height ? car_hash.height : 35;
   this.color                 = car_hash && car_hash.colors ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
+  this.type                  = car_hash && car_hash.type ? car_hash.type : 'car';
   this.street                = false;
   this.moving                = false;
   this.frustration           = 0;
@@ -488,8 +489,8 @@ var Car = function(car_hash){
   this.initialize_origins = function(){
     if (this.orientation == 'horizontal') {
       
-      var a1 = this.street.dom.offset().left - 100,
-          a2 = Game.map.width() + 100;
+      var a1 = this.street.dom.offset().left - 50,
+          a2 = Game.map.width() + 50;
 
       if (this.street.lanes==2) {
         var b1 = this.street.dom.offset().top + 
@@ -601,7 +602,7 @@ var Car = function(car_hash){
         speed    = (this.orientation=='horizontal' ? Game.map.width() : Game.map.height())/this.speed;
     
     self.dom = $("<div class='car'></div>").
-      addClass([this.orientation, this.street.name, this.color, this.lefthand ? 'left' : 'right'].join(' ')).
+      addClass([this.type, this.orientation, this.street.name, this.color, this.lefthand ? 'left' : 'right'].join(' ')).
       attr({ 'data-name' : this.name, 'data-speed' : this.speed, 'data-stopped' : false }).
       appendTo(Game.cars).
       css({ top: self.origins.top, left : self.origins.left });
@@ -825,10 +826,10 @@ var Car = function(car_hash){
       }
     } else {
       //console.log('not colliding');
-      //console.log('arrived at', self.destinations.left, self.dom.offset().left);
+      //console.log('driving to', self.destinations.left-self.dom.height(), self.dom.offset().left);
       if (self.has_arrived()) {
         
-        //console.log('arrived!');
+        console.log('arrived!');
         self.dom.stopTime('driving').remove();
         self.arrived();
         
@@ -850,7 +851,7 @@ var Car = function(car_hash){
       if (self.lefthand){ 
         return self.dom.offset().left <= self.destinations.left;
       } else {
-        return self.destinations.left <= self.dom.offset().left;
+        return self.destinations.left - self.dom.height() <= self.dom.offset().left;
       }
     } else {
       if (self.lefthand) {
@@ -885,12 +886,12 @@ var Maker = function(){
     self.max_cars   = Game.max_cars_per_street;
     self.iterations = 0;
     self.car_types  = {
-      car         : { width : 15, height : 35, frustrates_by : 1,
-          colors  : [ 'blue', 'yellow' ]
+      car         : { type : 'car', width : 15, height : 35, frustrates_by : 1,
+          colors  : [ 'blue', 'yellow', 'black' ]
       },
-      van         : { width : 15, height : 45, frustrates_by : 1 },
-      bus         : { width : 15, height : 65, frustrates_by : 1.5 },
-      ambulance   : { width : 15, height : 45, frustrates_by : 2 }
+      van         : { type : 'van', width : 15, height : 45, frustrates_by : 1 },
+      bus         : { type : 'bus', width : 15, height : 65, frustrates_by : 1.5 },
+      ambulance   : { type : 'ambulance', width : 15, height : 45, frustrates_by : 2 }
     };
     self.car_odds = { 'van' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
 
