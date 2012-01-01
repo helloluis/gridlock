@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon-l.png" />
   <link rel="shortcut icon" href="images/apple-touch-icon-l.png" />
 
-  <title>Gridlock | A Traffic Control game by @ryansumo &amp; @helloluis</title>
+  <title>Traffix!</title>
   
   <script src="javascripts/jquery-1.6.2.min.js"></script>
   <script src="javascripts/jquery-ui-1.8.16.custom.min.js"></script>
@@ -35,21 +35,40 @@
 
 <div id="intro" class="screen">
   <div class="screen_inner">
-    
+    <h1>Traffix!</h1>
+    <div class="help">
+      <div class="help_illustration help_illustration_intersection">show intersection</div>
+      <div class="help_illustration help_illustration_frustration">show frustration</div>
+      <p>Fix that traffic problem by managing busy intersections! Don't let the drivers get too frustrated!</p>
+    </div>
     <h2 class="bttn start_game">Play!</h2>
+    <h3 class="bttn credits">Credits</h3>
+    <h3 class="bttn leaderboards">Leaderboards</h3>
+    <div class="high_score_cont">
+      <label>High Score</label> 
+      <h3 class="high_score">0</h3>
+    </div>
   </div>
 </div>
 
-<div id="game" class="screen">
+<div id="leaderboards" class="screen" style="display:none">
+  <div class="screen_inner">
+    <h1>Leaderboards</h1>
+    <p>Coming Soon!</p>
+    <h2 class="bttn intro">Back to Home</h2>
+  </div>
+</div>
+
+<div id="game" class="screen" style="display:none">
   
-  <div class="pause">Pause</div>
-  <div class="quit">Quit</div>
-  <div class="restart">Try Again</div>
+  <div class="bttn pause">Pause</div>
+  <div class="bttn quit">Quit</div>
+  <div class="bttn restart">Try Again</div>
 
   <div id="messages"></div>
 
   <div id="score" title="Score">0</div>
-  <div id="high_score" title="High Score">0</div>
+  <div id="high_score" class="high_score" title="High Score">0</div>
 
   <div id="map">
     <div class="neighborhood"></div>
@@ -135,11 +154,17 @@
   
 </div>
 
-<div id="credits" class="screen"></div>
+<div id="credits" class="screen">
+  <div class="screen_inner">
+    <h1>Credits</h1>
+    <p>A traffic control game by Ryan Sumo (<a href="http://twitter.com/ryansumo">@ryansumo</a>) and Luis Buenaventura (<a href="http://twitter.com/helloluis">@helloluis</a>).</p>
+    <h2 class="bttn intro">Back to Home</h2>
+  </div>
+</div>
 
   <script>
     $(function(){
-      Game.initialize(true);
+      Game.initialize();
     });
   </script>
 

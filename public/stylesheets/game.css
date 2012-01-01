@@ -30,20 +30,34 @@ blockquote:before, blockquote:after,
 q:before, q:after { content: ''; content: none; }
 table { border-collapse: collapse; border-spacing: 0; }
 
-h1, h2, p { color:#fff; margin-bottom:0.5em;}
+h1, h2, p { color:#333; margin-bottom:0.5em;}
 h1 { font-size:48px; font-family: Helvetica, sans-serif; }
 h2 { font-size:24px; font-family: Times, sans-serif; margin-bottom:20px; }
 p { line-height:1.5; font-family: Times, sans-serif; }
 em { font-style:italic; }
 
-.screen { position:absolute; top:0; left:0; width:1024px; height:758px; display:none; overflow:hidden; }
-.screen_inner { margin:5% auto; width:80%; background:rgba(0,0,0,0.8); border-radius:10px; box-shadow:0 0 15px #000; padding:30px; border:2px dashed #fff; }
+.screen { position:absolute; top:0; left:0; width:1024px; height:758px; display:none; overflow:hidden; background:#6f3 url(../images/bg.jpg); }
+.screen_inner { position:absolute; top:10%; bottom:10%; left:10%; right:10%; width:70%; height:70%; background:#fff; border-radius:10px; box-shadow:0 0 15px #000; padding:5%; border:2px dashed #fff; }
 
 #intro { display:block; }
+#intro h1 { width:400px; text-align:center; }
 a, #intro p strong { color:#fc0; }
-#intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; }
+#intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; position:absolute; }
 #intro blockquote { font-size:18px; padding:10px 20px; }
-.bttn.start_game { width:200px; height:30px; padding:10px; margin-top:10px; border:2px solid #fff; margin:0 auto; text-align:center; border-radius: 10px; }
+#intro h3 { padding:10px 0px; font-size:24px; }
+#intro .high_score_cont { position:absolute; top:270px; left:50px; }
+.help p { font-size:24px; width:400px; }
+.help_illustration { position:absolute; right:0px; top:0px; width:250px; height:250px; border:10px solid #fff; -webkit-transform:rotate(10deg); background:#000; box-shadow:0 0 15px #000; color:#fff; }
+.help_illustration_frustration { top:260px; right:120px; -webkit-transform:rotate(-5deg); }
+.bttn { z-index:8; position:absolute; }
+
+.bttn.start_game, .bttn.restart { height:30px; padding:10px; margin-top:10px; border:2px solid #666; margin:0 auto; text-align:center; border-radius: 10px; }
+.bttn.start_game { bottom:150px; left:50px; }
+.bttn.credits, .bttn.leaderboards { font-size:16px; }
+.bttn.credits { bottom:30px; }
+.bttn.leaderboards { bottom:30px; right:30px; }
+.bttn.pause, .bttn.quit { top:20px; left :20px; }
+.bttn.quit { left: 100px; }
 .bttn.disabled { opacity:0.5; }
 
 .barrier { position:absolute; background:#fff; width:10px; height:50%; display:block; opacity:0; }

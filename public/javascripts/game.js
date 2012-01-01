@@ -50,6 +50,7 @@ Game = {
 
   initialize_containers : function(){
     Game.intro           = $("#intro");
+    Game.leaderboards    = $("#leaderboards");
     Game.main            = $("#game");
     Game.map             = $("#map");
     Game.cars            = $("#cars");
@@ -58,7 +59,7 @@ Game = {
     Game.score_cont      = $("#score");
     Game.frus_cont       = $("#frustration");
     Game.frus_bar        = $(".bar","#frustration");
-    Game.high_score_cont = $("#high_score");
+    Game.high_score_cont = $(".high_score");
   },
 
   initialize_behaviours : function() {
@@ -101,6 +102,23 @@ Game = {
       }
     });
 
+    $(".bttn.credits").click(function(){
+      if (!$(this).hasClass('disabled')) {
+        Game.show_credits();  
+      }
+    });
+
+    $(".bttn.leaderboards").click(function(){
+      if (!$(this).hasClass('disabled')) {
+        Game.show_leaderboards();  
+      }
+    });
+
+    $(".bttn.intro").click(function(){
+      if (!$(this).hasClass('disabled')) {
+        Game.show_intro();  
+      }
+    });
   },
 
   initialize_streets : function(){
@@ -145,10 +163,33 @@ Game = {
     }
   },
 
+  show_intro : function() {
+    Game.intro.show();
+    Game.credits.hide();
+    Game.leaderboards.hide();
+    Game.main.hide();
+  },
+
+  show_credits : function() {
+    Game.intro.hide();
+    Game.credits.show();
+    Game.leaderboards.hide();
+    Game.main.hide();
+  },
+
+  show_leaderboards : function(){
+    Game.intro.hide();
+    Game.credits.hide();
+    Game.leaderboards.show();
+    Game.main.hide();
+  },
+
   start : function(){
     Game.started = true;
     Game.ended   = false;
     Game.intro.hide();
+    Game.credits.hide();
+    Game.leaderboards.hide();
     Game.main.show();
     Game.credits.hide();
     Game.start_countdown();
@@ -210,31 +251,31 @@ Game = {
   start_countdown : function() {
     
     //temporary
-    Game.messages.hide();
-    Game.start_streets();
-    $(".pause, .quit").removeClass('disabled');
+    //Game.messages.hide();
+    //Game.start_streets();
+    //$(".pause, .quit").removeClass('disabled');
 
-    // var int = 3;
-    // Game.messages.show();
+    var int = 3;
+    Game.messages.show();
 
-    // Game.main.everyTime(1000,'countdown',function(){
+    Game.main.everyTime(1000,'countdown',function(){
       
-    //   Game.messages.html("<h1 class='countdown'>" + int + "<h1>");
+      Game.messages.html("<h1 class='countdown'>" + int + "<h1>");
       
-    //   if (int==0){
-    //     $(".countdown").text("GO!");
-    //   }
+      if (int==0){
+        $(".countdown").text("GO!");
+      }
 
-    //   if (int==-1) {
-    //     $(this).stopTime('countdown');
-    //     Game.messages.hide();
-    //     Game.start_streets();
-    //     $(".pause, .quit").removeClass('disabled');
-    //   } 
+      if (int==-1) {
+        $(this).stopTime('countdown');
+        Game.messages.hide();
+        Game.start_streets();
+        $(".pause, .quit").removeClass('disabled');
+      } 
 
-    //   int-=1;
+      int-=1;
       
-    // });
+    });
   },
 
   reset : function(return_to_intro){
