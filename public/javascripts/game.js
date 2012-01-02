@@ -13,7 +13,7 @@ Game = {
   max_frustration : 100,
   enable_frustration : true,
   maker_freq      : 3000,
-  max_cars_per_street : 15,
+  max_cars_per_street : 10,
   db_name         : "gridlock",
   high_score      : 0,
   high_score_key  : "high_score",
@@ -21,7 +21,7 @@ Game = {
 
   initialize : function(auto_start){
     
-    jQuery.fx.interval = 42;
+    jQuery.fx.interval = 50;
 
     Game.initialize_containers();
     
@@ -72,6 +72,7 @@ Game = {
     Game.score = 0;
     Game.score_cont.text('0');
     Game.initialize_frustration();
+    Game.initialize_high_score();
 
     $(".restart").hide();
     $(".pause, .quit").addClass('disabled');
@@ -230,6 +231,7 @@ Game = {
 
   quit : function() {
     Game.reset();
+    Game.show_intro();
   },
 
   // if passed a callback, will delay for X seconds, then run it
@@ -256,7 +258,7 @@ Game = {
     //$(".pause, .quit").removeClass('disabled');
 
     var int = 3;
-    Game.messages.show();
+    Game.messages.css({ display : 'block', opacity : 1 });
 
     Game.main.everyTime(1000,'countdown',function(){
       
@@ -677,7 +679,7 @@ var Car = function(car_hash){
     
     self.dom = $("<div class='car'></div>").
       addClass([this.type, this.orientation, this.street.name, this.color, this.lefthand ? 'left' : 'right'].join(' ')).
-      attr({ 'data-name' : this.name, 'data-speed' : this.speed, 'data-stopped' : false }).
+      attr({ 'data-name' : this.name }).
       appendTo(Game.cars).
       css({ top: self.origins.top, left : self.origins.left });
 
@@ -707,7 +709,6 @@ var Car = function(car_hash){
     }, {duration : speed, easing : 'linear'});
 
     self.moving = true;
-    self.dom.attr('data-stopped', false);
     self.remove_frustration_cloud();
   };
 
@@ -734,7 +735,6 @@ var Car = function(car_hash){
   this.stop = function(){
 
     this.dom.stop();
-    this.dom.attr('data-stopped',true);
     this.moving = false;
     
     // if the car is stopped at a light, we restart the polling, but slower this time  
@@ -764,8 +764,8 @@ var Car = function(car_hash){
   this.is_colliding = function(){
     
     var off   = this.dom.offset(),
-        self1 = [off.left, off.left + (this.orientation=='horizontal' ? this.dom.height() : this.dom.width())],
-        self2 = [off.top,  off.top + (this.orientation=='horizontal' ? this.dom.height() : this.dom.height())];
+        self1 = [off.left, off.left + (this.orientation=='horizontal' ? this.height : this.width)],
+        self2 = [off.top,  off.top + (this.orientation=='horizontal' ? this.width : this.height)];
     
     if (intersection = this.is_at_intersection(self1, self2)) {
       //console.log('intersecting', intersection);
@@ -847,14 +847,14 @@ var Car = function(car_hash){
   this.is_colliding_at_intersection = function(intersection, self1, self2) {
     var self = this;
     var classes = intersection.split(' ');
-    classes.push('intersecting')
+    classes.push('intersecting');
     classes.push(this.orientation=='horizontal' ? 'vertical' : 'horizontal');
-    
+
     var potential_collisions = $("." + classes.join('.'));
     
     if (potential_collisions.length) {
       var collision = false;
-
+      //console.log(potential_collisions);
       $("." + classes.join('.')).each(function(){
         var c     = $(this),
             c_off = c.offset(),
@@ -864,8 +864,6 @@ var Car = function(car_hash){
         var horiz_match = self.compare_positions( self1, c1 ),
             vert_match  = self.compare_positions( self2, c2 );
         
-        //debugger;
-
         if (horiz_match && vert_match){
           collision = c;
         }
@@ -958,7 +956,7 @@ var Maker = function(){
     self.iterations = 0;
     self.car_types  = {
       car         : { type : 'car', width : 15, height : 35, frustrates_by : 1,
-          colors  : [ 'blue', 'yellow', 'black', 'orange', 'green' ]
+          colors  : [ 'orange' ]
       },
       van         : { type : 'van', width : 15, height : 45, frustrates_by : 1 },
       bus         : { type : 'bus', width : 15, height : 65, frustrates_by : 1.5 },
