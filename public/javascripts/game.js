@@ -1,22 +1,27 @@
 Game = {
 
-  wait            : 1500,
-  scores          : 0,
-  started         : false,
-  paused          : true,
-  ended           : false,
-  with_sound      : false,
-  sounds          : {},
-  streets         : [],
-  barriers        : [],
-  frustration     : 0,
-  max_frustration : 100,
-  enable_frustration : true,
-  maker_freq      : 3000,
+  score               : 0,
+  frustration         : 0,
+  high_score          : 0,
+
+  started             : false,
+  paused              : true,
+  ended               : false,
+  with_sound          : false,
+
+  sounds              : {},
+  
+  streets             : [],
+  barriers            : [],
+  
+  max_frustration     : 100,
+  enable_frustration  : true,
+  
+  maker_freq          : 3000,
   max_cars_per_street : 15,
-  db_name         : "gridlock",
-  high_score      : 0,
-  high_score_key  : "high_score",
+  
+  db_name             : "gridlock",
+  high_score_key      : "high_score",
   high_score_key_full : ["gridlock", "high_score"].join("_"),
 
   initialize : function(auto_start){
