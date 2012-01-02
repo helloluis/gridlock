@@ -1,5 +1,6 @@
 Game = {
 
+
   score               : 0,
   frustration         : 0,
   high_score          : 0,
@@ -18,15 +19,16 @@ Game = {
   enable_frustration  : true,
   
   maker_freq          : 3000,
-  max_cars_per_street : 15,
+  max_cars_per_street : 10,
   
   db_name             : "gridlock",
   high_score_key      : "high_score",
+
   high_score_key_full : ["gridlock", "high_score"].join("_"),
 
   initialize : function(auto_start){
     
-    jQuery.fx.interval = 42;
+    jQuery.fx.interval = 50;
 
     Game.initialize_containers();
     
@@ -77,6 +79,7 @@ Game = {
     Game.score = 0;
     Game.score_cont.text('0');
     Game.initialize_frustration();
+    Game.initialize_high_score();
 
     $(".restart").hide();
     $(".pause, .quit").addClass('disabled');
@@ -235,6 +238,7 @@ Game = {
 
   quit : function() {
     Game.reset();
+    Game.show_intro();
   },
 
   // if passed a callback, will delay for X seconds, then run it
@@ -261,7 +265,7 @@ Game = {
     //$(".pause, .quit").removeClass('disabled');
 
     var int = 3;
-    Game.messages.show();
+    Game.messages.css({ display : 'block', opacity : 1 });
 
     Game.main.everyTime(1000,'countdown',function(){
       
@@ -273,9 +277,11 @@ Game = {
 
       if (int==-1) {
         $(this).stopTime('countdown');
+        Game.started = true;
         Game.messages.hide();
         Game.start_streets();
         $(".pause, .quit").removeClass('disabled');
+        console.log(Game.started);
       } 
 
       int-=1;
@@ -329,6 +335,7 @@ Game = {
 
   initialize_controls : function(){
     $(".stoplight").each(function(){
+      
       var self          = $(this),
           intersection  = $(this).parents(".intersection").attr('data-streets');
       
@@ -530,6 +537,8 @@ var Car = function(car_hash){
     this.orientation  = orientation;
     this.lefthand     = street.lefthand;
 
+    this.flip_dimensions(this.width, this.height);
+
     this.initialize_speed();
     this.initialize_origins(); 
     this.render();
@@ -545,18 +554,22 @@ var Car = function(car_hash){
       var myindex     = other_cars.length,
           leader      = $(other_cars.get( myindex-1 ));
 
-      this.leaders    = [[  leader, 
-                            leader.hasClass('horizontal') ? leader.height() : leader.width(), 
-                            leader.hasClass('horizontal') ? leader.width() : leader.height() ]];
-      // console.log(this.leaders[0].attr('data-name'));
-      // if (other_cars.length>1){
-      //   this.leaders.push($(other_cars.get( myindex-2 )));      
-      // }
+      this.leaders    = [[  leader, leader.width(), leader.height() ]];
+      // this.leaders    = [[  leader, 
+      //                       leader.hasClass('horizontal') ? leader.height() : leader.width(), 
+      //                       leader.hasClass('horizontal') ? leader.width() : leader.height() ]];
       
     } else {
       this.leaders    = false;
     }
 
+  };
+
+  this.flip_dimensions = function(w, h){
+    if (this.orientation=='horizontal') {
+      this.width = h;
+      this.heigth = w;
+    }
   };
 
   this.initialize_speed = function(){
@@ -567,14 +580,8 @@ var Car = function(car_hash){
     if (this.orientation == 'horizontal') {
       
       var a1 = this.street.dom.offset().left - 100,
-          a2 = Game.map.width() + 50;
-
-      if (this.street.lanes==2) {
-        var b1 = this.street.dom.offset().top + 
-            (Math.random() > 0.5 ? 0 : (this.street.dom.height()/2)) + this.street.gap;
-      } else {
-        var b1 = this.street.dom.offset().top + this.street.gap;
-      }
+          a2 = Game.map.width() + 50,
+          b1 = this.street.dom.offset().top + this.street.gap + (Math.random() > 0.5 ? -1 : 1);
 
       if (this.lefthand) {
         this.origins.left = a2;
@@ -591,13 +598,8 @@ var Car = function(car_hash){
     } else {
 
       var a1 = this.street.dom.offset().top - 100,
-          a2 = Game.map.height() + 100;
-
-      if (this.street.lanes==2) {
-        var b1 = this.street.dom.offset().left + (Math.random() > 0.5 ? 0 : (this.street.width/2)) + this.street.gap;
-      } else {
-        var b1 = this.street.dom.offset().left + this.street.gap;
-      }
+          a2 = Game.map.height() + 100,
+          b1 = this.street.dom.offset().left + this.street.gap + (Math.random() > 0.5 ? -1 : 1);
 
       if (this.lefthand) {
         this.origins.top = a1;
@@ -682,7 +684,7 @@ var Car = function(car_hash){
     
     self.dom = $("<div class='car'></div>").
       addClass([this.type, this.orientation, this.street.name, this.color, this.lefthand ? 'left' : 'right'].join(' ')).
-      attr({ 'data-name' : this.name, 'data-speed' : this.speed, 'data-stopped' : false }).
+      attr({ 'data-name' : this.name }).
       appendTo(Game.cars).
       css({ top: self.origins.top, left : self.origins.left });
 
@@ -712,7 +714,6 @@ var Car = function(car_hash){
     }, {duration : speed, easing : 'linear'});
 
     self.moving = true;
-    self.dom.attr('data-stopped', false);
     self.remove_frustration_cloud();
   };
 
@@ -739,7 +740,6 @@ var Car = function(car_hash){
   this.stop = function(){
 
     this.dom.stop();
-    this.dom.attr('data-stopped',true);
     this.moving = false;
     
     // if the car is stopped at a light, we restart the polling, but slower this time  
@@ -769,8 +769,10 @@ var Car = function(car_hash){
   this.is_colliding = function(){
     
     var off   = this.dom.offset(),
-        self1 = [off.left, off.left + (this.orientation=='horizontal' ? this.dom.height() : this.dom.width())],
-        self2 = [off.top,  off.top + (this.orientation=='horizontal' ? this.dom.height() : this.dom.height())];
+        self1 = [off.left, off.left + this.width],
+        self2 = [off.top,  off.top + this.height];
+        // self1 = [off.left, off.left + (this.orientation=='horizontal' ? this.height : this.width)],
+        // self2 = [off.top,  off.top + (this.orientation=='horizontal' ? this.width : this.height)];
     
     if (intersection = this.is_at_intersection(self1, self2)) {
       //console.log('intersecting', intersection);
@@ -852,14 +854,14 @@ var Car = function(car_hash){
   this.is_colliding_at_intersection = function(intersection, self1, self2) {
     var self = this;
     var classes = intersection.split(' ');
-    classes.push('intersecting')
+    classes.push('intersecting');
     classes.push(this.orientation=='horizontal' ? 'vertical' : 'horizontal');
-    
+
     var potential_collisions = $("." + classes.join('.'));
     
     if (potential_collisions.length) {
       var collision = false;
-
+      //console.log(potential_collisions);
       $("." + classes.join('.')).each(function(){
         var c     = $(this),
             c_off = c.offset(),
@@ -869,8 +871,6 @@ var Car = function(car_hash){
         var horiz_match = self.compare_positions( self1, c1 ),
             vert_match  = self.compare_positions( self2, c2 );
         
-        //debugger;
-
         if (horiz_match && vert_match){
           collision = c;
         }
@@ -963,7 +963,7 @@ var Maker = function(){
     self.iterations = 0;
     self.car_types  = {
       car         : { type : 'car', width : 15, height : 35, frustrates_by : 1,
-          colors  : [ 'blue', 'yellow', 'black', 'orange', 'green' ]
+          colors  : [ 'orange' ]
       },
       van         : { type : 'van', width : 15, height : 45, frustrates_by : 1 },
       bus         : { type : 'bus', width : 15, height : 65, frustrates_by : 1.5 },
