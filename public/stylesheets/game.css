@@ -90,8 +90,8 @@ a, #intro p strong { color:#fc0; }
 .street.horizontal .right { top:49%; }
 .street.vertical .right { left:51%; }
 .street .lane { position:absolute; }
-.street.horizontal .lane { width:100%; height:50%; }
-.street.horizontal .lane2 { top:50%; }
+.street.horizontal .lane { width:100%; height:48%; }
+.street.horizontal .lane2 { top:48%; }
 .street.vertical .lane { width:50%; height:100%; }
 .street.vertical .lane2 { left:50%; }
 #cars { z-index:5; position:absolute; top:0px; left:0px; width:100%; height:100%; }
@@ -102,7 +102,7 @@ a, #intro p strong { color:#fc0; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
-.car { top:10px; left:10px; width:15px; height:35px; background-repeat:no-repeat; background-image:url(../images/car_orange.png); }
+.car { top:5px; left:10px; width:15px; height:35px; background-repeat:no-repeat; background-image:url(../images/car_orange.png); }
 .van { width:15px; height: 45px; background-image:url(../images/van.png); }
 .bus { width:15px; height: 60px; background-image:url(../images/bus.png); }
 .ambulance { width:15px; height:45px; background-image:url(../images/ambulance.png); }
@@ -112,12 +112,16 @@ a, #intro p strong { color:#fc0; }
 .car.orange { background-image:url(../images/car_orange.png); }
 .car.green { background-image:url(../images/car_green.png); }*/
 .car.horizontal { width:35px; height:15px; background-image:url(../images/car_orange_horizontal.png); }
-.car.horizontal.right { -moz-transform: scaleX(-1); -o-transform: scaleX(-1); -webkit-transform: scaleX(-1);transform: scaleX(-1); }
-.car.horizontal.left { -webkit-transform:rotate(0deg); }
-.car.vertical.left { -webkit-transform:rotate(0deg); }
-.car.vertical.right { -webkit-transform:rotate(180deg); }
-.van.vertical.right, .bus.vertical.right, .ambulance.vertical.right { -webkit-transform:rotate(0deg); }
+.car.van.horizontal { width: 45px; height:15px; background-image:url(../images/van_horizontal.png); }
+.car.ambulance.horizontal { width: 45px; height:15px; background-image:url(../images/ambulance_horizontal.png); }
+.car.bus.horizontal { width: 60px; height:15px; background-image:url(../images/bus_horizontal.png); }
+.car.horizontal.right { -moz-transform:translateZ(0) scaleX(-1); -o-transform: translateZ(0) scaleX(-1); -webkit-transform: translateZ(0) scaleX(-1);transform: translateZ(0) scaleX(-1); }
+.car.horizontal.left { -webkit-transform: translateZ(0) rotate(0deg); }
+.car.vertical.left { -webkit-transform: translateZ(0) rotate(0deg); }
+.car.vertical.right { -webkit-transform: translateZ(0) rotate(180deg); }
+/*.van.vertical.right, .bus.vertical.right, .ambulance.vertical.right { -webkit-transform:rotate(0deg); }
 .van.vertical.left, .bus.vertical.left, .ambulance.vertical.left { -webkit-transform:rotate(180deg); }
+*/
 /*.car.horizontal { width:35px; height:15px; }
 .car.vertical.right { background:url(../images/car_vertical_right_yellow.png); }
 .car.horizontal.right { background:url(../images/car_horizontal_right_yellow.png); }
@@ -125,8 +129,8 @@ a, #intro p strong { color:#fc0; }
 .car.horizontal.left { background:url(../images/car_horizontal_left_blue.png); }
 */
 .intersection { width:50px; height:50px; z-index:6; }
-.stoplight { position:absolute; top:5px; left:30px; width:40px; height:40px; z-index:3; background:url(../images/control_horizontal.png); opacity:0.5;}
-.stoplight:hover{opacity:1.0;cursor:pointer;}
+.stoplight { position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:3; background:url(../images/control_horizontal.png) no-repeat 50% 50%; opacity:0.5;}
+.stoplight:hover { opacity:1.0; cursor:pointer; }
 .stoplight.vertical { background-image:url(../images/control_vertical.png); }
 .explosion { position:absolute; z-index:8; background-image: url(../images/explosion.png); width:80px; height:80px; background-repeat:no-repeat; }
 .frustration { position:absolute; width:15px; height:15px; background-image: url(../images/frustration.png); z-index:9; }
@@ -140,10 +144,14 @@ a, #intro p strong { color:#fc0; }
 .stoplight .light.vertical { background-image:url(../images/control_vertical_go.png);top:0px; left:45px; }
 .stoplight .light.vertical.stopped { background-image:url(../images/control_vertical_stop.png);top:0px; left:45px; }
 */
-.intersection.big .stoplight { top:30px; }
+.intersection.big .stoplight { top:0px; }
 .intersection.amber { top:200px; height:100px; }
 .intersection.baker { top:500px; height:50px; }
 .intersection.chang { left:250px; width:100px; }
 .intersection.dexter { left:650px; width:100px; }
 
 .restart { position:absolute; top:470px; left:400px; width:200px; height:60px; font-size:36px; color:#fff; text-align:center; display:none; z-index:8; cursor:pointer; }
+
+#overlay { background:rgba(0,0,0,0.7); position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:10; }
+#overlay .overlay_inner { position:absolute; top:40%; left:30%; width:30%; padding:5% 10%; text-align:center; background:#fff; border-radius:10px; }
+#overlay .overlay_inner h1, #overlay .overlay_inner h2 { margin:0px; padding:0px; }

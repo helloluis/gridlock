@@ -1,22 +1,29 @@
 Game = {
 
-  wait            : 1500,
-  scores          : 0,
-  started         : false,
-  paused          : true,
-  ended           : false,
-  with_sound      : false,
-  sounds          : {},
-  streets         : [],
-  barriers        : [],
-  frustration     : 0,
-  max_frustration : 100,
-  enable_frustration : true,
-  maker_freq      : 3000,
+
+  score               : 0,
+  frustration         : 0,
+  high_score          : 0,
+
+  started             : false,
+  paused              : true,
+  ended               : false,
+  with_sound          : false,
+
+  sounds              : {},
+  
+  streets             : [],
+  barriers            : [],
+  
+  max_frustration     : 100,
+  enable_frustration  : true,
+  
+  maker_freq          : 3000,
   max_cars_per_street : 10,
-  db_name         : "gridlock",
-  high_score      : 0,
-  high_score_key  : "high_score",
+  
+  db_name             : "gridlock",
+  high_score_key      : "high_score",
+
   high_score_key_full : ["gridlock", "high_score"].join("_"),
 
   initialize : function(auto_start){
@@ -60,6 +67,7 @@ Game = {
     Game.frus_cont       = $("#frustration");
     Game.frus_bar        = $(".bar","#frustration");
     Game.high_score_cont = $(".high_score");
+    Game.overlay         = $("#overlay").hide();
   },
 
   initialize_behaviours : function() {
@@ -79,9 +87,10 @@ Game = {
 
   },
 
+  // phonegap function
   initialize_sounds : function() {
-    Game.sounds.honk1  = new Audio("sounds/honk_short.mp3");
-    Game.sounds.honk2  = new Audio("sounds/honk_long.mp3");
+    Game.sounds.honk1  = new Media("sounds/honk_short.mp3");
+    Game.sounds.honk2  = new Media("sounds/honk_long.mp3");
   },
 
   initialize_buttons : function(){
@@ -99,12 +108,18 @@ Game = {
     });
     
     $(".pause").click(function(){
-      if (!$(this).hasClass('disabled')) {
+      if (!$(this).hasClass('disabled') && Game.started && !Game.paused && !Game.ended) {
         Game.pause();  
       }
     });
 
-    $(".quit").click(function(){
+    $(".resume").click(function(){
+      if (!$(this).hasClass('disabled') && Game.started && Game.paused && !Game.ended) {
+        Game.resume();  
+      }
+    });
+
+     $(".quit").click(function(){
       if (!$(this).hasClass('disabled')) {
         Game.quit();  
       }
@@ -194,6 +209,7 @@ Game = {
 
   start : function(){
     Game.started = true;
+    Game.paused  = true;
     Game.ended   = false;
     Game.intro.hide();
     Game.credits.hide();
@@ -234,11 +250,20 @@ Game = {
 
   pause : function(){
     Game.paused = true;
+    $("#overlay").show();
+    $(".car").pause();
+  },
+
+  resume : function() {
+    Game.paused = false;
+    $("#overlay").hide();
+    $(".car").resume();
   },
 
   quit : function() {
-    Game.reset();
-    Game.show_intro();
+    document.location.reload();
+    // Game.reset();
+    // Game.show_intro();
   },
 
   // if passed a callback, will delay for X seconds, then run it
@@ -277,7 +302,9 @@ Game = {
 
       if (int==-1) {
         $(this).stopTime('countdown');
-        Game.messages.empty().hide();
+        Game.started = true;
+        Game.paused = false;
+        Game.messages.hide();
         Game.start_streets();
         $(".pause, .quit").removeClass('disabled');
       } 
@@ -294,10 +321,6 @@ Game = {
 
     $(".restart").show();
 
-  },
-
-  resume : function() {
-    $("#overlay").remove();
   },
 
   arrived : function( car ) {
@@ -333,6 +356,7 @@ Game = {
 
   initialize_controls : function(){
     $(".stoplight").each(function(){
+      
       var self          = $(this),
           intersection  = $(this).parents(".intersection").attr('data-streets');
       
@@ -534,6 +558,8 @@ var Car = function(car_hash){
     this.orientation  = orientation;
     this.lefthand     = street.lefthand;
 
+    this.flip_dimensions(this.width, this.height);
+
     this.initialize_speed();
     this.initialize_origins(); 
     this.render();
@@ -549,18 +575,22 @@ var Car = function(car_hash){
       var myindex     = other_cars.length,
           leader      = $(other_cars.get( myindex-1 ));
 
-      this.leaders    = [[  leader, 
-                            leader.hasClass('horizontal') ? leader.height() : leader.width(), 
-                            leader.hasClass('horizontal') ? leader.width() : leader.height() ]];
-      // console.log(this.leaders[0].attr('data-name'));
-      // if (other_cars.length>1){
-      //   this.leaders.push($(other_cars.get( myindex-2 )));      
-      // }
+      this.leaders    = [[  leader, leader.width(), leader.height() ]];
+      // this.leaders    = [[  leader, 
+      //                       leader.hasClass('horizontal') ? leader.height() : leader.width(), 
+      //                       leader.hasClass('horizontal') ? leader.width() : leader.height() ]];
       
     } else {
       this.leaders    = false;
     }
 
+  };
+
+  this.flip_dimensions = function(w, h){
+    if (this.orientation=='horizontal') {
+      this.width = h;
+      this.heigth = w;
+    }
   };
 
   this.initialize_speed = function(){
@@ -571,14 +601,8 @@ var Car = function(car_hash){
     if (this.orientation == 'horizontal') {
       
       var a1 = this.street.dom.offset().left - 100,
-          a2 = Game.map.width() + 50;
-
-      if (this.street.lanes==2) {
-        var b1 = this.street.dom.offset().top + 
-            (Math.random() > 0.5 ? 0 : (this.street.dom.height()/2)) + this.street.gap;
-      } else {
-        var b1 = this.street.dom.offset().top + this.street.gap;
-      }
+          a2 = Game.map.width() + 50,
+          b1 = this.street.dom.offset().top + this.street.gap + (Math.random() > 0.5 ? -1 : 1);
 
       if (this.lefthand) {
         this.origins.left = a2;
@@ -595,13 +619,8 @@ var Car = function(car_hash){
     } else {
 
       var a1 = this.street.dom.offset().top - 100,
-          a2 = Game.map.height() + 100;
-
-      if (this.street.lanes==2) {
-        var b1 = this.street.dom.offset().left + (Math.random() > 0.5 ? 0 : (this.street.width/2)) + this.street.gap;
-      } else {
-        var b1 = this.street.dom.offset().left + this.street.gap;
-      }
+          a2 = Game.map.height() + 100,
+          b1 = this.street.dom.offset().left + this.street.gap + (Math.random() > 0.5 ? -1 : 1);
 
       if (this.lefthand) {
         this.origins.top = a1;
@@ -627,28 +646,32 @@ var Car = function(car_hash){
       stopTime('frustrating').
       everyTime( (self.travel_time/5)*1000, 'frustrating', function(){
       
-        self.frustration_checks+=1;
+        console.log('paused',Game.paused);
+        if (Game.paused!==true) {
+          self.frustration_checks+=1;
         
-        if (self.frustration_checks>self.frustration_threshold) {
-          self.frustration+=self.frustrates_by;
-          Game.frustration+=self.frustrates_by;  
-        }
+          if (self.frustration_checks>self.frustration_threshold) {
+            self.frustration+=self.frustrates_by;
+            Game.frustration+=self.frustrates_by;  
+          }
 
-        if (self.frustration == self.frustration_level1) {
-          self.dom.addClass('frustrated');
-          self.add_frustration_cloud();
-          if (Game.with_sounds) {
-            Game.sounds.honk1.play();  
+          if (self.frustration == self.frustration_level1) {
+            self.dom.addClass('frustrated');
+            self.add_frustration_cloud();
+            if (Game.with_sounds) {
+              Game.sounds.honk1.play();  
+            }
+            
+          } else if (self.frustration >= self.frustration_level2) {
+            self.dom.addClass('very_frustrated');
+            self.add_frustration_cloud(true);
+            if (Game.with_sounds) {
+              Game.sounds.honk2.play();  
+            }
+            
           }
-          
-        } else if (self.frustration >= self.frustration_level2) {
-          self.dom.addClass('very_frustrated');
-          self.add_frustration_cloud(true);
-          if (Game.with_sounds) {
-            Game.sounds.honk2.play();  
-          }
-          
         }
+        
       });
 
   };
@@ -771,8 +794,10 @@ var Car = function(car_hash){
   this.is_colliding = function(){
     
     var off   = this.dom.offset(),
-        self1 = [off.left, off.left + (this.orientation=='horizontal' ? this.height : this.width)],
-        self2 = [off.top,  off.top + (this.orientation=='horizontal' ? this.width : this.height)];
+        self1 = [off.left, off.left + this.width],
+        self2 = [off.top,  off.top + this.height];
+        // self1 = [off.left, off.left + (this.orientation=='horizontal' ? this.height : this.width)],
+        // self2 = [off.top,  off.top + (this.orientation=='horizontal' ? this.width : this.height)];
     
     if (intersection = this.is_at_intersection(self1, self2)) {
       //console.log('intersecting', intersection);
@@ -1003,23 +1028,24 @@ var Maker = function(){
 
   this.make = function(){
     
-    var self     = this,
+    if (Game.paused!==true) {
+      var self     = this,
         num_cars = 1;
 
-    if (Math.random() > 0.5 && $(".car." + self.street.name).length < self.max_cars) {
-      self.iterations+=1;
-      for (var i=0; i < num_cars; i++) {
-        
-        var car_hash = self.generate(),
-            car      = new Car(car_hash),
-            name     = [self.street.name, self.iterations, i].join("-");
+      if (Math.random() > 0.5 && $(".car." + self.street.name).length < self.max_cars) {
+        self.iterations+=1;
+        for (var i=0; i < num_cars; i++) {
+          
+          var car_hash = self.generate(),
+              car      = new Car(car_hash),
+              name     = [self.street.name, self.iterations, i].join("-");
 
-        car.initialize(name, self.street, self.street.orientation);
+          car.initialize(name, self.street, self.street.orientation);
 
-        self.street.cars.push( car ); 
+          self.street.cars.push( car ); 
+        }
       }
     }
-    
 
   };
 
