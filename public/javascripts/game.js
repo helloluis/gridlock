@@ -91,15 +91,22 @@ Game = {
     });
 
     $(".restart").click(function(){
-      Game.initialize_behaviours();
-      Game.initialize_controls();
-      Game.initialize_streets();
-      Game.start();
+      document.location.reload();
+      // Game.initialize_behaviours();
+      // Game.initialize_controls();
+      // Game.initialize_streets();
+      // Game.start();
     });
     
     $(".pause").click(function(){
       if (!$(this).hasClass('disabled')) {
         Game.pause();  
+      }
+    });
+
+    $(".quit").click(function(){
+      if (!$(this).hasClass('disabled')) {
+        Game.quit();  
       }
     });
 
@@ -270,7 +277,7 @@ Game = {
 
       if (int==-1) {
         $(this).stopTime('countdown');
-        Game.messages.hide();
+        Game.messages.empty().hide();
         Game.start_streets();
         $(".pause, .quit").removeClass('disabled');
       } 
