@@ -89,8 +89,10 @@ Game = {
 
   // phonegap function
   initialize_sounds : function() {
-    Game.sounds.honk1  = new Media("sounds/honk_short.mp3");
-    Game.sounds.honk2  = new Media("sounds/honk_long.mp3");
+    if (typeof Media!=="undefined") {
+      Game.sounds.honk1  = new Media("sounds/honk_short.mp3");
+      Game.sounds.honk2  = new Media("sounds/honk_long.mp3");  
+    }
   },
 
   initialize_buttons : function(){
@@ -987,12 +989,12 @@ var Maker = function(){
     self.max_cars   = Game.max_cars_per_street;
     self.iterations = 0;
     self.car_types  = {
-      car         : { type : 'car', width : 15, height : 35, frustrates_by : 1,
+      car         : { type : 'car', width : 15, height : 30, frustrates_by : 1,
           colors  : [ 'orange' ]
       },
-      van         : { type : 'van', width : 15, height : 45, frustrates_by : 1 },
-      bus         : { type : 'bus', width : 15, height : 65, frustrates_by : 1.5 },
-      ambulance   : { type : 'ambulance', width : 15, height : 45, frustrates_by : 2 }
+      van         : { type : 'van', width : 15, height : 40, frustrates_by : 1 },
+      bus         : { type : 'bus', width : 15, height : 55, frustrates_by : 1.5 },
+      ambulance   : { type : 'ambulance', width : 15, height : 40, frustrates_by : 2 }
     };
     self.car_odds = { 'van' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
 
