@@ -19,6 +19,7 @@
   <title>Traffix!</title>
   
   <script src="javascripts/jquery-1.7.1.min.js"></script>
+  <script src="javascripts/jquery.pause.js"></script>
   <script src="javascripts/jstorage.js"></script>
   <script src="javascripts/underscore.js"></script>
   <script src="javascripts/jquery-timers.js"></script>
@@ -58,6 +59,12 @@
 </div>
 
 <div id="game" class="screen" style="display:none">
+
+  <div id="overlay" style="display:none">
+    <div class="overlay_inner">
+      <h1>Paused</h1><h2 class="bttn resume">Resume?</h2>
+    </div>
+  </div>
   
   <div class="bttn pause">Pause</div>
   <div class="bttn quit">Quit</div>

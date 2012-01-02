@@ -67,6 +67,7 @@ Game = {
     Game.frus_cont       = $("#frustration");
     Game.frus_bar        = $(".bar","#frustration");
     Game.high_score_cont = $(".high_score");
+    Game.overlay         = $("#overlay").hide();
   },
 
   initialize_behaviours : function() {
@@ -105,8 +106,20 @@ Game = {
     });
     
     $(".pause").click(function(){
-      if (!$(this).hasClass('disabled')) {
+      if (!$(this).hasClass('disabled') && Game.started && !Game.paused && !Game.ended) {
         Game.pause();  
+      }
+    });
+
+    $(".resume").click(function(){
+      if (!$(this).hasClass('disabled') && Game.started && Game.paused && !Game.ended) {
+        Game.resume();  
+      }
+    });
+
+     $(".quit").click(function(){
+      if (!$(this).hasClass('disabled')) {
+        Game.quit();  
       }
     });
 
@@ -194,6 +207,7 @@ Game = {
 
   start : function(){
     Game.started = true;
+    Game.paused  = true;
     Game.ended   = false;
     Game.intro.hide();
     Game.credits.hide();
@@ -234,11 +248,20 @@ Game = {
 
   pause : function(){
     Game.paused = true;
+    $("#overlay").show();
+    $(".car").pause();
+  },
+
+  resume : function() {
+    Game.paused = false;
+    $("#overlay").hide();
+    $(".car").resume();
   },
 
   quit : function() {
-    Game.reset();
-    Game.show_intro();
+    document.location.reload();
+    // Game.reset();
+    // Game.show_intro();
   },
 
   // if passed a callback, will delay for X seconds, then run it
@@ -278,6 +301,7 @@ Game = {
       if (int==-1) {
         $(this).stopTime('countdown');
         Game.started = true;
+        Game.paused = false;
         Game.messages.hide();
         Game.start_streets();
         $(".pause, .quit").removeClass('disabled');
@@ -296,10 +320,6 @@ Game = {
 
     $(".restart").show();
 
-  },
-
-  resume : function() {
-    $("#overlay").remove();
   },
 
   arrived : function( car ) {
@@ -625,28 +645,32 @@ var Car = function(car_hash){
       stopTime('frustrating').
       everyTime( (self.travel_time/5)*1000, 'frustrating', function(){
       
-        self.frustration_checks+=1;
+        console.log('paused',Game.paused);
+        if (Game.paused!==true) {
+          self.frustration_checks+=1;
         
-        if (self.frustration_checks>self.frustration_threshold) {
-          self.frustration+=self.frustrates_by;
-          Game.frustration+=self.frustrates_by;  
-        }
+          if (self.frustration_checks>self.frustration_threshold) {
+            self.frustration+=self.frustrates_by;
+            Game.frustration+=self.frustrates_by;  
+          }
 
-        if (self.frustration == self.frustration_level1) {
-          self.dom.addClass('frustrated');
-          self.add_frustration_cloud();
-          if (Game.with_sounds) {
-            Game.sounds.honk1.play();  
+          if (self.frustration == self.frustration_level1) {
+            self.dom.addClass('frustrated');
+            self.add_frustration_cloud();
+            if (Game.with_sounds) {
+              Game.sounds.honk1.play();  
+            }
+            
+          } else if (self.frustration >= self.frustration_level2) {
+            self.dom.addClass('very_frustrated');
+            self.add_frustration_cloud(true);
+            if (Game.with_sounds) {
+              Game.sounds.honk2.play();  
+            }
+            
           }
-          
-        } else if (self.frustration >= self.frustration_level2) {
-          self.dom.addClass('very_frustrated');
-          self.add_frustration_cloud(true);
-          if (Game.with_sounds) {
-            Game.sounds.honk2.play();  
-          }
-          
         }
+        
       });
 
   };
@@ -1003,23 +1027,24 @@ var Maker = function(){
 
   this.make = function(){
     
-    var self     = this,
+    if (Game.paused!==true) {
+      var self     = this,
         num_cars = 1;
 
-    if (Math.random() > 0.5 && $(".car." + self.street.name).length < self.max_cars) {
-      self.iterations+=1;
-      for (var i=0; i < num_cars; i++) {
-        
-        var car_hash = self.generate(),
-            car      = new Car(car_hash),
-            name     = [self.street.name, self.iterations, i].join("-");
+      if (Math.random() > 0.5 && $(".car." + self.street.name).length < self.max_cars) {
+        self.iterations+=1;
+        for (var i=0; i < num_cars; i++) {
+          
+          var car_hash = self.generate(),
+              car      = new Car(car_hash),
+              name     = [self.street.name, self.iterations, i].join("-");
 
-        car.initialize(name, self.street, self.street.orientation);
+          car.initialize(name, self.street, self.street.orientation);
 
-        self.street.cars.push( car ); 
+          self.street.cars.push( car ); 
+        }
       }
     }
-    
 
   };
 
