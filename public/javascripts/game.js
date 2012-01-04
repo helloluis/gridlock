@@ -19,7 +19,7 @@ Game = {
   enable_frustration  : true,
   
   maker_freq          : 3000,
-  max_cars_per_street : 10,
+  max_cars_per_street : 15,
   
   db_name             : "gridlock",
   high_score_key      : "high_score",
