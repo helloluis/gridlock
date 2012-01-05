@@ -500,7 +500,7 @@ Game = {
     });
 
     if (Game.with_sound) {
-      Game.sounds.explosion.play();
+      //Game.sounds.explosion.play();
     }
   },
 
