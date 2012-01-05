@@ -11,14 +11,25 @@ Game = {
   
   with_css3_animation : true,
 
-  with_sound          : false,
-  with_phonegap_sound : false,
-  with_jplayer_sound  : false,
+  with_sound          : true,
+  with_phonegap_sound : false,   // we use the phonegap sound library for iOS
+  with_sm2_sound      : true,   // soundmanager2 is what we use for regular web presentation
 
   raw_sounds          : { 
-                honk1 : "sounds/honk_short.mp3",
-                honk2 : "sounds/honk_long.mp3" 
-                        },
+        horns_short   : [
+          "sounds/horn1.mp3",
+          "sounds/horn2.mp3",
+          "sounds/horn3.mp3",
+          "sounds/horn4.mp3" 
+        ],
+        horns_long    : [
+          "sounds/horn_long1.mp3",
+          "sounds/horn_long2.mp3"
+        ],
+        horn_truck    : "sounds/horn_truck.mp3",
+        bell          : "sounds/bell.mp3",
+        ding          : "sounds/ding.mp3"
+      },
   sounds              : {},
   
   streets             : [],
@@ -109,12 +120,36 @@ Game = {
     if (Game.with_sound){
       if (Game.with_phonegap_sound && typeof Media!=="undefined") {
 
-        _.each(Game.raw.sounds, function(key, media){
-          Game.sounds[key] = new Media(media);
+        _.each(Game.raw_sounds, function(key, media_or_arr){
+          if (typeof media_or_arr=='Array') {
+            _.each(media_or_arr, function(m){
+              Game.sounds[[key, index].join("")] = m;
+            });
+          } else {
+            Game.sounds[key] = new Media(media);  
+          }
+          
         });
         
-      } else if (Game.with_jplayer_sound) {
-        // TODO
+      } else if (Game.with_sm2_sound) {
+        
+        soundManager.onready(function() {
+          //console.log(soundManager.createSound({ id : 'horn1test', url : "sounds/horn_long1.mp3" }));
+
+          _.each(Game.raw_sounds, function(media_or_arr, key){
+            
+            if (_.isArray(media_or_arr)) {
+              _.each(media_or_arr, function(media, index){
+                var new_k = [key, index].join("");
+                var new_obj = soundManager.createSound({ id : new_k, url : media });
+                Game.sounds[new_k] = new_obj;
+              });
+            } else {
+              Game.sounds[key] = soundManager.createSound({ id : key, url : media_or_arr });
+            }
+            
+          });
+        });
 
       }
     }
@@ -321,9 +356,16 @@ Game = {
 
     Game.main.everyTime(1000,'countdown',function(){
       
+      if (Game.with_sound && int > 0) {
+        Game.sounds.bell.play();  
+      }
+
       Game.messages.html("<h1 class='countdown'>" + int + "<h1>");
       
       if (int==0){
+        if (Game.with_sound) {
+          Game.sounds.ding.play();  
+        }
         $(".countdown").text("GO!");
       }
 
@@ -456,7 +498,7 @@ Game = {
       $(this).animate({ opacity : 0 });  
     });
 
-    if (Game.with_sounds) {
+    if (Game.with_sound) {
       Game.sounds.explosion.play();
     }
   },
@@ -686,15 +728,17 @@ var Car = function(car_hash){
           if (self.frustration == self.frustration_level1) {
             self.dom.addClass('frustrated');
             self.add_frustration_cloud();
-            if (Game.with_sounds) {
-              Game.sounds.honk1.play();  
+            if (Game.with_sound && (Math.random()*3 > 2)) {
+              var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
+              Game.sounds[horn_name].play();
             }
             
           } else if (self.frustration >= self.frustration_level2) {
             self.dom.addClass('very_frustrated');
             self.add_frustration_cloud(true);
-            if (Game.with_sounds) {
-              Game.sounds.honk2.play();  
+            if (Game.with_sound) {
+              var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
+              Game.sounds[horn_name].play();
             }
             
           }
@@ -763,14 +807,14 @@ var Car = function(car_hash){
        speed = self.calculate_speed();
 
     if ( Game.with_css3_animation===true ) {
-      console.log('animating with css3');
+      //console.log('animating with css3');
       self.dom.css3animate({
         top      : self.destinations.top, 
         left     : self.destinations.left 
         }, speed);
 
     } else {
-      console.log('animating traditionally');
+      //console.log('animating traditionally');
       self.dom.animate({
           top      : self.destinations.top, 
           left     : self.destinations.left 
