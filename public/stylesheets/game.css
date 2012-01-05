@@ -105,7 +105,8 @@ a, #intro p strong { color:#fc0; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
-.car { top:5px; left:10px; width:15px; height:30px; background-repeat:no-repeat; background-image:url(../images/car_orange.png); }
+.car { top:5px; left:10px; width:20px; height:35px; background-repeat:no-repeat; background-image:url(../images/car_orange.png); }
+.jeepney { background-image:url(../images/jeepney.png); }
 .van { width:15px; height: 40px; background-image:url(../images/van.png); }
 .bus { width:15px; height: 55px; background-image:url(../images/bus.png); }
 .ambulance { width:15px; height:40px; background-image:url(../images/ambulance.png); }
@@ -114,7 +115,8 @@ a, #intro p strong { color:#fc0; }
 .car.yellow { background-image:url(../images/car_yellow.png); }
 .car.orange { background-image:url(../images/car_orange.png); }
 .car.green { background-image:url(../images/car_green.png); }*/
-.car.horizontal { width:30px; height:15px; background-image:url(../images/car_orange_horizontal.png); }
+.car.horizontal { width:35px; height:20px; background-image:url(../images/car_orange_horizontal.png); }
+.jeepney.horizontal { width:45px; height:20px; background-image:url(../images/jeepney_horizontal.png); }
 .car.van.horizontal { width: 40px; height:15px; background-image:url(../images/van_horizontal.png); }
 .car.ambulance.horizontal { width: 40px; height:15px; background-image:url(../images/ambulance_horizontal.png); }
 .car.bus.horizontal { width: 55px; height:15px; background-image:url(../images/bus_horizontal.png); }

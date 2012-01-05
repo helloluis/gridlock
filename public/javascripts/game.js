@@ -41,9 +41,10 @@ Game = {
   maker_freq          : 3000,
   max_cars_per_street : 10,
   car_types           : {
-          car         : { type : 'car', width : 15, height : 30, frustrates_by : 1,
+          car         : { type : 'car', width : 20, height : 35, frustrates_by : 1,
             colors    : [ 'orange' ]
           },
+          jeepney     : { type : 'jeepney', width : 20, height : 45, frustrates_by : 1.5 },
           van         : { type : 'van', width : 15, height : 40, frustrates_by : 1.5 },
           bus         : { type : 'bus', width : 15, height : 55, frustrates_by : 2 },
           ambulance   : { type : 'ambulance', width : 15, height : 40, frustrates_by : 5 }
@@ -728,7 +729,7 @@ var Car = function(car_hash){
           if (self.frustration == self.frustration_level1) {
             self.dom.addClass('frustrated');
             self.add_frustration_cloud();
-            if (Game.with_sound && (Math.random()*3 > 2)) {
+            if (Game.with_sound && (Math.random()*5 > 3)) {
               var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
               Game.sounds[horn_name].play();
             }
