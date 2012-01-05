@@ -60,9 +60,9 @@ animation = function($obj, cssObject, speed, callback) {
     if (!speed) {
         var speed = settings.speed;
     }
-   console.log(cssObject);
+   //console.log(cssObject);
     if (Modernizr.csstransitions) {
-        console.log('using native css-transitions');
+        //console.log('using native css-transitions');
         $obj.data("css3animate", true);
         $obj.css(browserPrefix + "transition", "all " + speed + "ms ease-in-out");
         $obj.css(cssObject);
@@ -73,7 +73,7 @@ animation = function($obj, cssObject, speed, callback) {
         });
         
     } else {  
-        console.log('falling back to jquery animation');    
+        //console.log('falling back to jquery animation');    
         $obj.animate(cssObject, speed, function(){ $.isFunction(callback) && callback($(this)); });            
     }
 };
@@ -104,10 +104,10 @@ methods = {
         }
         else
         {
-            console.log('pause');
+            //console.log('pause');
             animation($that,currentCss,1);
         }
-       console.log("stop was called");
+       //console.log("stop was called");
     });
    }
 };
