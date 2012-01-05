@@ -8,8 +8,17 @@ Game = {
   started             : false,
   paused              : true,
   ended               : false,
-  with_sound          : false,
+  
+  with_css3_animation : true,
 
+  with_sound          : false,
+  with_phonegap_sound : false,
+  with_jplayer_sound  : false,
+
+  raw_sounds          : { 
+                honk1 : "sounds/honk_short.mp3",
+                honk2 : "sounds/honk_long.mp3" 
+                        },
   sounds              : {},
   
   streets             : [],
@@ -19,7 +28,15 @@ Game = {
   enable_frustration  : true,
   
   maker_freq          : 3000,
-  max_cars_per_street : 15,
+  max_cars_per_street : 10,
+  car_types           : {
+          car         : { type : 'car', width : 15, height : 30, frustrates_by : 1,
+            colors    : [ 'orange' ]
+          },
+          van         : { type : 'van', width : 15, height : 40, frustrates_by : 1.5 },
+          bus         : { type : 'bus', width : 15, height : 55, frustrates_by : 2 },
+          ambulance   : { type : 'ambulance', width : 15, height : 40, frustrates_by : 5 }
+        },
   
   db_name             : "gridlock",
   high_score_key      : "high_score",
@@ -89,9 +106,17 @@ Game = {
 
   // phonegap function
   initialize_sounds : function() {
-    if (typeof Media!=="undefined") {
-      Game.sounds.honk1  = new Media("sounds/honk_short.mp3");
-      Game.sounds.honk2  = new Media("sounds/honk_long.mp3");  
+    if (Game.with_sound){
+      if (Game.with_phonegap_sound && typeof Media!=="undefined") {
+
+        _.each(Game.raw.sounds, function(key, media){
+          Game.sounds[key] = new Media(media);
+        });
+        
+      } else if (Game.with_jplayer_sound) {
+        // TODO
+
+      }
     }
   },
 
@@ -540,7 +565,9 @@ var Car = function(car_hash){
   this.frustration_level1    = 4;
   this.frustration_level2    = 5;
   this.speed                 = 60; // pixels per second
-  this.polling_rate          = 60;
+  this.polling_rate          = 50;
+  this.polling_fast          = 50;
+  this.polling_slow          = 500;
   this.at_intersection       = false;
   this.on_street             = false;
   this.orientation           = 'horizontal';
@@ -648,7 +675,6 @@ var Car = function(car_hash){
       stopTime('frustrating').
       everyTime( (self.travel_time/5)*1000, 'frustrating', function(){
       
-        console.log('paused',Game.paused);
         if (Game.paused!==true) {
           self.frustration_checks+=1;
         
@@ -736,12 +762,53 @@ var Car = function(car_hash){
     var self = this,
        speed = self.calculate_speed();
 
-    self.dom.animate({
-      top: self.destinations.top, left: self.destinations.left
-    }, {duration : speed, easing : 'linear'});
+    if ( Game.with_css3_animation===true ) {
+      console.log('animating with css3');
+      self.dom.css3animate({
+        top      : self.destinations.top, 
+        left     : self.destinations.left 
+        }, speed);
 
+    } else {
+      console.log('animating traditionally');
+      self.dom.animate({
+          top      : self.destinations.top, 
+          left     : self.destinations.left 
+        },
+        { duration : speed, 
+          easing   : 'linear' 
+        });
+
+    }
+    
     self.moving = true;
     self.remove_frustration_cloud();
+
+  };
+
+  this.stop = function(){
+    var self = this;
+
+    if (Game.with_css3_animation===true) {
+      self.dom.css3animate({
+          top  : self.dom.offset().top, 
+          left : self.dom.offset().left 
+        }, 0);
+    } else {
+      self.dom.stop();  
+    }
+    
+    self.moving = false;
+    
+    // if the car is stopped at a light, we restart the polling, but slower this time  
+    // we maintain the high polling rate if the car is 'intersecting' though, i.e.,
+    // stuck in the middle of an intersection
+    if (!self.dom.hasClass('intersecting')) {
+      self.polling_rate = self.polling_slow;
+      self.dom.stopTime('driving');
+      self.restart();
+    }
+
   };
 
   this.calculate_speed = function(){
@@ -764,26 +831,10 @@ var Car = function(car_hash){
     return speed;
   };
 
-  this.stop = function(){
-
-    this.dom.stop();
-    this.moving = false;
-    
-    // if the car is stopped at a light, we restart the polling, but slower this time  
-    // we maintain the high polling rate if the car is 'intersecting' though, i.e.,
-    // stuck in the middle of an intersection
-    if (!this.dom.hasClass('intersecting')) {
-      this.polling_rate = 500;
-      this.dom.stopTime('driving');
-      this.restart();
-    }
-
-  };
-
   this.restart = function(reset_polling){
     
     var self = this;
-    if (reset_polling===true) { self.polling_rate = 100; }
+    if (reset_polling===true) { self.polling_rate = this.polling_fast; }
     self.dom.stopTime('driving').everyTime( self.polling_rate, 'driving', function(){ self.drive(); });
 
   };
@@ -915,7 +966,7 @@ var Car = function(car_hash){
 
   this.drive = function(){
     var self = this;
-    
+    //console.log(self.dom.offset().left);
     var leader_or_collision_or_barrier = self.is_colliding();
     if (leader_or_collision_or_barrier) {
       //console.log( leader_or_collision_or_barrier );
@@ -988,14 +1039,7 @@ var Maker = function(){
     self.frequency  = Game.maker_freq; //+(Math.random()*5000);
     self.max_cars   = Game.max_cars_per_street;
     self.iterations = 0;
-    self.car_types  = {
-      car         : { type : 'car', width : 15, height : 30, frustrates_by : 1,
-          colors  : [ 'orange' ]
-      },
-      van         : { type : 'van', width : 15, height : 40, frustrates_by : 1 },
-      bus         : { type : 'bus', width : 15, height : 55, frustrates_by : 1.5 },
-      ambulance   : { type : 'ambulance', width : 15, height : 40, frustrates_by : 2 }
-    };
+    self.car_types  = Game.car_types;
     self.car_odds = { 'van' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
 
     //debugger;
