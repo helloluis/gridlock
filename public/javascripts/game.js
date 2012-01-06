@@ -106,7 +106,10 @@ Game = {
   started             : false,
   paused              : true,
   ended               : false,
-  
+  muted               : false,
+
+  touch_device        : (navigator.platform.indexOf("iPad") != -1),
+    
   with_css3_animation : true,
 
   with_sound          : true,
@@ -125,8 +128,7 @@ Game = {
           "sounds/horn_long2.mp3"
         ],
         horn_truck    : "sounds/horn_truck.mp3",
-        bell          : "sounds/bell.mp3",
-        ding          : "sounds/ding.mp3",
+        countdown     : "sounds/countdown.mp3",
         theme         : "sounds/bg.mp3",
         explosion     : "sounds/explosion_short.mp3"
       },
@@ -224,14 +226,14 @@ Game = {
       if (Game.with_phonegap_sound && typeof Media!=="undefined") {
 
         _.each(Game.raw_sounds, function(media_or_arr, key){
-          if (typeof media_or_arr=='Array') {
+          if (_.isArray(media_or_arr)) {
             _.each(media_or_arr, function(media, index){
               var new_k = [key, index].join("");
               Game.sounds[new_k] = new Media(media);
             });
           } else {
-            Game.sounds[key] = new Media(media);  
-          }
+            Game.sounds[key] = new Media(media_or_arr);
+          }          
         });
         
       } else if (Game.with_sm2_sound) {
@@ -279,6 +281,14 @@ Game = {
     $(".resume").click(function(){
       if (!$(this).hasClass('disabled') && Game.started && Game.paused && !Game.ended) {
         Game.resume();  
+      }
+    });
+
+    $(".mute").click(function(){
+      if (Game.muted) {
+        Game.unmute();
+      } else {
+        Game.mute();
       }
     });
 
@@ -388,7 +398,7 @@ Game = {
     Game.cars.empty();
 
     if (Game.with_sound) {
-      Game.sounds.theme.play({ loops : 10 });
+      Game.start_theme();
     }
 
     _.each(Game.streets,function(street){
@@ -419,18 +429,56 @@ Game = {
     Game.paused = true;
     $("#overlay").show();
     $(".car").pause();
+    if (Game.with_sound) {
+      Game.stop_theme();
+    }
   },
 
   resume : function() {
     Game.paused = false;
     $("#overlay").hide();
     $(".car").resume();
+    if (Game.with_sound) {
+      Game.start_theme();
+    }
   },
 
   quit : function() {
+    if (Game.with_sound) {
+      Game.stop_theme();
+    }
+
     document.location.reload();
-    // Game.reset();
-    // Game.show_intro();
+  },
+
+  mute : function(){
+    $(".bttn.mute").addClass('muted').text('Un-mute');
+    Game.with_sound = false;
+    Game.muted = true;
+    _.each(Game.sounds,function(media, key) {
+      Game.sounds[key].stop();
+    });
+  },
+
+  unmute : function(){
+    $(".bttn.mute").removeClass('muted').text('Mute');
+    Game.with_sound = true;
+    Game.muted = false;
+    if (Game.started) {
+      Game.start_theme();
+    }
+  },
+
+  start_theme : function(){
+    if (Game.with_sm2_sound) {
+      Game.sounds.theme.play({ loops : 10 });
+    } else {
+      Game.sounds.theme.play({ numberOfLoops : 99 });  
+    }
+  },
+
+  stop_theme : function(){
+    Game.sounds.theme.stop();
   },
 
   // if passed a callback, will delay for X seconds, then run it
@@ -459,23 +507,21 @@ Game = {
     var int = 3;
     Game.messages.css({ display : 'block', opacity : 1 });
 
+    if (Game.with_sound) {
+      _.delay(function(){
+        Game.sounds.countdown.play();    
+      },1000);
+    }
+
     Game.main.everyTime(1000,'countdown',function(){
-      
-      if (Game.with_sound && int > 0) {
-        Game.sounds.bell.play();  
-      }
 
       Game.messages.html("<h1 class='countdown'>" + int + "<h1>");
       
       if (int==0){
-        if (Game.with_sound) {
-          Game.sounds.ding.play();  
-        }
         $(".countdown").text("GO!");
       }
 
       if (int==-1) {
-        console.log('finishing countdown');
         $(this).stopTime('countdown');
         Game.started = true;
         Game.paused = false;
@@ -537,40 +583,53 @@ Game = {
     $(".stoplight").each(function(){
       
       var self          = $(this),
-          intersection  = $(this).parents(".intersection").attr('data-streets');
+          intersection  = $(this).parents(".intersection").attr('data-streets'),
+          click_func    = function(){
+            if (Game.started) {
+              if (self.hasClass('horizontal')) {
+                self.removeClass('horizontal').addClass('vertical');
+              } else {
+                self.addClass('horizontal').removeClass('vertical');
+              }
+
+              var new_orientation = self.hasClass('horizontal') ? 'horizontal' : 'vertical';
+              
+              // we go through the Game.barriers array and toggle the orientation of barrier,
+              // then iterate through Game.streets.barriers to find the specific barriers within 
+              // each matching street object
+              if (barriers = _.filter(Game.barriers, function(b){ return b.intersection==intersection; })) {
+                
+                _.each(barriers, function(barrier){
+                  barrier.active = !(barrier.orientation==new_orientation);
+                });
+
+                _.each(Game.streets, function(street){
+                  _.each(street.barriers, function(street_barrier){
+                    if (street_barrier.intersection==intersection) {
+                      street_barrier.active = !(street_barrier.orientation==new_orientation);
+                    }
+                  });
+                });
+              } 
+            }
+          };
       
       self.
         removeClass('vertical').
-        addClass('horizontal').
-        unbind('click').
-        click(function(){
-        if (Game.started) {
-          if (self.hasClass('horizontal')) {
-            self.removeClass('horizontal').addClass('vertical');
-          } else {
-            self.addClass('horizontal').removeClass('vertical');
-          }
+        addClass('horizontal');
 
-          var new_orientation = self.hasClass('horizontal') ? 'horizontal' : 'vertical';
-          // we go through the Game.barriers array and toggle the orientation of barrier,
-          // then iterate through Game.streets.barriers to find the specific barriers within 
-          // each matching street object
-          if (barriers = _.filter(Game.barriers, function(b){ return b.intersection==intersection; })) {
-            
-            _.each(barriers, function(barrier){
-              barrier.active = !(barrier.orientation==new_orientation);
-            });
+      if (Game.touch_device) {
+        self.tappable(click_func);
 
-            _.each(Game.streets, function(street){
-              _.each(street.barriers, function(street_barrier){
-                if (street_barrier.intersection==intersection) {
-                  street_barrier.active = !(street_barrier.orientation==new_orientation);
-                }
-              });
-            });
-          } 
-        }
-      });
+      } else {
+        self.
+          unbind('click').
+          click(click_func);
+
+      }
+        
+
+
     });
   },
 
