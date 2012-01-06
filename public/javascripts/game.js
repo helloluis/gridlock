@@ -28,7 +28,9 @@ Game = {
         ],
         horn_truck    : "sounds/horn_truck.mp3",
         bell          : "sounds/bell.mp3",
-        ding          : "sounds/ding.mp3"
+        ding          : "sounds/ding.mp3",
+        theme         : "sounds/bg.mp3",
+        explosion     : "sounds/explosion_short.mp3"
       },
   sounds              : {},
   
@@ -142,14 +144,15 @@ Game = {
             if (_.isArray(media_or_arr)) {
               _.each(media_or_arr, function(media, index){
                 var new_k = [key, index].join("");
-                var new_obj = soundManager.createSound({ id : new_k, url : media });
+                var new_obj = soundManager.createSound({ id : new_k, url : media, autoLoad : true });
                 Game.sounds[new_k] = new_obj;
               });
             } else {
-              Game.sounds[key] = soundManager.createSound({ id : key, url : media_or_arr });
+              Game.sounds[key] = soundManager.createSound({ id : key, url : media_or_arr, autoLoad : true });
             }
             
           });
+
         });
 
       }
@@ -164,10 +167,6 @@ Game = {
 
     $(".restart").click(function(){
       document.location.reload();
-      // Game.initialize_behaviours();
-      // Game.initialize_controls();
-      // Game.initialize_streets();
-      // Game.start();
     });
     
     $(".pause").click(function(){
@@ -287,6 +286,10 @@ Game = {
     Game.initialize_barriers();
     Game.cars.empty();
 
+    if (Game.with_sound) {
+      Game.sounds.theme.play({ loops : 10 });
+    }
+
     _.each(Game.streets,function(street){
       street.start();
     });
@@ -371,6 +374,7 @@ Game = {
       }
 
       if (int==-1) {
+        console.log('finishing countdown');
         $(this).stopTime('countdown');
         Game.started = true;
         Game.paused = false;
@@ -386,6 +390,10 @@ Game = {
 
   reset : function(return_to_intro){
     
+    if (Game.with_sound) {
+      Game.sounds.theme.stop();
+    }
+
     Game.stop_streets();
     Game.frus_cont.stopTime('frustrating');
 
@@ -500,7 +508,7 @@ Game = {
     });
 
     if (Game.with_sound) {
-      //Game.sounds.explosion.play();
+      Game.sounds.explosion.play();
     }
   },
 
