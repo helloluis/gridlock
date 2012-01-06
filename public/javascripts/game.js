@@ -163,6 +163,8 @@ Game = {
 
     // TODO: Add Loader somewhere here
 
+    Game.initialize_mobile_behaviours();
+
     Game.initialize_containers();
     
     Game.initialize_behaviours();
@@ -181,6 +183,12 @@ Game = {
       Game.start();
     }
 
+  },
+
+  initialize_mobile_behaviours : function(){
+    $("body, .screen").bind('touchmove',function(e){
+      e.preventDefault();
+    })
   },
 
   //TODO
