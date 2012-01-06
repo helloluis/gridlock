@@ -37,8 +37,10 @@ h2, h3, label, .bttn, #score, #high_score { font-size:24px; font-family: 'Boogal
 p { line-height:1.5; font-family: 'Boogaloo', Times, sans-serif; }
 em { font-style:italic; }
 
-.screen { position:absolute; top:0; left:0; width:1024px; height:758px; display:none; overflow:hidden; background:#6f3 url(../images/bg.jpg); }
+.screen { position:absolute; top:0; left:0; width:1024px; height:758px; display:none; overflow:hidden; background:#444 url(../images/bg.jpg); }
 .screen_inner { position:absolute; top:10%; bottom:10%; left:10%; right:10%; width:70%; height:70%; background:#fff; border-radius:10px; box-shadow:0 0 15px #000; padding:5%; border:10px solid #f90; }
+
+#loader.screen { background:#000; }
 
 #intro { display:block; }
 #intro h1 { text-indent:-2000px; background:url(../images/traffix_logo.png) no-repeat; width:600px; height:250px; margin:-50px 0px 0px -90px; }
@@ -58,7 +60,7 @@ a, #intro p strong { color:#fc0; }
 .bttn.credits, .bttn.leaderboards { font-size:16px; }
 .bttn.credits { bottom:30px; }
 .bttn.leaderboards { bottom:30px; right:30px; }
-.bttn.pause, .bttn.quit { top:20px; left :20px; }
+.bttn.pause, .bttn.quit { top:20px; left :20px; color:#fff; }
 .bttn.quit { left: 100px; }
 .bttn.disabled { opacity:0.5; }
 
@@ -74,7 +76,8 @@ a, #intro p strong { color:#fc0; }
 .bttn, .buttons li { cursor:pointer; }
 
 #messages { position:absolute; top:320px; left:325px; text-align:center; width:350px; height:60px; z-index:6; }
-#messages .countdown { color:#fff; }
+#messages h1, #messages h2, #messages h3, #messages .countdown { color:#fff; }
+ 
 
 #score, #high_score { position:absolute; text-align:right; top:20px; right:20px; width:200px; height:50px; font-size:36px; color:#fff; z-index:5; }
 #high_score { font-size:16px; top:60px; right:25px; }
@@ -106,7 +109,7 @@ a, #intro p strong { color:#fc0; }
 #dexter { top:0px; left:650px; }
 
 .car { top:5px; left:10px; width:20px; height:35px; background-repeat:no-repeat; background-image:url(../images/car_orange.png); }
-.jeepney { background-image:url(../images/jeepney.png); }
+.jeepney { width:20px; height: 45px; background-image:url(../images/jeepney.png); }
 .van { width:15px; height: 40px; background-image:url(../images/van.png); }
 .bus { width:15px; height: 55px; background-image:url(../images/bus.png); }
 .ambulance { width:15px; height:40px; background-image:url(../images/ambulance.png); }

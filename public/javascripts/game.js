@@ -1,5 +1,103 @@
-Game = {
+Loader = {
 
+  field    : $("#loader"),
+  interval : 1000,
+
+  start : function( completed_callback ) {
+    
+    var s = this, i = 0;
+
+    s.completed_callback = completed_callback;
+
+    s.start_preloading();
+
+    if (s.loaded_images < s.images.length) {
+      
+      s.initialize_lemniscates();  
+
+      s.field.
+        everyTime(this.interval, 'stars', function(){
+          if (i < s.max_loops && s.loaded_images < s.images.length) {
+            // DO SOMETHING
+          } else {
+            s.everything_loaded();
+          }
+        });
+
+    } else {
+      
+      s.everything_loaded();
+
+    }
+
+  },
+
+  start_preloading : function(  ){
+    
+    var self = this;
+
+    var preloader = $("<div></div>").
+      css({ height   : "0px",
+            width    : "0px",
+            overflow : "hidden"
+      }).
+      appendTo(this.field);
+
+    for (var i = 0; i < this.images.length; i++) {
+        $("<img/>")
+          .unbind("load")
+          .unbind("readystatechange")
+          .bind("load readystatechange", function(){ self.loaded_callback(); })
+          .attr("src", this.images[i])
+          .appendTo($(preloader));
+      }
+
+  },
+
+  loaded_callback: function () {
+    if ( this.force_loading===false ){
+      this.loaded_images += 1;  
+    }
+  },
+
+  get_images: function (selector) {
+
+    var self = this;
+    
+    var everything = $(selector).find("img,div,span").each(function () {
+      var url = "";
+    
+      if ($(this).css("background-image") != "none") {
+        var url = $(this).css("background-image");
+      } else if (typeof($(this).attr("src")) != "undefined") {
+        var url = $(this).attr("src");
+      }
+    
+      url = url.replace("url(\"", "");
+      url = url.replace("url(", "");
+      url = url.replace("\")", "");
+      url = url.replace(")", "");
+      
+      if (url.length > 0) {
+        self.images.push(url);
+      }
+    });
+
+    debug.log(self.images);
+    
+  },
+
+  everything_loaded : function() {
+    
+    this.completed = true;
+    if (this.completed_callback!==undefined) {
+      this.completed_callback.call();
+    }
+
+  }
+};
+
+Game = {
 
   score               : 0,
   frustration         : 0,
@@ -13,7 +111,7 @@ Game = {
 
   with_sound          : true,
   with_phonegap_sound : false,   // we use the phonegap sound library for iOS
-  with_sm2_sound      : true,   // soundmanager2 is what we use for regular web presentation
+  with_sm2_sound      : true,    // soundmanager2 is what we use for regular web presentation
 
   raw_sounds          : { 
         horns_short   : [
@@ -60,6 +158,8 @@ Game = {
   initialize : function(auto_start){
     
     jQuery.fx.interval = 50;
+
+    // TODO: Add Loader somewhere here
 
     Game.initialize_containers();
     
@@ -123,21 +223,22 @@ Game = {
     if (Game.with_sound){
       if (Game.with_phonegap_sound && typeof Media!=="undefined") {
 
-        _.each(Game.raw_sounds, function(key, media_or_arr){
+        _.each(Game.raw_sounds, function(media_or_arr, key){
           if (typeof media_or_arr=='Array') {
-            _.each(media_or_arr, function(m){
-              Game.sounds[[key, index].join("")] = m;
+            _.each(media_or_arr, function(media, index){
+              var new_k = [key, index].join("");
+              Game.sounds[new_k] = new Media(media);
             });
           } else {
             Game.sounds[key] = new Media(media);  
           }
-          
         });
         
       } else if (Game.with_sm2_sound) {
         
+        soundManager.waitForWindowLoad = true;
+
         soundManager.onready(function() {
-          //console.log(soundManager.createSound({ id : 'horn1test', url : "sounds/horn_long1.mp3" }));
 
           _.each(Game.raw_sounds, function(media_or_arr, key){
             
@@ -1093,7 +1194,7 @@ var Maker = function(){
     self.max_cars   = Game.max_cars_per_street;
     self.iterations = 0;
     self.car_types  = Game.car_types;
-    self.car_odds = { 'van' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
+    self.car_odds = { 'jeepney' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
 
     //debugger;
 
@@ -1117,8 +1218,8 @@ var Maker = function(){
       return self.car_types.ambulance;
     } else if (rand < self.car_odds.bus) {
       return self.car_types.bus;
-    } else if (rand < self.car_odds.van) {
-      return self.car_types.van;
+    } else if (rand < self.car_odds.jeepney) {
+      return self.car_types.jeepney;
     } else {
       return self.car_types.car;
     }
