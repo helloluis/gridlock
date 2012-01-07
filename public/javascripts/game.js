@@ -112,7 +112,7 @@ Game = {
     
   with_css3_animation : true,
 
-  with_sound          : true,
+  with_sound          : false,
   with_phonegap_sound : false,   // we use the phonegap sound library for iOS
   with_sm2_sound      : true,    // soundmanager2 is what we use for regular web presentation
 
@@ -140,7 +140,7 @@ Game = {
   max_frustration     : 100,
   enable_frustration  : true,
   
-  maker_freq          : 3000,
+  maker_freq          : 5000,
   max_cars_per_street : 10,
   car_types           : {
           car         : { type : 'car', width : 20, height : 35, frustrates_by : 1,
@@ -479,7 +479,7 @@ Game = {
 
   start_theme : function(){
     if (Game.with_sm2_sound) {
-      Game.sounds.theme.play({ loops : 10 });
+      Game.sounds.theme.play({ loops : 99 });
     } else {
       Game.sounds.theme.play({ numberOfLoops : 99 });  
     }
@@ -507,11 +507,6 @@ Game = {
 
   start_countdown : function() {
     
-    //temporary
-    //Game.messages.hide();
-    //Game.start_streets();
-    //$(".pause, .quit").removeClass('disabled');
-
     var int = 3;
     Game.messages.css({ display : 'block', opacity : 1 });
 
@@ -630,13 +625,10 @@ Game = {
         self.tappable(click_func);
 
       } else {
-        self.
-          unbind('click').
+        self.unbind('click').
           click(click_func);
 
       }
-        
-
 
     });
   },
@@ -761,9 +753,12 @@ var Street = function(){
   };
 
   this.stop = function(){
-    $(".car." + this.name ).stopTime('frustrating').stopTime('driving').remove();
+    var car_dom = $(".car." + this.name ).stopTime('frustrating').stopTime('driving');
+
+    car_dom.remove();
+
     $(".frustration").remove();
-    this.dom.stopTime('frustrating');
+    
     this.maker.stop();
   };
 
@@ -836,7 +831,7 @@ var Car = function(car_hash){
 
   this.flip_dimensions = function(w, h){
     if (this.orientation=='horizontal') {
-      this.width = h;
+      this.width  = h;
       this.heigth = w;
     }
   };
@@ -1021,14 +1016,14 @@ var Car = function(car_hash){
     
     self.moving = false;
     
-    // if the car is stopped at a light, we restart the polling, but slower this time  
+    // if the car is stopped at a light, we restart the polling, but slower this time.  
     // we maintain the high polling rate if the car is 'intersecting' though, i.e.,
     // stuck in the middle of an intersection
-    if (!self.dom.hasClass('intersecting')) {
-      self.polling_rate = self.polling_slow;
-      self.dom.stopTime('driving');
-      self.restart();
-    }
+    // if (!self.dom.hasClass('intersecting')) {
+    //   self.polling_rate = self.polling_slow;
+    //   self.dom.stopTime('driving');
+    //   self.restart();
+    // }
 
   };
 
@@ -1052,7 +1047,7 @@ var Car = function(car_hash){
     return speed;
   };
 
-  this.restart = function(reset_polling){
+  this.restart = function(reset_polling) {
     
     var self = this;
     if (reset_polling===true) { self.polling_rate = this.polling_fast; }
@@ -1070,22 +1065,18 @@ var Car = function(car_hash){
     var off   = this.dom.offset(),
         self1 = [off.left, off.left + this.width],
         self2 = [off.top,  off.top + this.height];
-        // self1 = [off.left, off.left + (this.orientation=='horizontal' ? this.height : this.width)],
-        // self2 = [off.top,  off.top + (this.orientation=='horizontal' ? this.width : this.height)];
-    
+        
     if (intersection = this.is_at_intersection(self1, self2)) {
-      //console.log('intersecting', intersection);
       if (collision = this.is_colliding_at_intersection(intersection, self1, self2)){
         return collision;
       }
-    }
 
-    if (leader = this.is_following(self1, self2)) {
+    } else if (leader = this.is_following(self1, self2)) {
       return leader;
-    }
 
-    if (this.is_at_barrier(self1, self2)) {
+    } else if (this.is_at_barrier(self1, self2)) {
       return 'barrier';  
+
     }
 
     return false;
@@ -1187,10 +1178,11 @@ var Car = function(car_hash){
 
   this.drive = function(){
     var self = this;
-    //console.log(self.dom.offset().left);
+    
     var leader_or_collision_or_barrier = self.is_colliding();
+
     if (leader_or_collision_or_barrier) {
-      //console.log( leader_or_collision_or_barrier );
+      
       if (leader_or_collision_or_barrier=='barrier') {
         self.stop(); 
 
@@ -1203,8 +1195,7 @@ var Car = function(car_hash){
 
       }
     } else {
-      //console.log('not colliding');
-      //console.log('driving to', self.destinations.left-self.dom.height(), self.dom.offset().left);
+      
       if (self.has_arrived()) {
         
         self.arrived();
@@ -1212,7 +1203,7 @@ var Car = function(car_hash){
       } else {
         
         if (!self.moving) {
-          self.restart(true);
+          //self.restart(true);
           self.go();
         }
       }
@@ -1273,7 +1264,7 @@ var Maker = function(){
 
       self.make();
 
-    }, (1 + Math.round(Math.random()*3))*1000);
+    }, (1 + Math.round(Math.random()*8))*1000);
 
   };
 
@@ -1297,7 +1288,7 @@ var Maker = function(){
     
     if (Game.paused!==true) {
       var self     = this,
-        num_cars = 1;
+        num_cars   = 1;
 
       if (Math.random() > 0.5 && $(".car." + self.street.name).length < self.max_cars) {
         self.iterations+=1;

@@ -65,12 +65,12 @@ a, #intro p strong { color:#fc0; }
 .bttn.mute { bottom:20px; left:20px; color:#fff; }
 .bttn.disabled { opacity:0.5; }
 
-.barrier { position:absolute; background:#fff; width:10px; height:50%; display:block; opacity:0; }
-.barrier.vertical { width:50%; height:10px; }
-.barrier.vertical.right { bottom:-10px; left:50%; }
-.barrier.vertical.left { top:-10px; left:0px; }
-.barrier.horizontal.right { top:50%; left:-10px; }
-.barrier.horizontal.left { top:0; right:-10px; }
+.barrier { position:absolute; background:#fff; width:20px; height:50%; display:block; visibility:hidden; }
+.barrier.vertical { width:50%; height:20px; }
+.barrier.vertical.right { bottom:-20px; left:50%; }
+.barrier.vertical.left { top:-20px; left:0px; }
+.barrier.horizontal.right { top:50%; left:-20px; }
+.barrier.horizontal.left { top:0; right:-20px; }
 
 #intro .examples { display:block; clear:both; overflow:hidden; margin-bottom:10px; margin-left:200px; }
 #intro h1, #intro h2 { text-align:center; }
