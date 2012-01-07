@@ -1,6 +1,7 @@
 var STREETS = [
   // name, orientation, top, left, width, height
   ["amber_right_lane1", "horizontal", 250, 0, 1024, 20 ],
+  // ["amber_right_lane2", "horizontal", 275, 0, 1024, 20 ],
   // ["amber_right_lane2", "horizontal"],
   // ["amber_left_lane1", "horizontal"],
   // ["amber_left_lane2", "horizontal"],
