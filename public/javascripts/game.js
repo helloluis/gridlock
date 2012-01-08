@@ -623,7 +623,7 @@ Game = {
       Game.started = false;
       Game.ended = true;
       Game.store_high_score(Game.score);
-      Game.show_message("<h1>How Frustrating!</h1><p>Final Score: " + Game.score + "</p>");
+      Game.show_message("<h1>How Frustrating!</h1>");
       Game.reset();  
     }
   },
@@ -634,7 +634,7 @@ Game = {
       Game.ended = true;
       Game.generate_explosion( exploding_car );
       Game.store_high_score(Game.score);
-      Game.show_message("<h1>Boom!</h1><p>Final Score: " + Game.score + "</p>");
+      Game.show_message("<h1>Boom!</h1>");
       Game.reset();  
     }
   },
