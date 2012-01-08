@@ -39,12 +39,13 @@ Game = {
   
   streets             : [],
   barriers            : {},
+  intersections       : [],
   
   max_frustration     : 100,
   enable_frustration  : true,
   
   maker_freq          : 3000,
-  max_cars_per_street : 8,
+  max_cars_per_street : 1,
   car_types           : {
           car         : { type : 'car', width : 20, height : 35, frustrates_by : 1,
             colors    : [ 'orange' ]
@@ -76,6 +77,8 @@ Game = {
     Game.initialize_buttons();
 
     Game.initialize_sounds();
+
+    Game.initialize_intersections();
 
     Game.initialize_barriers();
 
@@ -113,7 +116,6 @@ Game = {
   // which calls the animate() function on all
   // the cars on all the streets
   animate : function() {
-    //update
     
     //clear 
     Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
@@ -290,15 +292,15 @@ Game = {
 
     _.each(BARRIERS, function(b){
       var t  = b[0].match(/^([^\s]+)\_barrier[\d]$/i),
-        hash = {  name   : b[0],
-                  top    : b[1], 
-                  left   : b[2], 
-                  width  : b[3], 
-                  height : b[4], 
-                  active : b[7], 
-                  orientation : b[5],
+        hash = {  name         : b[0],
+                  top          : b[1], 
+                  left         : b[2], 
+                  width        : b[3], 
+                  height       : b[4], 
+                  orientation  : b[5],
                   intersection : b[6],
-                  color : b[8] };
+                  active       : b[7],
+                  color        : b[8] };
 
       if (Game.barriers[t[1]]) {
         Game.barriers[t[1]].push( hash );  
@@ -306,8 +308,19 @@ Game = {
         Game.barriers[t[1]] = [ hash ];
       }
     });
+  },
 
-    console.log(Game.barriers);
+  initialize_intersections : function(){
+    _.each(INTERSECTIONS, function(intersection){
+      Game.intersections.push({
+        name   : intersection[0],
+        top    : intersection[1],
+        left   : intersection[2],
+        width  : intersection[3],
+        height : intersection[4],
+        cars   : []
+      });
+    });
   },
 
   show_barriers : function(){
@@ -321,6 +334,14 @@ Game = {
           Game.context.fill();  
         }
       });
+    });
+
+    _.each(Game.intersections, function(inter){
+      Game.context.beginPath();
+      Game.context.rect( inter.left, inter.top, inter.width, inter.height );
+      Game.context.lineWidth = 2;
+      Game.context.strokeStyle = "#0ff";
+      Game.context.stroke();
     });
 
   },
@@ -555,12 +576,12 @@ Game = {
   initialize_controls : function(){
     
     var self = this;
-    self.intersections = INTERSECTIONS;
+    self.stoplights = STOPLIGHTS;
 
     $(".stoplight").each(function(idx, el){
       
       var elem   = $(el),
-          inter  = self.intersections[idx],
+          light  = self.stoplights[idx],
           click  = function(){
             if (Game.started) {
               if (elem.hasClass('horizontal')) {
@@ -571,8 +592,8 @@ Game = {
 
               var new_orientation = elem.hasClass('horizontal') ? 'horizontal' : 'vertical';
               
-              var barriers_to_activate   = inter[ new_orientation=='horizontal' ? 1 : 0 ],
-                  barriers_to_deactivate = inter[ new_orientation=='horizontal' ? 0 : 1 ];
+              var barriers_to_activate   = light[ new_orientation=='horizontal' ? 1 : 0 ],
+                  barriers_to_deactivate = light[ new_orientation=='horizontal' ? 0 : 1 ];
 
               _.each(Game.streets, function(street){
                 _.each(street.barriers, function(street_barrier) {
@@ -676,7 +697,7 @@ var Street = function(){
     this.maker       = new Maker(Game, this);
 
     this.initialize_barriers();
-    // this.initialize_intersections();
+    this.initialize_intersections();
 
   };
 
@@ -691,25 +712,40 @@ var Street = function(){
 
   this.initialize_intersections = function(){
     var self = this,
-        css  = this.name.replace(/\_(left|right)_lane[\d]+$/,'');
+        name = this.name.replace(/\_(left|right)_lane[\d]+$/,'');
 
-    $(".intersection." + css).each(function(){
-      var intersection = $(this);
-      var intersection_hash = {
-          top    : intersection.offset().top,
-          left   : intersection.offset().left,
-          width  : intersection.width(),
-          height : intersection.height(),
-          css    : intersection.attr('data-streets')
-        };
-      self.intersections.push( intersection_hash );
+    _.each(Game.intersections, function(intersection){
+      if (intersection.name.indexOf(name)!==-1) {
+        self.intersections.push(intersection);
+      }
     });
+
+    // _.each(INTERSECTIONS, function(intersection){
+    //   Game.intersections.push({
+    //     name   : intersection[0],
+    //     top    : intersection[1],
+    //     left   : intersection[2],
+    //     width  : intersection[3],
+    //     height : intersection[4]
+    //   });
+    // });
+
+    // $(".intersection." + css).each(function(){
+    //   var intersection = $(this);
+    //   var intersection_hash = {
+    //       top    : intersection.offset().top,
+    //       left   : intersection.offset().left,
+    //       width  : intersection.width(),
+    //       height : intersection.height(),
+    //       css    : intersection.attr('data-streets')
+    //     };
+    //   self.intersections.push( intersection_hash );
+    // });
+
     //console.log(self.intersections);
   };
 
   this.start = function(){
-    //this.initialize_barriers();
-    //this.initialize_intersections();
     this.maker.initialize(this);
   };
 
@@ -740,10 +776,7 @@ var Car = function(car_hash){
   this.frustration_level1    = 4;
   this.frustration_level2    = 5;
   this.speed                 = Math.round((Math.random()*1)+1); // pixels per frame
-  this.polling_rate          = 50;
-  this.polling_fast          = 50;
-  this.polling_slow          = 500;
-  this.at_intersection       = false;
+  this.intersecting          = {};
   this.on_street             = false;
   this.orientation           = 'horizontal';
   this.lefthand              = false;
@@ -768,6 +801,7 @@ var Car = function(car_hash){
     
     //this.initialize_speed();
     this.initialize_origins(); 
+    this.initialize_intersecting();
 
     var colors = ["#c00","#009","#360","#f60","#ff0"];
     this.color = colors[Math.floor(Math.random()*colors.length)];
@@ -843,6 +877,13 @@ var Car = function(car_hash){
 
     }
 
+  };
+
+  this.initialize_intersecting = function(){
+    var self = this;
+    _.each(self.street.intersections, function(inter){
+      self.intersecting[inter.name] = false;
+    });
   };
 
   this.initialize_frustration = function(){
@@ -1009,22 +1050,15 @@ var Car = function(car_hash){
     
     if (this.is_at_barrier(self1, self2)) {
       return 'barrier';
-    } else if (leader = this.is_following(self1, self2)) {
+    } else if (intersection = this.is_at_intersection(self1, self2)) {
+      if (collision = this.is_colliding_at_intersection(intersection, self1, self2)){
+        return collision;
+      }
+    } 
+
+    if (leader = this.is_following(self1, self2)) {
       return leader;
     }
-
-    // if (intersection = this.is_at_intersection(self1, self2)) {
-    //   if (collision = this.is_colliding_at_intersection(intersection, self1, self2)){
-    //     return collision;
-    //   }
-
-    // } else if (leader = this.is_following(self1, self2)) {
-    //   return leader;
-
-    // } else if (this.is_at_barrier(self1, self2)) {
-    //   return 'barrier';  
-
-    // }
 
     return false;
 
@@ -1046,20 +1080,8 @@ var Car = function(car_hash){
           
         }    
       }
-      
     }
-    
     return false;
-
-    // if (this.leader) {  
-    //   var leader = this.leader,
-    //       p1     = [leader.current_pos.left, leader.current_pos.left + this.leader.width],
-    //       p2     = [leader.current_pos.top,  leader.current_pos.top  + this.leader];
-    //   var horiz_match = this.compare_positions( self1, p1 ),
-    //       vert_match  = this.compare_positions( self2, p2 );
-    //   if (horiz_match && vert_match) { return leader; }  
-    // }
-
   };
 
   this.is_at_barrier = function(self1, self2) {
@@ -1082,22 +1104,54 @@ var Car = function(car_hash){
 
   this.is_at_intersection = function(self1, self2) {
     if (this.street.intersections.length) {
-      //console.log('intersections',this.street.intersections);
-      var offset = this.dom.offset();
+      
       for (var i=0; i<this.street.intersections.length; i++) {
+        
         var intersection = this.street.intersections[i];
+        
         var b1 = [intersection.left, intersection.left + intersection.width  ],
             b2 = [intersection.top,  intersection.top +  intersection.height ];
-            
-          var horiz_match = this.compare_positions( self1, b1 ),
-              vert_match  = this.compare_positions( self2, b2 );
+        
+        var horiz_match = this.compare_positions( self1, b1 ),
+            vert_match  = this.compare_positions( self2, b2 );
           
-          if (horiz_match && vert_match) { 
-            this.dom.addClass('intersecting ' + intersection.css);
-            return intersection.css; 
-          } else {
-            this.dom.removeClass('intersecting ' + intersection.css);  
+        if (horiz_match && vert_match) { 
+          
+          if (this.intersecting[intersection.name]!==true) {
+            this.intersecting[intersection.name] = true;
+            this.add_to_intersection(intersection.name);
           }
+          
+        } else {
+          
+          if (this.intersecting[intersection.name]===true){
+            this.intersecting[intersection.name] = false;
+            this.remove_from_intersection(intersection.name);
+          }
+
+        }
+      }
+    }
+  };
+
+  this.is_intersecting = function() {
+    return _.detect(_.values(this.intersecting), function(val){ return val===true; }) ? true : false;
+  };
+
+  this.add_to_intersection = function( name ) {
+    if (intersection = _.detect(Game.intersections, function(inter){ return inter.name == name; })) {
+      if (!_.include(intersection.cars, this)) {
+        intersection.cars.push( this );
+      } 
+    }
+  };
+
+  this.remove_from_intersection = function( intersection_name ) {
+    var self = this;
+    for (var i=0; i < Game.intersections.length; i++) {
+      if ( Game.intersections[i].name==intersection_name ) {
+        var idx = Game.intersections[i].cars.indexOf(self);
+        Game.intersections[i].cars.splice(idx, 1);
       }
     }
   };

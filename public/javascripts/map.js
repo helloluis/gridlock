@@ -1,19 +1,19 @@
 var STREETS = [
   // name, orientation, top, left, width, height
   ["amber_right_lane1",  "horizontal",  250,   0,     1024,  20 ],
-  ["amber_right_lane2",  "horizontal",  275,   0,     1024,  20 ],
-  ["amber_left_lane1",   "horizontal",  202,   0,     1024,  20 ],
-  ["amber_left_lane2",   "horizontal",  225,   0,     1024,  20 ],
-  ["baker_right",        "horizontal",  528,   0,     1024,  20 ],
-  ["baker_left",         "horizontal",  505,   0,     1024,  20 ],
-  ['chang_right_lane1',  "vertical",    0,     308,   768,   20 ],
-  ['chang_right_lane2',  "vertical",    0,     329,   768,   20 ],
-  ['chang_left_lane1',   "vertical",    0,     253,   768,   20 ],
-  ['chang_left_lane2',   "vertical",    0,     276,   768,   20 ],
-  ['dexter_right_lane1', "vertical",    0,     706,   768,   20 ],
-  ['dexter_right_lane2', "vertical",    0,     728,   768,   20 ],
-  ['dexter_left_lane1',  "vertical",    0,     653,   768,   20 ],
-  ['dexter_left_lane2',  "vertical",    0,     676,   768,   20 ]
+  // ["amber_right_lane2",  "horizontal",  275,   0,     1024,  20 ],
+  // ["amber_left_lane1",   "horizontal",  202,   0,     1024,  20 ],
+  // ["amber_left_lane2",   "horizontal",  225,   0,     1024,  20 ],
+  // ["baker_right",        "horizontal",  528,   0,     1024,  20 ],
+  // ["baker_left",         "horizontal",  505,   0,     1024,  20 ],
+  // ['chang_right_lane1',  "vertical",    0,     308,   768,   20 ],
+  // ['chang_right_lane2',  "vertical",    0,     329,   768,   20 ],
+  // ['chang_left_lane1',   "vertical",    0,     253,   768,   20 ],
+  // ['chang_left_lane2',   "vertical",    0,     276,   768,   20 ],
+  // ['dexter_right_lane1', "vertical",    0,     706,   768,   20 ],
+  // ['dexter_right_lane2', "vertical",    0,     728,   768,   20 ],
+  // ['dexter_left_lane1',  "vertical",    0,     653,   768,   20 ],
+  // ['dexter_left_lane2',  "vertical",    0,     676,   768,   20 ]
 ];
 
 var BARRIERS = [
@@ -36,14 +36,23 @@ var BARRIERS = [
   ['dexter_left_barrier2',  487, 655, 50, 20, 'horizontal', 'baker dexter',  true,  "#eee" ]
 ];
 
-// intersections from left to right, top to bottom
-var INTERSECTIONS = [
+// stoplights from left to right, top to bottom
+var STOPLIGHTS = [
   // [ horizontal barriers ], [ vertical_barriers ]
-  [ [ 'amber_right_barrier1', 'amber_left_barrier1' ], ['chang_right_barrier1',  'chang_left_barrier1'] ],
+  [ [ 'amber_right_barrier1', 'amber_left_barrier1' ], ['chang_right_barrier1',  'chang_left_barrier1']  ],
   [ [ 'amber_right_barrier2', 'amber_left_barrier2' ], ['dexter_right_barrier1', 'dexter_left_barrier1'] ],
-  [ [ 'baker_right_barrier1', 'baker_left_barrier1' ], ['chang_right_barrier2',  'chang_left_barrier2'] ],
+  [ [ 'baker_right_barrier1', 'baker_left_barrier1' ], ['chang_right_barrier2',  'chang_left_barrier2']  ],
   [ [ 'baker_right_barrier2', 'baker_left_barrier2' ], ['dexter_right_barrier2', 'dexter_left_barrier2'] ],
 ];
+
+// intersections from left to right, top to bottom
+var INTERSECTIONS = [
+  [ 'amber chang',  202, 252, 95, 95 ],
+  [ 'amber dexter', 202, 652, 95, 95 ],
+  [ 'baker chang',  502, 252, 95, 45 ],
+  [ 'baker dexter', 502, 652, 95, 45 ],
+];
+
 /*
 
 Definitions:
