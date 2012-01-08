@@ -41,8 +41,8 @@ var INTERSECTIONS = [
   // [ horizontal barriers ], [ vertical_barriers ]
   [ [ 'amber_right_barrier1', 'amber_left_barrier1' ], ['chang_right_barrier1',  'chang_left_barrier1'] ],
   [ [ 'amber_right_barrier2', 'amber_left_barrier2' ], ['dexter_right_barrier1', 'dexter_left_barrier1'] ],
-  [ [ 'baker_right_barrier1', 'amber_left_barrier1' ], ['chang_right_barrier2',  'chang_left_barrier2'] ],
-  [ [ 'baker_right_barrier2', 'amber_left_barrier2' ], ['dexter_right_barrier2', 'dexter_left_barrier2'] ],
+  [ [ 'baker_right_barrier1', 'baker_left_barrier1' ], ['chang_right_barrier2',  'chang_left_barrier2'] ],
+  [ [ 'baker_right_barrier2', 'baker_left_barrier2' ], ['dexter_right_barrier2', 'dexter_left_barrier2'] ],
 ];
 /*
 

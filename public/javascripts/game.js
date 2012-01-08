@@ -44,7 +44,7 @@ Game = {
   enable_frustration  : true,
   
   maker_freq          : 3000,
-  max_cars_per_street : 1,
+  max_cars_per_street : 8,
   car_types           : {
           car         : { type : 'car', width : 20, height : 35, frustrates_by : 1,
             colors    : [ 'orange' ]
@@ -576,6 +576,7 @@ Game = {
 
               _.each(Game.streets, function(street){
                 _.each(street.barriers, function(street_barrier) {
+
                   if (_.include(barriers_to_activate, street_barrier.name)) {
                     street_barrier.active = true;
                     console.log('activating', street_barrier.name, street_barrier.active);
