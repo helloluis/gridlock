@@ -97,7 +97,7 @@ var INTERSECTIONS = [
 
 // once a Maker hits MAX_CARS_PER_STREET, it stops generating new cars until the user
 // has managed to remove some more. 8 is a purely arbitrary number.
-var MAX_CARS_PER_STREET = 8;
+var MAX_CARS_PER_STREET = 1;
 
 var MAKER_FREQUENCY = 5000;
 

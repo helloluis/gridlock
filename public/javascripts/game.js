@@ -68,6 +68,10 @@ Game = {
 
     Game.initialize_high_score();
 
+    if (Game.enable_frustration) {
+      Game.initialize_frustration();  
+    }
+
     if (auto_start===true) {
       Game.start();
     }
@@ -158,7 +162,7 @@ Game = {
     Game.streets = [];
     Game.score = 0;
     Game.score_cont.text('0');
-    //Game.initialize_frustration();
+    Game.initialize_frustration();
     Game.initialize_high_score();
 
     $(".restart").hide();
@@ -482,7 +486,7 @@ Game = {
     } else {
       Game.messages.removeClass("subtle");
     }
-    Game.messages.css({ display : 'none' });
+    Game.messages.css({ display : 'block' });
   },
 
   hide_message : function(){
@@ -757,10 +761,13 @@ var Car = function(car_hash){
   this.origins               = {}; // top, left
   this.current_pos           = {}; // top, left
   this.destinations          = {}; // top, left
-  this.travel_time           = 0; 
-  // travel time is the time in seconds it would take the car to travel from 
+  
+  this.ideal_travel_time     = 0; 
+  this.actual_travel_time    = 0;
+  // ideal_travel_time is the time in seconds it would take the car to travel from 
   // origin to destination, assuming the road was completely open, multiplied by 2.
   // the closer we approach the travel_time, the more frustrated the car driver becomes.
+  // actual_travel_time is just an integer we increment with every render();
 
   this.initialize = function(name, street, orientation){
     
@@ -773,9 +780,9 @@ var Car = function(car_hash){
     
     this.flip_dimensions(this.width, this.height);
     
-    //this.initialize_speed();
     this.initialize_origins(); 
     this.initialize_intersecting();
+    this.initialize_frustration();
 
     if (Game.debug===true) {
       
@@ -793,8 +800,7 @@ var Car = function(car_hash){
     }
 
     this.render();
-    // this.initialize_frustration();
-
+    
     // the leader is the car directly in front of this current car.
     // on a two-lane street, we have to check the two older cars, just
     // to make sure we're not colliding with either one
@@ -839,7 +845,7 @@ var Car = function(car_hash){
       
       this.origins.top = this.current_pos.top = this.destinations.top = b1;
 
-      this.travel_time = (Math.abs(this.destinations.left-this.origins.left)/this.speed)*2;
+      this.ideal_travel_time = Math.ceil((Math.abs(this.destinations.left-this.origins.left)/this.speed)*2);
 
     } else {
 
@@ -859,8 +865,8 @@ var Car = function(car_hash){
       
       this.destinations.left = this.current_pos.left = this.origins.left = b1;
 
-      this.travel_time = Math.ceil((Math.abs(this.destinations.top-this.origins.top)/this.speed)*2);
-
+      this.ideal_travel_time = Math.ceil((Math.abs(this.destinations.top-this.origins.top)/this.speed)*4);
+      
     }
 
   };
@@ -873,41 +879,57 @@ var Car = function(car_hash){
   };
 
   this.initialize_frustration = function(){
+    this.frustration_thresholds = [
+      Math.round(this.ideal_travel_time/2),
+      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.25)),
+      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.1))
+    ];
+  };
+
+  this.manage_frustration = function(){
     
     var self = this;
     
-    self.dom.
-      stopTime('frustrating').
-      everyTime( (self.travel_time/5)*1000, 'frustrating', function(){
-      
-        if (Game.paused!==true) {
-          self.frustration_checks+=1;
-        
-          if (self.frustration_checks>self.frustration_threshold) {
-            self.frustration+=self.frustrates_by;
-            Game.frustration+=self.frustrates_by;  
-          }
+    self.actual_travel_time += 1;
+    
+    if (self.actual_travel_time == self.frustration_thresholds[0]) {
+      self.frustration += self.frustrates_by;
+      Game.frustration += self.frustrates_by;
+      if (Game.with_sound) {
+        var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
+        Game.sounds[horn_name].play();
+      }
 
-          if (self.frustration == self.frustration_level1) {
-            self.dom.addClass('frustrated');
-            self.add_frustration_cloud();
-            if (Game.with_sound && (Math.random()*5 > 3)) {
-              var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
-              Game.sounds[horn_name].play();
-            }
-            
-          } else if (self.frustration >= self.frustration_level2) {
-            self.dom.addClass('very_frustrated');
-            self.add_frustration_cloud(true);
-            if (Game.with_sound) {
-              var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
-              Game.sounds[horn_name].play();
-            }
-            
-          }
-        }
-        
-      });
+    } else if (self.actual_travel_time > self.frustration_thresholds[0] && self.actual_travel_time < self.frustration_thresholds[1]) {
+      // show frustration graphic
+
+    } else if (self.actual_travel_time == self.frustration_thresholds[1]) {
+      self.frustration += self.frustrates_by;
+      Game.frustration += self.frustrates_by;
+      if (Game.with_sound) {
+        var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
+        Game.sounds[horn_name].play();
+      }
+    
+    } else if (self.actual_travel_time > self.frustration_thresholds[1] && self.actual_travel_time < self.frustration_thresholds[2]) {
+      // show major frustration graphic
+
+    } else if (self.actual_travel_time == self.frustration_thresholds[2]) {
+      self.frustration += self.frustrates_by*2;
+      Game.frustration += self.frustrates_by*2;
+      if (Game.with_sound) {
+        var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
+        Game.sounds[horn_name].play();
+      }
+
+    } else if (self.actual_travel_time > self.ideal_travel_time) {
+      
+      // game ender?
+      Game.end_with_frustration();
+      // self.frustration += self.frustrates_by;
+      // Game.frustration += self.frustrates_by;
+
+    }
 
   };
 
@@ -941,7 +963,11 @@ var Car = function(car_hash){
     var self   = this,
         street = self.street,
         ctx    = Game.context;
-  
+    
+    if (Game.enable_frustration) {
+      self.manage_frustration();  
+    }
+
     if (Game.debug===true) {
       ctx.beginPath();
 
