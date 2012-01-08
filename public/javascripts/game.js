@@ -1,6 +1,6 @@
 Game = {
 
-  debug               : true,
+  debug               : false,  // set to TRUE to visualize barriers and intersections
 
   score               : 0,
   frustration         : 0,
@@ -15,26 +15,11 @@ Game = {
   
   with_css3_animation : true,
 
-  with_sound          : false,
+  with_sound          : true,
   with_phonegap_sound : false,   // we use the phonegap sound library for iOS
   with_sm2_sound      : true,    // soundmanager2 is what we use for regular web presentation
 
-  raw_sounds          : { 
-        horns_short   : [
-          "sounds/horn1.mp3",
-          "sounds/horn2.mp3",
-          "sounds/horn3.mp3",
-          "sounds/horn4.mp3" 
-        ],
-        horns_long    : [
-          "sounds/horn_long1.mp3",
-          "sounds/horn_long2.mp3"
-        ],
-        horn_truck    : "sounds/horn_truck.mp3",
-        countdown     : "sounds/countdown.mp3",
-        theme         : "sounds/bg.mp3",
-        explosion     : "sounds/explosion_short.mp3"
-      },
+  raw_sounds          : SOUNDS,
   sounds              : {},
   
   streets             : [],
@@ -44,22 +29,17 @@ Game = {
   max_frustration     : 100,
   enable_frustration  : true,
   
-  maker_freq          : 3000,
-  max_cars_per_street : 1,
-  car_types           : {
-          car         : { type : 'car', width : 20, height : 35, frustrates_by : 1,
-            colors    : [ 'orange' ]
-          },
-          jeepney     : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 1.5 },
-          van         : { type : 'van',       width : 20, height : 40, frustrates_by : 1.5 },
-          bus         : { type : 'bus',       width : 20, height : 55, frustrates_by : 2   },
-          ambulance   : { type : 'ambulance', width : 20, height : 40, frustrates_by : 5   }
-        },
+  maker_freq          : MAKER_FREQUENCY,
+  max_cars_per_street : MAX_CARS_PER_STREET,
+  car_types           : CARS,
+  car_odds            : CAR_ODDS,
   
-  db_name             : "gridlock",
+  images_dir          : IMAGES_DIR,
+
+  db_name             : "traffix",
   high_score_key      : "high_score",
 
-  high_score_key_full : ["gridlock", "high_score"].join("_"),
+  high_score_key_full : ["traffix", "01", "high_score"].join("_"),
 
   initialize : function(auto_start){
     
@@ -97,18 +77,22 @@ Game = {
   initialize_canvas : function(){
     
     window.requestAnimFrame = (function(callback){
-      return window.requestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      window.oRequestAnimationFrame ||
-      window.msRequestAnimationFrame ||
-      function(callback){
-        window.setTimeout(callback, 1000 / 60);
+      // return window.requestAnimationFrame ||
+      // window.webkitRequestAnimationFrame ||
+      // window.mozRequestAnimationFrame ||
+      // window.oRequestAnimationFrame ||
+      // window.msRequestAnimationFrame ||
+      return function(callback){
+        window.setTimeout(callback, 1000 / 30); // we only need 30 fps coz we're third-world that way
       };
     })();
 
     Game.canvas  = document.getElementById('cars');
     Game.context = Game.canvas.getContext('2d');
+
+    if (Game.debug==true) {
+      $(".neighborhood").css({'background':"#121212"});
+    }
     
   },
 
@@ -117,23 +101,26 @@ Game = {
   // the cars on all the streets
   animate : function() {
     
-    //clear 
-    Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
+    if (Game.started && !Game.paused && !Game.ended) {
+      //clear 
+      Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
 
-    _.each(Game.streets, function(street){
-      _.each(street.cars, function(car){
-        car.animate();
+      if (Game.debug==true) {
+        Game.show_game_objects();  
+      }
+
+      _.each(Game.streets, function(street){
+        _.each(street.cars, function(car){
+          car.animate();
+        });
       });
-    });
 
-    if (Game.debug==true) {
-      Game.show_barriers();  
+      //new frame
+      requestAnimFrame(function(){
+        Game.animate();  
+      });  
     }
-
-    //new frame
-    requestAnimFrame(function(){
-      Game.animate();  
-    });
+    
   },
 
   initialize_mobile_behaviours : function(){
@@ -318,12 +305,12 @@ Game = {
         left   : intersection[2],
         width  : intersection[3],
         height : intersection[4],
-        cars   : []
+        cars   : [ [], [] ] // [ [ horizontal ], [ vertical ] ]
       });
     });
   },
 
-  show_barriers : function(){
+  show_game_objects : function(){
     // temporary
     _.each(Game.streets, function(street){
       _.each(street.barriers, function(b){
@@ -334,6 +321,11 @@ Game = {
           Game.context.fill();  
         }
       });
+      Game.context.beginPath();
+      Game.context.rect( street.left, street.top, street.width, street.height );
+      Game.context.lineWidth = 2;
+      Game.context.strokeStyle = "#333";
+      Game.context.stroke();
     });
 
     _.each(Game.intersections, function(inter){
@@ -490,17 +482,19 @@ Game = {
     } else {
       Game.messages.removeClass("subtle");
     }
-    Game.messages.animate({ opacity : 1 },200);
+    Game.messages.css({ display : 'none' });
   },
 
   hide_message : function(){
-    Game.messages.animate({ opacity : 0 }).hide();
+    Game.messages.css({ display : 'none' });
   },
 
   start_countdown : function() {
     
     var int = 3;
-    Game.messages.css({ display : 'block', opacity : 1 });
+    Game.messages.css({ display : 'block', opacity : '1' });
+    
+    Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
 
     if (Game.with_sound) {
       _.delay(function(){
@@ -600,10 +594,8 @@ Game = {
 
                   if (_.include(barriers_to_activate, street_barrier.name)) {
                     street_barrier.active = true;
-                    console.log('activating', street_barrier.name, street_barrier.active);
                   } else if (_.include(barriers_to_deactivate, street_barrier.name)) {
                     street_barrier.active = false;
-                    console.log('deactivating', street_barrier.name, street_barrier.active);
                   }
                 });
               });
@@ -645,13 +637,13 @@ Game = {
 
   generate_explosion : function( exploding_car ) {
     
-    var off = exploding_car.dom.offset();
+    var pos = exploding_car.current_pos;
     
     $("<div class='explosion'></div>").css({
-      top : off.top,
-      left : off.left
+      top :  pos.top - 20,
+      left : pos.left - 20
     }).
-    appendTo("#cars").
+    appendTo("#map").
     oneTime(3000, function(){
       $(this).animate({ opacity : 0 });  
     });
@@ -712,37 +704,14 @@ var Street = function(){
 
   this.initialize_intersections = function(){
     var self = this,
-        name = this.name.replace(/\_(left|right)_lane[\d]+$/,'');
-
+        name = this.name.replace(/\_lane[\d]/i,'').replace(/\_(left|right)/i,'');
+    
     _.each(Game.intersections, function(intersection){
       if (intersection.name.indexOf(name)!==-1) {
         self.intersections.push(intersection);
       }
     });
-
-    // _.each(INTERSECTIONS, function(intersection){
-    //   Game.intersections.push({
-    //     name   : intersection[0],
-    //     top    : intersection[1],
-    //     left   : intersection[2],
-    //     width  : intersection[3],
-    //     height : intersection[4]
-    //   });
-    // });
-
-    // $(".intersection." + css).each(function(){
-    //   var intersection = $(this);
-    //   var intersection_hash = {
-    //       top    : intersection.offset().top,
-    //       left   : intersection.offset().left,
-    //       width  : intersection.width(),
-    //       height : intersection.height(),
-    //       css    : intersection.attr('data-streets')
-    //     };
-    //   self.intersections.push( intersection_hash );
-    // });
-
-    //console.log(self.intersections);
+    
   };
 
   this.start = function(){
@@ -767,6 +736,7 @@ var Car = function(car_hash){
   this.height                = car_hash && car_hash.height ? car_hash.height : 35;
   this.color                 = car_hash && car_hash.colors ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
   this.type                  = car_hash && car_hash.type ? car_hash.type : 'car';
+  this.image_assets          = car_hash && car_hash.assets ? car_hash.assets : false;
   this.street                = false;
   this.moving                = false;
   this.frustration           = 0;
@@ -775,7 +745,7 @@ var Car = function(car_hash){
   this.frustration_threshold = 3;
   this.frustration_level1    = 4;
   this.frustration_level2    = 5;
-  this.speed                 = Math.round((Math.random()*1)+1); // pixels per frame
+  this.speed                 = Math.round((Math.random()*2)+2); // pixels per frame
   this.intersecting          = {};
   this.on_street             = false;
   this.orientation           = 'horizontal';
@@ -803,8 +773,20 @@ var Car = function(car_hash){
     this.initialize_origins(); 
     this.initialize_intersecting();
 
-    var colors = ["#c00","#009","#360","#f60","#ff0"];
-    this.color = colors[Math.floor(Math.random()*colors.length)];
+    if (Game.debug===true) {
+      
+      var colors = ["#c00","#009","#360","#f60","#ff0"];
+      this.color = colors[Math.floor(Math.random()*colors.length)];  
+
+    } else {
+      
+      this.image = new Image();
+
+      this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
+        (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
+        (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );
+
+    }
 
     this.render();
     // this.initialize_frustration();
@@ -956,15 +938,22 @@ var Car = function(car_hash){
         street = self.street,
         ctx    = Game.context;
   
-    ctx.beginPath();
+    if (Game.debug===true) {
+      ctx.beginPath();
 
-    ctx.rect( self.current_pos.left, 
+      ctx.rect( self.current_pos.left, 
             self.current_pos.top, 
             self.width, 
             self.height );
 
-    ctx.fillStyle = this.color;
-    ctx.fill();
+      ctx.fillStyle = this.color;
+      ctx.fill();
+
+    } else {
+      
+      ctx.drawImage(self.image, self.current_pos.left, self.current_pos.top);
+       
+    }
 
   };
 
@@ -987,27 +976,7 @@ var Car = function(car_hash){
 
   this.stop = function(){
     var self = this;
-
-    // if (Game.with_css3_animation===true) {
-    //   self.dom.css3animate({
-    //       top  : self.dom.offset().top, 
-    //       left : self.dom.offset().left 
-    //     }, 0);
-    // } else {
-    //   self.dom.stop();  
-    // }
-    
     self.moving = false;
-    
-    // if the car is stopped at a light, we restart the polling, but slower this time.  
-    // we maintain the high polling rate if the car is 'intersecting' though, i.e.,
-    // stuck in the middle of an intersection
-    // if (!self.dom.hasClass('intersecting')) {
-    //   self.polling_rate = self.polling_slow;
-    //   self.dom.stopTime('driving');
-    //   self.restart();
-    // }
-
   };
 
   this.calculate_speed = function(){
@@ -1026,7 +995,6 @@ var Car = function(car_hash){
         var speed = (this.dom.offset().top/this.speed)*1000;
       }
     }
-    //console.log('calculating speed', this.dom.offset().top, this.speed, speed);
     return speed;
   };
 
@@ -1048,14 +1016,19 @@ var Car = function(car_hash){
     var self1 = [this.current_pos.left, this.current_pos.left + this.width],
         self2 = [this.current_pos.top,  this.current_pos.top + this.height];
     
+    // is it at an intersection?
+    if (intersection = this.is_at_intersection(self1, self2)) {
+      if (other_car = this.is_colliding_at_intersection(intersection, self1, self2)){
+        return other_car;
+      }
+    }
+
+    // is it at an active barrier?
     if (this.is_at_barrier(self1, self2)) {
       return 'barrier';
-    } else if (intersection = this.is_at_intersection(self1, self2)) {
-      if (collision = this.is_colliding_at_intersection(intersection, self1, self2)){
-        return collision;
-      }
     } 
 
+    // is it a following a lead car?
     if (leader = this.is_following(self1, self2)) {
       return leader;
     }
@@ -1103,6 +1076,7 @@ var Car = function(car_hash){
   };
 
   this.is_at_intersection = function(self1, self2) {
+    
     if (this.street.intersections.length) {
       
       for (var i=0; i<this.street.intersections.length; i++) {
@@ -1121,6 +1095,7 @@ var Car = function(car_hash){
             this.intersecting[intersection.name] = true;
             this.add_to_intersection(intersection.name);
           }
+          return intersection;
           
         } else {
           
@@ -1141,7 +1116,7 @@ var Car = function(car_hash){
   this.add_to_intersection = function( name ) {
     if (intersection = _.detect(Game.intersections, function(inter){ return inter.name == name; })) {
       if (!_.include(intersection.cars, this)) {
-        intersection.cars.push( this );
+        intersection.cars[( this.orientation=='horizontal' ? 0 : 1 )].push( this );
       } 
     }
   };
@@ -1150,39 +1125,35 @@ var Car = function(car_hash){
     var self = this;
     for (var i=0; i < Game.intersections.length; i++) {
       if ( Game.intersections[i].name==intersection_name ) {
-        var idx = Game.intersections[i].cars.indexOf(self);
-        Game.intersections[i].cars.splice(idx, 1);
+        var idx = Game.intersections[i].cars[( this.orientation=='horizontal' ? 0 : 1 )].indexOf(self);
+        Game.intersections[i].cars[( this.orientation=='horizontal' ? 0 : 1 )].splice(idx, 1);
       }
     }
   };
 
   this.is_colliding_at_intersection = function(intersection, self1, self2) {
-    var self = this;
-    var classes = intersection.split(' ');
-    classes.push('intersecting');
-    classes.push(this.orientation=='horizontal' ? 'vertical' : 'horizontal');
-
-    var potential_collisions = $("." + classes.join('.'));
     
-    if (potential_collisions.length) {
-      var collision = false;
-      //console.log(potential_collisions);
-      $("." + classes.join('.')).each(function(){
-        var c     = $(this),
-            c_off = c.offset(),
-            c1    = [ c_off.left, c_off.left + c.width() ],
-            c2    = [ c_off.top,  c_off.top + c.height() ];
-
+    var self = this,
+       other = self.orientation=='horizontal' ? 1 : 0,
+       collision = false;
+    
+    if (intersection.cars[other].length) {
+      for (var i=0; i < intersection.cars[other].length; i++) {
+        var c   = intersection.cars[other][i],
+            c1  = [ c.current_pos.left, c.current_pos.left + c.width ],
+            c2  = [ c.current_pos.top,  c.current_pos.top + c.height ];
+        
         var horiz_match = self.compare_positions( self1, c1 ),
             vert_match  = self.compare_positions( self2, c2 );
-        
-        if (horiz_match && vert_match){
-          collision = c;
+      
+        if (horiz_match && vert_match) {
+          collision = c; 
         }
-      });
-
-      return collision;
+      }  
     }
+
+    return collision;
+    
   };
 
   this.compare_positions = function(p1, p2){
@@ -1198,17 +1169,19 @@ var Car = function(car_hash){
 
     if (leader_or_collision_or_barrier) {
       
-      if (leader_or_collision_or_barrier==='barrier') {
+      if (leader_or_collision_or_barrier.orientation!==undefined && 
+          leader_or_collision_or_barrier.orientation !== self.orientation) {
+        self.moving = false;
+        Game.end_with_collision( self );
+
+      } else if (leader_or_collision_or_barrier==='barrier') {
         self.moving = false;
 
       } else if (typeof leader_or_collision_or_barrier==='object') {
         self.moving = false;
         
-      } else if (leader_or_collision_or_barrier==='collision') {
-        self.moving = false;
-        Game.end_with_collision( self );
-
       }
+
     } else {
       
       if (self.orientation=='horizontal') {
@@ -1277,11 +1250,11 @@ var Maker = function(){
  
     var self        = this;
     self.street     = street;
-    self.frequency  = Math.round(Game.maker_freq + (Math.random()*3000));
+    self.frequency  = Math.round(Game.maker_freq + (Math.random()*(Game.maker_freq/2)));
     self.max_cars   = Game.max_cars_per_street;
     self.iterations = 0;
     self.car_types  = Game.car_types;
-    self.car_odds   = { 'jeepney' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
+    self.car_odds   = Game.car_odds;
 
     //debugger;
     
@@ -1308,7 +1281,12 @@ var Maker = function(){
     } else if (rand < self.car_odds.jeepney) {
       return self.car_types.jeepney;
     } else {
-      return self.car_types.car;
+      if (_.isArray(self.car_types.car.assets[0])) {
+        var selected_assets = self.car_types.car.assets[ Math.floor(Math.random()*self.car_types.car.assets.length) ];
+        return _.extend( _.clone(self.car_types.car), { assets : selected_assets });
+      } else {
+        return self.car_types.car;  
+      }
     }
     
   };
@@ -1322,13 +1300,6 @@ var Maker = function(){
         self.build_car(0);
       }  
     }
-    
-    //   if (Math.random() > 0.5 && self.street.cars.length < Game.max_cars_per_street) {
-    //     self.iterations+=1;
-    //     for (var i=0; i < num_cars; i++) {
-    //       self.build_car(i);
-    //     }
-    //   }
 
   };
 
@@ -1345,8 +1316,7 @@ var Maker = function(){
   };
 
   this.stop = function(){
-    this.street.dom.stopTime('making');
-    this.iterations = 0;
+    window.clearInterval(this.timer);
   };
 
 };

@@ -52,7 +52,7 @@ a, #intro p strong { color:#fc0; }
 .help p { font-size:24px; width:350px; }
 .help_illustration { position:absolute; right:0px; top:0px; width:250px; height:250px; border:10px solid #fff; -webkit-transform:rotate(10deg); background:#000; box-shadow:0 0 15px #000; color:#fff; }
 .help_illustration_frustration { top:260px; right:120px; -webkit-transform:rotate(-5deg); }
-.bttn { z-index:8; position:absolute; }
+.bttn { z-index:13; position:absolute; }
 
 .bttn.start_game, .bttn.restart { height:35px; padding:10px; margin-top:10px; border:5px solid #500; margin:0 auto; text-align:center; border-radius: 10px; background:#f90; color:#fff; }
 .bttn.start_game { font-size:30px; padding:10px 30px; bottom:100px; left:50px;  }
@@ -76,7 +76,7 @@ a, #intro p strong { color:#fc0; }
 #intro h1, #intro h2 { text-align:center; }
 .bttn, .buttons li { cursor:pointer; }
 
-#messages { position:absolute; top:320px; left:325px; text-align:center; width:350px; height:60px; z-index:6; }
+#messages { position:absolute; top:320px; left:325px; text-align:center; width:350px; height:60px; z-index:13; opacity : 1; display:none; }
 #messages h1, #messages h2, #messages h3, #messages .countdown { color:#fff; }
  
 
@@ -139,7 +139,7 @@ a, #intro p strong { color:#fc0; }
 .intersection { width:50px; height:50px; z-index:12; }
 .stoplight { position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:3; background:url(../images/control_horizontal.png) no-repeat 50% 50%; opacity:0.7;}
 .stoplight.vertical { -webkit-transform:rotate(90deg) translateZ(0); }
-.explosion { position:absolute; z-index:8; background-image: url(../images/explosion.png); width:80px; height:80px; background-repeat:no-repeat; }
+.explosion { position:absolute; z-index:13; background-image: url(../images/explosion.png); width:80px; height:80px; background-repeat:no-repeat; }
 .frustration { position:absolute; width:15px; height:15px; background-image: url(../images/frustration.png); z-index:9; }
 .frustration.major { background-image:url(../images/frustration_major.png); }
 #frustration_label { position:absolute; right:20px; bottom:25px; text-align:left; width:190px; font-size:12px; color:#fff; z-index:2; }
@@ -157,7 +157,7 @@ a, #intro p strong { color:#fc0; }
 .intersection.chang { left:250px; width:100px; }
 .intersection.dexter { left:650px; width:100px; }
 
-.restart { position:absolute; top:470px; left:400px; width:200px; height:60px; font-size:36px; color:#fff; text-align:center; display:none; z-index:8; cursor:pointer; }
+.restart { position:absolute; top:470px; left:400px; width:200px; height:60px; font-size:36px; color:#fff; text-align:center; display:none; cursor:pointer; }
 
 #overlay { background:rgba(0,0,0,0.7); position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:10; }
 #overlay .overlay_inner { position:absolute; top:40%; left:30%; width:30%; padding:5% 10%; text-align:center; background:#fff; border-radius:10px; }
