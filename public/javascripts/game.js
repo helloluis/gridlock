@@ -745,8 +745,11 @@ var Car = function(car_hash){
   this.frustration_threshold = 3;
   this.frustration_level1    = 4;
   this.frustration_level2    = 5;
+
   // this.speed                 = Math.round((Math.random()*2)+2); // pixels per frame
-  this.speed                 = (Math.random()*3)+2; // pixels per frame
+  this.speed                 = (Math.random()*3)+2; // pixels per frame 
+  // might want to go back to the original integer version of this if you want to save CPU cycles on iPad 1 devices
+
   this.intersecting          = {};
   this.on_street             = false;
   this.orientation           = 'horizontal';
