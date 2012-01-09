@@ -35,6 +35,7 @@ Game = {
   car_odds            : CAR_ODDS,
 
   images_dir          : IMAGES_DIR,
+  sounds_dir          : SOUNDS_DIR,
 
   frustration_assets  : _.map(FRUSTRATIONS, function(f){ 
                           var img = new Image();
@@ -760,6 +761,7 @@ var Car = function(car_hash){
   this.color                 = car_hash && car_hash.colors ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
   this.type                  = car_hash && car_hash.type ? car_hash.type : 'car';
   this.image_assets          = car_hash && car_hash.assets ? car_hash.assets : false;
+  this.sounds                = car_hash && car_hash.sounds ? car_hash.sounds : false;
   this.street                = false;
   this.moving                = false;
   this.frustration           = 0;
@@ -804,6 +806,7 @@ var Car = function(car_hash){
     this.initialize_origins(); 
     this.initialize_intersecting();
     this.initialize_frustration();
+    this.initialize_sounds();
 
     if (Game.debug===true) {
       
@@ -844,6 +847,21 @@ var Car = function(car_hash){
     if (this.orientation=='horizontal') {
       this.width  = h;
       this.height = w;
+    }
+  };
+
+  this.initialize_sounds = function() {
+    if (this.sounds) {
+      console.log('ambulance sound', Game.sounds_dir + this.sounds[0]);
+      if (Game.with_sound) {
+        if (Game.with_phonegap_sound) {
+          this.sound_loop = new Media( Game.sounds_dir + this.sounds[0] );
+          this.sound_loop.play({ numberOfLoops : 99 });
+        } else if (Game.with_sm2_sound) {
+          this.sound_loop = soundManager.createSound({ id : this.name, url : Game.sounds_dir + this.sounds[0], autoLoad : true });
+          this.sound_loop.play({ loops : 99 });
+        }
+      }
     }
   };
 
@@ -1337,6 +1355,10 @@ var Car = function(car_hash){
     }
 
     this.street.cars.splice(idx,1);
+
+    if (this.sound_loop) {
+      this.sound_loop.stop();
+    }
 
     Game.frustration -= this.frustration;
     Game.arrived( this );

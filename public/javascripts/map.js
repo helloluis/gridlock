@@ -122,7 +122,8 @@ var CARS = {
   bus         : { type : 'bus',       width : 20, height : 55, frustrates_by : 4,   
        assets : [ 'bus_horizontal.png', 'bus_horizontal_left.png', 'bus.png', 'bus_bottom.png' ]   },
   ambulance   : { type : 'ambulance', width : 20, height : 40, frustrates_by : 4, speed : 5,  
-       assets : [ 'ambulance_horizontal.png', 'ambulance_horizontal_left.png', 'ambulance.png', 'ambulance_bottom.png' ]}
+       assets : [ 'ambulance_horizontal.png', 'ambulance_horizontal_left.png', 'ambulance.png', 'ambulance_bottom.png' ],
+       sounds : [ 'ambulance.mp3' ] }
 };
 
 var FRUSTRATIONS = [
@@ -134,6 +135,8 @@ var FRUSTRATIONS = [
 ];
 
 var CAR_ODDS = { 'car' : 0.6, 'van' : 0.2, 'jeepney' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
+
+var SOUNDS_DIR = "sounds/";
 
 // all sounds and music
 var SOUNDS = { 
