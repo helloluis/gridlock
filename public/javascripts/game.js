@@ -15,9 +15,11 @@ Game = {
   
   with_css3_animation : true,
 
-  with_sound          : true,
+  with_sound          : false,
   with_phonegap_sound : false,   // we use the phonegap sound library for iOS
   with_sm2_sound      : true,    // soundmanager2 is what we use for regular web presentation
+
+  can_adjust_speed    : true,    // clicking or swiping on a car will increase its speed (UNDER CONSTRUCTION)
 
   raw_sounds          : SOUNDS,
   sounds              : {},
@@ -26,6 +28,7 @@ Game = {
   barriers            : {},
   intersections       : [],
   
+  max_speed           : MAX_SPEED,
   max_frustration     : 100,
   enable_frustration  : true,
   
@@ -83,6 +86,8 @@ Game = {
 
     Game.initialize_high_score();
 
+    Game.initialize_speed_changer();
+
     if (Game.enable_frustration) {
       // Game.initialize_frustration();  
     }
@@ -113,6 +118,50 @@ Game = {
       $(".neighborhood").css({'background':"#121212"});
     }
     
+  },
+
+  initialize_speed_changer : function(){
+    if (this.can_adjust_speed) {
+      $(".street").click(function(e){ 
+        if (Game.started && !Game.paused && !Game.ended) {
+          
+          var street_name = $(this).attr('data-name');
+
+          var hit1 = [ e.pageX - 15, e.pageX + 15 ],
+              hit2 = [ e.pageY - 15, e.pageY + 15 ];
+          
+          if (Game.debug) {
+            $("<div></div>").
+              addClass('hitbox').
+              css({ top    : e.pageY-15, 
+                    left   : e.pageX-15, 
+                    width  : 30, 
+                    height : 30,
+                    opacity : 0.5 }).
+              oneTime(20000, function(){ $(this).remove(); }).
+              appendTo('#map');
+          }
+
+          if (streets = _.filter(Game.streets, function(street){ return (street_name===street.css_name); })) {
+            _.each(streets, function(street){
+              _.each(street.cars, function(c){
+                var c1 = [ c.current_pos.left, c.current_pos.left + c.width ],
+                    c2 = [ c.current_pos.top,  c.current_pos.top + c.height ];
+                
+                var horiz_match = Game.compare_positions( hit1, c1 ),
+                    vert_match  = Game.compare_positions( hit2, c2 );
+                
+                console.log( 'clicked', e.pageX, e.pageY, 'car pos', c.current_pos.left, c.current_pos.top );
+
+                if (horiz_match && vert_match) {
+                  c.change_speed(true);  
+                }
+              });
+            });
+          }
+        }
+      }); 
+    }
   },
 
   // this is the main animation function,
@@ -607,7 +656,7 @@ Game = {
       var elem   = $(el),
           light  = self.stoplights[idx],
           click  = function(){
-            if (Game.started) {
+            if (Game.started && !Game.paused && !Game.ended) {
               if (elem.hasClass('horizontal')) {
                 elem.removeClass('horizontal').addClass('vertical');
               } else {
@@ -683,6 +732,12 @@ Game = {
     }
   },
 
+  compare_positions : function(p1, p2){
+    var x1 = p1[0] < p2[0] ? p1 : p2;
+    var x2 = p1[0] < p2[0] ? p2 : p1;
+    return x1[1] > x2[0] || x1[0] === x2[0] ? true : false;
+  }
+
 };
 
 var Street = function(){
@@ -708,6 +763,7 @@ var Street = function(){
   this.initialize    = function(game, street) {
     this.game        = Game;
     this.name        = street[0];
+    this.css_name    = street[0].replace(/\_(right|left)/,'').replace(/\_lane[\d]/,'');
     
     this.lefthand    = this.name.indexOf('left')!==-1;
     this.orientation = street[1];
@@ -1012,31 +1068,6 @@ var Car = function(car_hash){
 
   };
 
-  this.add_frustration_cloud = function(very){
-    if (!this.moving) {
-
-      var top = this.orientation=='horizontal' ? 
-        this.dom.offset().top : 
-        ( this.lefthand ? (this.dom.offset().top + this.dom.height()) - 15 : this.dom.offset().top - 15 ); 
-
-      var left = this.orientation=='horizontal' ?
-        ( this.lefthand ? this.dom.offset().left - 15 : (this.dom.offset().left + this.dom.width()) - 15 ) : 
-        this.dom.offset().left;
-
-      var cloud = $("<div class='frustration'></div>").
-        css({ top : top, left : left }).
-        attr('data-car-name',this.name).
-        appendTo('#cars');
-      if (very===true) {
-        cloud.addClass('very');
-      }
-    }
-  };
-
-  this.remove_frustration_cloud = function(){
-    $(".frustration[data-car-name='" + this.name + "']").remove();
-  };
-
   this.render = function(left, top){
     
     var self   = this,
@@ -1097,23 +1128,13 @@ var Car = function(car_hash){
     self.moving = false;
   };
 
-  this.calculate_speed = function(){
-    var self = this;
-    if (this.orientation==='horizontal') {
-      if (this.lefthand) {
-        var speed = (this.dom.offset().left/this.speed)*1000;
-      } else {
-        var speed = ((Game.map.width() - this.dom.offset().left)/this.speed)*1000;  
-      }
-      
-    } else {
-      if (this.lefthand) {
-        var speed = ((Game.map.height() - this.dom.offset().top)/this.speed)*1000;
-      } else {
-        var speed = (this.dom.offset().top/this.speed)*1000;
-      }
+  this.change_speed = function(faster) {
+    if (faster && Math.ceil(this.speed) < Game.max_speed) {
+      this.speed += 1;
+    } else if (!faster && Math.ceil(this.speed) > 2) {
+      this.speed -= 1;
     }
-    return speed;
+    console.log('new speed', this.speed);
   };
 
   this.restart = function(reset_polling) {
@@ -1275,9 +1296,10 @@ var Car = function(car_hash){
   };
 
   this.compare_positions = function(p1, p2){
-    var x1 = p1[0] < p2[0] ? p1 : p2;
-    var x2 = p1[0] < p2[0] ? p2 : p1;
-    return x1[1] > x2[0] || x1[0] === x2[0] ? true : false;
+    return Game.compare_positions( p1, p2 );
+    // var x1 = p1[0] < p2[0] ? p1 : p2;
+    // var x2 = p1[0] < p2[0] ? p2 : p1;
+    // return x1[1] > x2[0] || x1[0] === x2[0] ? true : false;
   };
 
   this.drive = function(){
@@ -1354,6 +1376,7 @@ var Car = function(car_hash){
       follower.leader = false;
     }
 
+    // remove from street.cars array
     this.street.cars.splice(idx,1);
 
     if (this.sound_loop) {

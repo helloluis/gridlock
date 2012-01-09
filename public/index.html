@@ -20,9 +20,8 @@
   
   <script src="javascripts/modernizr.js"></script>
   <script src="javascripts/jquery-1.7.1.min.js"></script>
-  <script src="javascripts/jquery.pause.js"></script>
+  <script src="javascripts/jquery.swipe.js"></script>
   <script src="javascripts/jquery.tappable.js"></script>
-  <script src="javascripts/jquery.css3animate.js"></script>
   <script src="javascripts/jstorage.js"></script>
   <script src="javascripts/underscore.js"></script>
   <script src="javascripts/jquery-timers.js"></script>
@@ -108,17 +107,19 @@
   <div id="map">
     
     <div class="neighborhood"></div>
+    
+    <div id="amber"  data-name="amber" class="street horizontal lanes_4"></div>
+    <div id="baker"  data-name="baker" class="street horizontal lanes_2"></div>
+    <div id="chang"  data-name="chang" class="street vertical lanes_4"></div>
+    <div id="dexter" data-name="dexter" class="street vertical lanes_4"></div>
 
     <div class="intersection amber chang"  data-streets="amber chang"><div class='stoplight horizontal'></div></div>
     <div class="intersection amber dexter" data-streets="amber dexter"><div class='stoplight horizontal'></div></div>
     <div class="intersection baker chang"  data-streets="baker chang"><div class='stoplight horizontal'></div></div>
     <div class="intersection baker dexter" data-streets="baker dexter"><div class='stoplight horizontal'></div></div>
-    
+
     <canvas id="cars" width="1024" height="768"></canvas>
     
-    <!-- <div id="frustration_label">FRUSTRATION</div>
-    <div id="frustration"><div class='bar'></div></div> -->
-
   </div>
   
 </div>

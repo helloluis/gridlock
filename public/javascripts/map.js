@@ -99,6 +99,8 @@ var INTERSECTIONS = [
 // has managed to remove some more. 8 is a purely arbitrary number.
 var MAX_CARS_PER_STREET = 10;
 
+var MAX_SPEED = 6;
+
 var MAKER_FREQUENCY = 5000;
 
 var IMAGES_DIR = "images/";
