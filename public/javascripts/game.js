@@ -46,6 +46,10 @@ Game = {
                                     left   : f[4] };
                         }),
   
+  deferred_renders    : [], 
+  // sometimes we want to defer rendering on some items 
+  // until all of the cars have been rendered, e.g., the frustration indicators
+
   db_name             : "traffix",
   high_score_key      : "high_score",
 
@@ -118,6 +122,7 @@ Game = {
     if (Game.started && !Game.paused && !Game.ended) {
       //clear 
       Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
+      Game.deferred_renders = new Array;
 
       if (Game.debug==true) {
         Game.show_game_objects();  
@@ -127,6 +132,14 @@ Game = {
         _.each(street.cars, function(car){
           car.animate();
         });
+      });
+
+      _.each(Game.deferred_renders, function(arr) {
+        if (_.isFunction(arr[0])) {
+          var func = arr[0];
+          arr.splice(0,1);
+          func(arr[0], arr[1]); // TODO: Figure out how to use Function.apply() here so we can have a dynamic number of arguments
+        }
       });
 
       //new frame
@@ -957,6 +970,8 @@ var Car = function(car_hash){
       }
       
     }
+    
+    return false;
 
   };
 
@@ -1010,7 +1025,14 @@ var Car = function(car_hash){
 
     if (Game.enable_frustration) {
       if (frustration = self.manage_frustration()) {
-        ctx.drawImage(frustration.image, self.current_pos.left + frustration.left, self.current_pos.top + frustration.top);
+        Game.deferred_renders.push([ 
+            function(f, p) {
+              ctx.drawImage( f.image, 
+                             (p.left + f.left), 
+                             (p.top + f.top) );
+            }, 
+            frustration, 
+            self.current_pos ]);
       }
     }
 
