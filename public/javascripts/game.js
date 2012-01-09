@@ -111,8 +111,11 @@ Game = {
       };
     })();
 
-    Game.canvas  = document.getElementById('cars');
-    Game.context = Game.canvas.getContext('2d');
+    Game.car_canvas  = document.getElementById('cars');
+    Game.car_context = Game.car_canvas.getContext('2d');
+
+    Game.frustration_canvas = document.getElementById('frustrations');
+    Game.frustration_context = Game.frustration_canvas.getContext('2d');
 
     if (Game.debug==true) {
       $(".neighborhood").css({'background':"#121212"});
@@ -171,7 +174,7 @@ Game = {
     
     if (Game.started && !Game.paused && !Game.ended) {
       //clear 
-      Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
+      Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
       Game.deferred_renders = new Array;
 
       if (Game.debug==true) {
@@ -392,25 +395,25 @@ Game = {
     _.each(Game.streets, function(street){
       _.each(street.barriers, function(b){
         if (b.active) {
-          Game.context.beginPath();
-          Game.context.rect( b.left, b.top, b.width, b.height);
-          Game.context.fillStyle = b.color;
-          Game.context.fill();  
+          Game.car_context.beginPath();
+          Game.car_context.rect( b.left, b.top, b.width, b.height);
+          Game.car_context.fillStyle = b.color;
+          Game.car_context.fill();  
         }
       });
-      Game.context.beginPath();
-      Game.context.rect( street.left, street.top, street.width, street.height );
-      Game.context.lineWidth = 2;
-      Game.context.strokeStyle = "#333";
-      Game.context.stroke();
+      Game.car_context.beginPath();
+      Game.car_context.rect( street.left, street.top, street.width, street.height );
+      Game.car_context.lineWidth = 2;
+      Game.car_context.strokeStyle = "#333";
+      Game.car_context.stroke();
     });
 
     _.each(Game.intersections, function(inter){
-      Game.context.beginPath();
-      Game.context.rect( inter.left, inter.top, inter.width, inter.height );
-      Game.context.lineWidth = 2;
-      Game.context.strokeStyle = "#0ff";
-      Game.context.stroke();
+      Game.car_context.beginPath();
+      Game.car_context.rect( inter.left, inter.top, inter.width, inter.height );
+      Game.car_context.lineWidth = 2;
+      Game.car_context.strokeStyle = "#0ff";
+      Game.car_context.stroke();
     });
 
   },
@@ -573,7 +576,7 @@ Game = {
     var int = 3;
     Game.messages.css({ display : 'block', opacity : '1' });
     
-    Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
+    Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
 
     if (Game.with_sound) {
       _.delay(function(){
@@ -1072,7 +1075,7 @@ var Car = function(car_hash){
     
     var self   = this,
         street = self.street,
-        ctx    = Game.context;
+        ctx    = Game.car_context;
 
     if (Game.debug===true) {
       ctx.beginPath();
@@ -1427,6 +1430,8 @@ var Maker = function(){
       return self.car_types.jeepney;
     } else if (rand < self.car_odds.van) {
       return self.car_types.van;
+    } else if (rand < self.car_odds.hatch) {
+      return self.car_types.hatch;
     } else {
       if (_.isArray(self.car_types.car.assets[0])) {
         var selected_assets = self.car_types.car.assets[ Math.floor(Math.random()*self.car_types.car.assets.length) ];

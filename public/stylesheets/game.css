@@ -52,7 +52,7 @@ a, #intro p strong { color:#fc0; }
 .help p { font-size:24px; width:350px; }
 .help_illustration { position:absolute; right:0px; top:0px; width:250px; height:250px; border:10px solid #fff; -webkit-transform:rotate(10deg); background:#000; box-shadow:0 0 15px #000; color:#fff; }
 .help_illustration_frustration { top:260px; right:120px; -webkit-transform:rotate(-5deg); }
-.bttn { z-index:13; position:absolute; }
+.bttn { z-index:18; position:absolute; }
 
 .bttn.start_game, .bttn.restart { height:35px; padding:10px; margin-top:10px; border:5px solid #500; margin:0 auto; text-align:center; border-radius: 10px; background:#f90; color:#fff; }
 .bttn.start_game { font-size:30px; padding:10px 30px; bottom:100px; left:50px;  }
@@ -87,7 +87,7 @@ a, #intro p strong { color:#fc0; }
 #map { top:0px; left:0px; width:100%; height:100%; }
 .neighborhood, .buildings { top:0px; left:0px; background:url(../images/bg.jpg); width:100%; height:100%; }
 .buildings { top:0px; left:0px; background:url(../images/buildings.png); width:100%; height:100%; z-index:12; }
-.street{z-index:13; cursor:pointer;}
+.street{z-index:14; cursor:pointer;}
 .street.horizontal.lanes_4 { width:100%; height: 100px; }
 .street.horizontal.lanes_2 { width:100%; height: 50px; }
 .street.vertical.lanes_2 { width:50px; height: 100%; }
@@ -102,7 +102,9 @@ a, #intro p strong { color:#fc0; }
 .street.horizontal .lane2 { top:48%; }
 .street.vertical .lane { width:50%; height:100%; }
 .street.vertical .lane2 { left:50%; }
-#cars { z-index:10; position:absolute; top:0px; left:0px; }
+
+#cars, #frustrations { z-index:10; position:absolute; top:0px; left:0px; }
+#frustrations { z-index:13; }
 
 #amber { top:200px; left:0px; }
 #baker { top:500px; left:0px; }
@@ -110,34 +112,7 @@ a, #intro p strong { color:#fc0; }
 #dexter { top:0px; left:650px; }
 
 .hitbox { position:absolute; background:#0fc; }
-.car { top:5px; left:10px; width:20px; height:35px; background-repeat:no-repeat; background-image:url(../images/car_orange.png); }
-.jeepney { width:20px; height: 45px; background-image:url(../images/jeepney.png); }
-.van { width:15px; height: 40px; background-image:url(../images/van.png); }
-.bus { width:15px; height: 55px; background-image:url(../images/bus.png); }
-.ambulance { width:15px; height:40px; background-image:url(../images/ambulance.png); }
-/*.car.blue { background-image:url(../images/car_blue.png); }
-.car.black { background-image:url(../images/car_black.png); }
-.car.yellow { background-image:url(../images/car_yellow.png); }
-.car.orange { background-image:url(../images/car_orange.png); }
-.car.green { background-image:url(../images/car_green.png); }*/
-.car.horizontal { width:35px; height:20px; background-image:url(../images/car_orange_horizontal.png); }
-.jeepney.horizontal { width:45px; height:20px; background-image:url(../images/jeepney_horizontal.png); }
-.car.van.horizontal { width: 40px; height:15px; background-image:url(../images/van_horizontal.png); }
-.car.ambulance.horizontal { width: 40px; height:15px; background-image:url(../images/ambulance_horizontal.png); }
-.car.bus.horizontal { width: 55px; height:15px; background-image:url(../images/bus_horizontal.png); }
-.car.horizontal.right { -webkit-transform: translateZ(0) scaleX(-1); }
-.car.horizontal.left { -webkit-transform: translateZ(0) rotate(0deg); }
-.car.vertical.left { -webkit-transform: translateZ(0) rotate(0deg); }
-.car.vertical.right { -webkit-transform: translateZ(0) rotate(180deg); }
-/*.van.vertical.right, .bus.vertical.right, .ambulance.vertical.right { -webkit-transform:rotate(0deg); }
-.van.vertical.left, .bus.vertical.left, .ambulance.vertical.left { -webkit-transform:rotate(180deg); }
-*/
-/*.car.horizontal { width:35px; height:15px; }
-.car.vertical.right { background:url(../images/car_vertical_right_yellow.png); }
-.car.horizontal.right { background:url(../images/car_horizontal_right_yellow.png); }
-.car.vertical.left { background:url(../images/car_vertical_left_blue.png); }
-.car.horizontal.left { background:url(../images/car_horizontal_left_blue.png); }
-*/
+
 .intersection { width:50px; height:50px; z-index:14; }
 .stoplight { position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:3; background:url(../images/control_horizontal.png) no-repeat 50% 50%; opacity:0.7;}
 .stoplight.vertical { -webkit-transform:rotate(90deg) translateZ(0); }
@@ -147,12 +122,7 @@ a, #intro p strong { color:#fc0; }
 #frustration_label { position:absolute; right:20px; bottom:25px; text-align:left; width:190px; font-size:12px; color:#fff; z-index:2; }
 #frustration { position:absolute; right:20px; bottom:20px; width:200px; height:20px; background:#690; overflow:hidden; }
 #frustration .bar { position:absolute; top:0; left:0; width:0; height:100%; background:#900; }
-/*.stoplight .light { position:absolute; width:32px; height:32px; top:0px; left:0px; background:url(../images/control_horizontal_go.png) no-repeat; z-index:7; opacity:0.5; }
-.stoplight .light:hover { opacity:1.0; }
-.stoplight .light.stopped { background-image:url(../images/control_horizontal_stop.png); }
-.stoplight .light.vertical { background-image:url(../images/control_vertical_go.png);top:0px; left:45px; }
-.stoplight .light.vertical.stopped { background-image:url(../images/control_vertical_stop.png);top:0px; left:45px; }
-*/
+
 .intersection.big .stoplight { top:0px; }
 .intersection.amber { top:200px; height:100px; }
 .intersection.baker { top:500px; height:50px; }

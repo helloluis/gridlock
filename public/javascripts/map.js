@@ -114,11 +114,12 @@ var CARS = {
     frustrates_by : 7,
     assets    : [ 
       // from right, from left, from top, from bottom
-      [ 'car1_r.png', 'car1_l.png', 'car1_d.png', 'car1_u.png' ], 
       [ 'car2_r.png', 'car2_l.png', 'car2_d.png', 'car2_u.png' ], 
       [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ], 
     ]
   },
+  hatch       : { type : 'hatch',     width : 20, height : 35, frustrates_by : 7,
+      assets  : [ 'car1_r.png', 'car1_l.png', 'car1_d.png', 'car1_u.png' ] },
   jeepney     : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, 
        assets : [ 'jeepney_r.png', 'jeepney_l.png', 'jeepney_d.png', 'jeepney_u.png' ] },
   van         : { type : 'van',       width : 20, height : 45, frustrates_by : 5, 
@@ -138,7 +139,7 @@ var FRUSTRATIONS = [
   [ 'frustration_04.png', 40, 40, -20, -25 ]
 ];
 
-var CAR_ODDS = { 'car' : 0.6, 'van' : 0.2, 'jeepney' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
+var CAR_ODDS = { 'hatch' : 0.4, 'van' : 0.2, 'jeepney' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
 
 var SOUNDS_DIR = "sounds/";
 
