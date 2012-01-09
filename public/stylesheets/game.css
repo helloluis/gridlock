@@ -80,7 +80,7 @@ a, #intro p strong { color:#fc0; }
 #messages h1, #messages h2, #messages h3, #messages .countdown { color:#fff; }
  
 
-#score, #high_score { position:absolute; text-align:right; top:20px; right:20px; width:200px; height:50px; font-size:36px; color:#fff; z-index:5; }
+#score, #high_score { position:absolute; text-align:right; top:20px; right:20px; width:200px; height:50px; font-size:36px; color:#fff; z-index:20; }
 #high_score { font-size:16px; top:60px; right:25px; }
 
 #map, .neighborhood, .street, .buildings, .intersection { position:absolute; }
