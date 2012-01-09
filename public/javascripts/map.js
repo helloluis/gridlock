@@ -38,20 +38,20 @@ a car bumping into another car on the same street.
 
 var STREETS = [
   // name, orientation, top, left, width, height
+  ["amber_left_lane1",   "horizontal",  200,   0,     1024,  20 ],
+  ["amber_left_lane2",   "horizontal",  220,   0,     1024,  20 ],
   ["amber_right_lane1",  "horizontal",  250,   0,     1024,  20 ],
   ["amber_right_lane2",  "horizontal",  275,   0,     1024,  20 ],
-  ["amber_left_lane1",   "horizontal",  202,   0,     1024,  20 ],
-  ["amber_left_lane2",   "horizontal",  225,   0,     1024,  20 ],
-  ["baker_right",        "horizontal",  528,   0,     1024,  20 ],
-  ["baker_left",         "horizontal",  505,   0,     1024,  20 ],
-  ['chang_right_lane1',  "vertical",    0,     308,   20,    768 ],
-  ['chang_right_lane2',  "vertical",    0,     329,   20,    768 ],
+  ["baker_left",         "horizontal",  502,   0,     1024,  20 ],
+  ["baker_right",        "horizontal",  523,   0,     1024,  20 ],
   ['chang_left_lane1',   "vertical",    0,     253,   20,    768 ],
   ['chang_left_lane2',   "vertical",    0,     276,   20,    768 ],
-  ['dexter_right_lane1', "vertical",    0,     706,   20,    768 ],
-  ['dexter_right_lane2', "vertical",    0,     728,   20,    768 ],
+  ['chang_right_lane1',  "vertical",    0,     306,   20,    768 ],
+  ['chang_right_lane2',  "vertical",    0,     327,   20,    768 ],
   ['dexter_left_lane1',  "vertical",    0,     653,   20,    768 ],
-  ['dexter_left_lane2',  "vertical",    0,     676,   20,    768 ]
+  ['dexter_left_lane2',  "vertical",    0,     676,   20,    768 ],
+  ['dexter_right_lane1', "vertical",    0,     706,   20,    768 ],
+  ['dexter_right_lane2', "vertical",    0,     728,   20,    768 ]
 ];
 
 
