@@ -97,7 +97,7 @@ var INTERSECTIONS = [
 
 // once a Maker hits MAX_CARS_PER_STREET, it stops generating new cars until the user
 // has managed to remove some more. 8 is a purely arbitrary number.
-var MAX_CARS_PER_STREET = 8;
+var MAX_CARS_PER_STREET = 10;
 
 var MAKER_FREQUENCY = 5000;
 
@@ -109,19 +109,19 @@ var CARS = {
     type      : 'car', 
     width     : 20, 
     height    : 35, 
-    frustrates_by : 1,
+    frustrates_by : 7,
     assets    : [ 
       [ 'car_orange_horizontal.png', 'car_orange_horizontal_left.png', 'car_orange.png', 'car_orange_bottom.png' ], 
       [ 'car_yellow_horizontal.png', 'car_yellow_horizontal_left.png', 'car_yellow.png', 'car_yellow_bottom.png' ], 
     ]
   },
-  jeepney     : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 1.5, 
+  jeepney     : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, 
        assets : [ 'jeepney_horizontal.png', 'jeepney_horizontal_left.png', 'jeepney.png', 'jeepney_bottom.png' ] },
-  van         : { type : 'van',       width : 20, height : 40, frustrates_by : 1.5, 
+  van         : { type : 'van',       width : 20, height : 50, frustrates_by : 5, 
        assets : [ 'van_horizontal.png', 'van_horizontal_left.png', 'van.png', 'van_bottom.png' ] },
-  bus         : { type : 'bus',       width : 20, height : 55, frustrates_by : 2,   
+  bus         : { type : 'bus',       width : 20, height : 55, frustrates_by : 4,   
        assets : [ 'bus_horizontal.png', 'bus_horizontal_left.png', 'bus.png', 'bus_bottom.png' ]   },
-  ambulance   : { type : 'ambulance', width : 20, height : 40, frustrates_by : 5,   
+  ambulance   : { type : 'ambulance', width : 20, height : 40, frustrates_by : 4, speed : 5,  
        assets : [ 'ambulance_horizontal.png', 'ambulance_horizontal_left.png', 'ambulance.png', 'ambulance_bottom.png' ]}
 };
 
@@ -129,10 +129,9 @@ var FRUSTRATIONS = [
   // filename, width, height, offset top, offset left
   [ 'frustration_01.png', 40, 40, -20, -25 ],
   [ 'frustration_02.png', 40, 40, -20, -25 ],
-  [ 'frustration_03.png', 40, 40, -20, -25 ]
+  [ 'frustration_03.png', 40, 40, -20, -25 ],
+  [ 'frustration_04.png', 40, 40, -20, -25 ]
 ];
-
-var FRUSTRATION_MOD = 6;
 
 var CAR_ODDS = { 'car' : 0.6, 'van' : 0.2, 'jeepney' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
 

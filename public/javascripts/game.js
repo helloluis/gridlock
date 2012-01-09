@@ -83,7 +83,7 @@ Game = {
     Game.initialize_high_score();
 
     if (Game.enable_frustration) {
-      Game.initialize_frustration();  
+      // Game.initialize_frustration();  
     }
 
     if (auto_start===true) {
@@ -189,7 +189,7 @@ Game = {
     Game.initialize_high_score();
 
     $(".restart").hide();
-    $(".pause, .quit").addClass('disabled');
+    $(".pause, .quit, .mute").addClass('disabled');
 
   },
 
@@ -431,8 +431,6 @@ Game = {
     _.each(Game.streets,function(street){
       street.stop();
     });
-    
-    Game.map.stopTime('intersecting');
 
   },
 
@@ -446,8 +444,9 @@ Game = {
 
   pause : function(){
     Game.paused = true;
+    
     $("#overlay").show();
-    $(".car").pause();
+    
     if (Game.with_sound) {
       Game.stop_theme();
     }
@@ -455,8 +454,11 @@ Game = {
 
   resume : function() {
     Game.paused = false;
+    
     $("#overlay").hide();
-    $(".car").resume();
+    
+    Game.animate();
+
     if (Game.with_sound) {
       Game.start_theme();
     }
@@ -543,7 +545,7 @@ Game = {
         Game.paused = false;
         Game.messages.hide();
         Game.start_streets();
-        $(".pause, .quit").removeClass('disabled');
+        $(".pause, .quit, .mute").removeClass('disabled');
       } 
 
       int-=1;
@@ -577,16 +579,16 @@ Game = {
 
     Game.frustration = 0;
     
-    Game.frus_bar.width(0);
+    // Game.frus_bar.width(0);
 
-    Game.frus_cont.
-      stopTime('frustrating').
-      everyTime(1000, 'frustrating', function(){
-        Game.adjust_frustration();
-        if (Game.frustration >= Game.max_frustration) {
-          Game.end_with_frustration();
-        }
-      });
+    // Game.frus_cont.
+    //   stopTime('frustrating').
+    //   everyTime(1000, 'frustrating', function(){
+    //     Game.adjust_frustration();
+    //     if (Game.frustration >= Game.max_frustration) {
+    //       Game.end_with_frustration();
+    //     }
+    //   });
   },
 
   adjust_frustration : function(){
@@ -746,12 +748,6 @@ var Street = function(){
   };
 
   this.stop = function(){
-    var car_dom = $(".car." + this.name ).stopTime('frustrating').stopTime('driving');
-
-    car_dom.remove();
-
-    $(".frustration").remove();
-    
     this.maker.stop();
   };
 
@@ -772,10 +768,11 @@ var Car = function(car_hash){
   this.frustration_threshold = 3;
   this.frustration_level1    = 4;
   this.frustration_level2    = 5;
-  this.travel_time_modifier  = FRUSTRATION_MOD; // this is the number we use to modify ideal_travel_time, for frustration purposes
+  this.travel_time_modifier  = car_hash && car_hash.frustrates_by ? car_hash.frustrates_by : 6;
+  // this is the number we use to modify ideal_travel_time, for frustration purposes
 
   // this.speed                 = Math.round((Math.random()*2)+2); // pixels per frame
-  this.speed                 = (Math.random()*3)+2; // pixels per frame 
+  this.speed                 = car_hash && car_hash.speed ? car_hash.speed : (Math.random()*3)+2; // pixels per frame 
   // might want to go back to the original integer version of this if you want to save CPU cycles on iPad 1 devices
 
   this.intersecting          = {};
@@ -908,7 +905,7 @@ var Car = function(car_hash){
       Math.round(this.ideal_travel_time/2),
       Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.35)),
       Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.2)),
-      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.1))
+      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.05))
     ];
   };
 
@@ -919,8 +916,7 @@ var Car = function(car_hash){
     self.actual_travel_time += 1;
     
     if (self.actual_travel_time == self.frustration_thresholds[0]) {
-      self.frustration += self.frustrates_by;
-      Game.frustration += self.frustrates_by;
+      
       if (Game.with_sound) {
         var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
         Game.sounds[horn_name].play();
@@ -933,23 +929,28 @@ var Car = function(car_hash){
       }
 
     } else if (self.actual_travel_time == self.frustration_thresholds[1]) {
-      self.frustration += self.frustrates_by;
-      Game.frustration += self.frustrates_by;
+      
+      if (self.moving===false) {
+        return Game.frustration_assets[0];
+      }
+
       if (Game.with_sound) {
         var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
         Game.sounds[horn_name].play();
       }
     
     } else if (self.actual_travel_time > self.frustration_thresholds[1] && self.actual_travel_time < self.frustration_thresholds[2]) {
-      // show major frustration graphic
+      
       if (self.moving===false) {
         return Game.frustration_assets[1];  
       }
-      
 
     } else if (self.actual_travel_time == self.frustration_thresholds[2]) {
-      self.frustration += self.frustrates_by*2;
-      Game.frustration += self.frustrates_by*2;
+      
+      if (self.moving===false) {
+        return Game.frustration_assets[1];
+      }
+
       if (Game.with_sound) {
         var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
         Game.sounds[horn_name].play();
@@ -961,14 +962,32 @@ var Car = function(car_hash){
         return Game.frustration_assets[2];  
       }
     
-    } else if (self.actual_travel_time > self.ideal_travel_time) {
+    } else if (self.actual_travel_time === self.frustration_thresholds[3]) {
+      
+      if (self.moving===false) {
+        return Game.frustration_assets[2];  
+      }
+            
+      if (Game.with_sound) {
+        var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
+        Game.sounds[horn_name].play();
+      }
+    
+    } else if (self.actual_travel_time > self.frustration_thresholds[3] && self.actual_travel_time < self.ideal_travel_time) {
+      
+      //console.log(self.actual_travel_time, self.ideal_travel_time);
+      if (self.moving===false) {
+        return Game.frustration_assets[3];  
+      }
+      
+    } else if (self.actual_travel_time === self.ideal_travel_time) {
       
       Game.end_with_frustration();
 
       if (self.moving===false) {
-        return Game.frustration_assets[2];  
+        return Game.frustration_assets[3];  
       }
-      
+
     }
     
     return false;
@@ -1361,6 +1380,8 @@ var Maker = function(){
       return self.car_types.bus;
     } else if (rand < self.car_odds.jeepney) {
       return self.car_types.jeepney;
+    } else if (rand < self.car_odds.van) {
+      return self.car_types.van;
     } else {
       if (_.isArray(self.car_types.car.assets[0])) {
         var selected_assets = self.car_types.car.assets[ Math.floor(Math.random()*self.car_types.car.assets.length) ];
