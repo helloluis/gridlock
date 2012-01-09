@@ -110,21 +110,23 @@ var CARS = {
   car         : { 
     type      : 'car', 
     width     : 20, 
-    height    : 35, 
+    height    : 40, 
     frustrates_by : 7,
     assets    : [ 
-      [ 'car_orange_horizontal.png', 'car_orange_horizontal_left.png', 'car_orange.png', 'car_orange_bottom.png' ], 
-      [ 'car_yellow_horizontal.png', 'car_yellow_horizontal_left.png', 'car_yellow.png', 'car_yellow_bottom.png' ], 
+      // from right, from left, from top, from bottom
+      [ 'car1_r.png', 'car1_l.png', 'car1_d.png', 'car1_u.png' ], 
+      [ 'car2_r.png', 'car2_l.png', 'car2_d.png', 'car2_u.png' ], 
+      [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ], 
     ]
   },
   jeepney     : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, 
-       assets : [ 'jeepney_horizontal.png', 'jeepney_horizontal_left.png', 'jeepney.png', 'jeepney_bottom.png' ] },
-  van         : { type : 'van',       width : 20, height : 50, frustrates_by : 5, 
-       assets : [ 'van_horizontal.png', 'van_horizontal_left.png', 'van.png', 'van_bottom.png' ] },
-  bus         : { type : 'bus',       width : 20, height : 55, frustrates_by : 4,   
-       assets : [ 'bus_horizontal.png', 'bus_horizontal_left.png', 'bus.png', 'bus_bottom.png' ]   },
-  ambulance   : { type : 'ambulance', width : 20, height : 40, frustrates_by : 4, speed : 5,  
-       assets : [ 'ambulance_horizontal.png', 'ambulance_horizontal_left.png', 'ambulance.png', 'ambulance_bottom.png' ],
+       assets : [ 'jeepney_r.png', 'jeepney_l.png', 'jeepney_d.png', 'jeepney_u.png' ] },
+  van         : { type : 'van',       width : 20, height : 45, frustrates_by : 5, 
+       assets : [ 'van_r.png', 'van_l.png', 'van_d.png', 'van_u.png' ] },
+  bus         : { type : 'bus',       width : 20, height : 60, frustrates_by : 4,   
+       assets : [ 'bus_r.png', 'bus_l.png', 'bus_d.png', 'bus_u.png' ]   },
+  ambulance   : { type : 'ambulance', width : 20, height : 45, frustrates_by : 4, speed : 5,  
+       assets : [ 'ambulance_r.png', 'ambulance_l.png', 'ambulance_d.png', 'ambulance_u.png' ],
        sounds : [ 'ambulance.mp3' ] }
 };
 
@@ -157,3 +159,7 @@ var SOUNDS = {
   theme         : "sounds/bg.mp3",
   explosion     : "sounds/explosion_short.mp3"
 };
+
+var NEIGHBORHOOD = [
+  "bg.png", "buildings.png"
+];

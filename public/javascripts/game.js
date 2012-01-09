@@ -15,7 +15,7 @@ Game = {
   
   with_css3_animation : true,
 
-  with_sound          : false,
+  with_sound          : true,
   with_phonegap_sound : false,   // we use the phonegap sound library for iOS
   with_sm2_sound      : true,    // soundmanager2 is what we use for regular web presentation
 
@@ -151,7 +151,7 @@ Game = {
                 var horiz_match = Game.compare_positions( hit1, c1 ),
                     vert_match  = Game.compare_positions( hit2, c2 );
                 
-                console.log( 'clicked', e.pageX, e.pageY, 'car pos', c.current_pos.left, c.current_pos.top );
+                // console.log( 'clicked', e.pageX, e.pageY, 'car pos', c.current_pos.left, c.current_pos.top );
 
                 if (horiz_match && vert_match) {
                   c.change_speed(true);  
