@@ -57,22 +57,22 @@ var STREETS = [
 
 var BARRIERS = [
   // name, top, left, width, height
-  ['amber_right_barrier1',  250, 232, 20, 50, 'horizontal', 'amber chang',   false, "#fff" ],
-  ['amber_right_barrier2',  250, 632, 20, 50, 'horizontal', 'amber dexter',  false, "#eee" ],
-  ['amber_left_barrier1',   200, 347, 20, 50, 'horizontal', 'amber chang',   false, "#ddd" ],
-  ['amber_left_barrier2',   200, 747, 20, 50, 'horizontal', 'amber dexter',  false, "#ccc" ],
-  ['baker_right_barrier1',  525, 232, 20, 25, 'horizontal', 'baker chang',   false, "#bbb" ],
-  ['baker_right_barrier2',  525, 632, 20, 25, 'horizontal', 'baker dexter',  false, "#aaa" ],
-  ['baker_left_barrier1',   498, 347, 20, 25, 'horizontal', 'baker chang',   false, "#999" ],
-  ['baker_left_barrier2',   498, 747, 20, 25, 'horizontal', 'baker dexter',  false, "#888" ],
-  ['chang_right_barrier1',  300, 305, 50, 20, 'horizontal', 'amber chang',   true,  "#999" ],
-  ['chang_right_barrier2',  550, 305, 50, 20, 'horizontal', 'baker chang',   true,  "#aaa" ],
-  ['chang_left_barrier1',   180, 253, 50, 20, 'horizontal', 'amber chang',   true,  "#bbb" ],
-  ['chang_left_barrier2',   487, 253, 50, 20, 'horizontal', 'baker chang',   true,  "#ccc" ],
-  ['dexter_right_barrier1', 300, 705, 50, 20, 'horizontal', 'amber dexter',  true,  "#ddd" ],
-  ['dexter_right_barrier2', 550, 705, 50, 20, 'horizontal', 'baker dexter',  true,  "#eee" ],
-  ['dexter_left_barrier1',  180, 655, 50, 20, 'horizontal', 'amber dexter',  true,  "#fff" ],
-  ['dexter_left_barrier2',  487, 655, 50, 20, 'horizontal', 'baker dexter',  true,  "#eee" ]
+  ['amber_right_barrier1',  250, 237, 15, 50, 'horizontal', 'amber chang',   false, "#fff" ],
+  ['amber_right_barrier2',  250, 637, 15, 50, 'horizontal', 'amber dexter',  false, "#eee" ],
+  ['amber_left_barrier1',   200, 347, 15, 50, 'horizontal', 'amber chang',   false, "#ddd" ],
+  ['amber_left_barrier2',   200, 747, 15, 50, 'horizontal', 'amber dexter',  false, "#ccc" ],
+  ['baker_right_barrier1',  525, 237, 15, 25, 'horizontal', 'baker chang',   false, "#bbb" ],
+  ['baker_right_barrier2',  525, 637, 15, 25, 'horizontal', 'baker dexter',  false, "#aaa" ],
+  ['baker_left_barrier1',   500, 347, 15, 25, 'horizontal', 'baker chang',   false, "#999" ],
+  ['baker_left_barrier2',   500, 747, 15, 25, 'horizontal', 'baker dexter',  false, "#888" ],
+  ['chang_right_barrier1',  295, 310, 50, 15, 'horizontal', 'amber chang',   true,  "#999" ],
+  ['chang_right_barrier2',  545, 310, 50, 15, 'horizontal', 'baker chang',   true,  "#aaa" ],
+  ['chang_left_barrier1',   190, 253, 50, 15, 'horizontal', 'amber chang',   true,  "#bbb" ],
+  ['chang_left_barrier2',   487, 253, 50, 15, 'horizontal', 'baker chang',   true,  "#ccc" ],
+  ['dexter_right_barrier1', 295, 710, 50, 15, 'horizontal', 'amber dexter',  true,  "#ddd" ],
+  ['dexter_right_barrier2', 545, 710, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ],
+  ['dexter_left_barrier1',  190, 655, 50, 15, 'horizontal', 'amber dexter',  true,  "#fff" ],
+  ['dexter_left_barrier2',  487, 655, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ]
 ];
 
 
@@ -97,7 +97,7 @@ var INTERSECTIONS = [
 
 // once a Maker hits MAX_CARS_PER_STREET, it stops generating new cars until the user
 // has managed to remove some more. 8 is a purely arbitrary number.
-var MAX_CARS_PER_STREET = 1;
+var MAX_CARS_PER_STREET = 8;
 
 var MAKER_FREQUENCY = 5000;
 
@@ -124,6 +124,15 @@ var CARS = {
   ambulance   : { type : 'ambulance', width : 20, height : 40, frustrates_by : 5,   
        assets : [ 'ambulance_horizontal.png', 'ambulance_horizontal_left.png', 'ambulance.png', 'ambulance_bottom.png' ]}
 };
+
+var FRUSTRATIONS = [
+  // filename, width, height, offset top, offset left
+  [ 'frustration_01.png', 40, 40, -20, -25 ],
+  [ 'frustration_02.png', 40, 40, -20, -25 ],
+  [ 'frustration_03.png', 40, 40, -20, -25 ]
+];
+
+var FRUSTRATION_MOD = 6;
 
 var CAR_ODDS = { 'car' : 0.6, 'van' : 0.2, 'jeepney' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
 

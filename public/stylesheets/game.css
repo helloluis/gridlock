@@ -42,7 +42,7 @@ em { font-style:italic; }
 
 #loader.screen { background:#000; }
 
-#intro { display:block; }
+#intro { display:block; background:url(../images/bg.jpg) no-repeat; }
 #intro h1 { text-indent:-2000px; background:url(../images/traffix_logo.png) no-repeat; width:600px; height:250px; margin:-50px 0px 0px -90px; }
 a, #intro p strong { color:#fc0; }
 #intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; position:absolute; }

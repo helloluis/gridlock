@@ -33,9 +33,19 @@ Game = {
   max_cars_per_street : MAX_CARS_PER_STREET,
   car_types           : CARS,
   car_odds            : CAR_ODDS,
-  
+
   images_dir          : IMAGES_DIR,
 
+  frustration_assets  : _.map(FRUSTRATIONS, function(f){ 
+                          var img = new Image();
+                          img.src = IMAGES_DIR + f[0];
+                          return {  image  : img, 
+                                    width  : f[1], 
+                                    height : f[2], 
+                                    top    : f[3], 
+                                    left   : f[4] };
+                        }),
+  
   db_name             : "traffix",
   high_score_key      : "high_score",
 
@@ -749,6 +759,7 @@ var Car = function(car_hash){
   this.frustration_threshold = 3;
   this.frustration_level1    = 4;
   this.frustration_level2    = 5;
+  this.travel_time_modifier  = FRUSTRATION_MOD; // this is the number we use to modify ideal_travel_time, for frustration purposes
 
   // this.speed                 = Math.round((Math.random()*2)+2); // pixels per frame
   this.speed                 = (Math.random()*3)+2; // pixels per frame 
@@ -826,7 +837,8 @@ var Car = function(car_hash){
     }
   };
 
-  this.initialize_origins = function(){
+  this.initialize_origins = function(){    
+
     if (this.orientation == 'horizontal') {
       
       var a1 = this.street.left - 100,
@@ -845,7 +857,7 @@ var Car = function(car_hash){
       
       this.origins.top = this.current_pos.top = this.destinations.top = b1;
 
-      this.ideal_travel_time = Math.ceil((Math.abs(this.destinations.left-this.origins.left)/this.speed)*2);
+      this.ideal_travel_time = Math.ceil((Math.abs(this.destinations.left-this.origins.left)/this.speed)*this.travel_time_modifier);
 
     } else {
 
@@ -865,7 +877,7 @@ var Car = function(car_hash){
       
       this.destinations.left = this.current_pos.left = this.origins.left = b1;
 
-      this.ideal_travel_time = Math.ceil((Math.abs(this.destinations.top-this.origins.top)/this.speed)*4);
+      this.ideal_travel_time = Math.ceil((Math.abs(this.destinations.top-this.origins.top)/this.speed)*this.travel_time_modifier);
       
     }
 
@@ -881,7 +893,8 @@ var Car = function(car_hash){
   this.initialize_frustration = function(){
     this.frustration_thresholds = [
       Math.round(this.ideal_travel_time/2),
-      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.25)),
+      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.35)),
+      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.2)),
       Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.1))
     ];
   };
@@ -902,6 +915,9 @@ var Car = function(car_hash){
 
     } else if (self.actual_travel_time > self.frustration_thresholds[0] && self.actual_travel_time < self.frustration_thresholds[1]) {
       // show frustration graphic
+      if (self.moving===false) {
+        return Game.frustration_assets[0];
+      }
 
     } else if (self.actual_travel_time == self.frustration_thresholds[1]) {
       self.frustration += self.frustrates_by;
@@ -913,6 +929,10 @@ var Car = function(car_hash){
     
     } else if (self.actual_travel_time > self.frustration_thresholds[1] && self.actual_travel_time < self.frustration_thresholds[2]) {
       // show major frustration graphic
+      if (self.moving===false) {
+        return Game.frustration_assets[1];  
+      }
+      
 
     } else if (self.actual_travel_time == self.frustration_thresholds[2]) {
       self.frustration += self.frustrates_by*2;
@@ -922,13 +942,20 @@ var Car = function(car_hash){
         Game.sounds[horn_name].play();
       }
 
+    } else if (self.actual_travel_time > self.frustration_thresholds[2] && self.actual_travel_time < self.frustration_thresholds[3]) {
+      
+      if (self.moving===false) {
+        return Game.frustration_assets[2];  
+      }
+    
     } else if (self.actual_travel_time > self.ideal_travel_time) {
       
-      // game ender?
       Game.end_with_frustration();
-      // self.frustration += self.frustrates_by;
-      // Game.frustration += self.frustrates_by;
 
+      if (self.moving===false) {
+        return Game.frustration_assets[2];  
+      }
+      
     }
 
   };
@@ -963,10 +990,6 @@ var Car = function(car_hash){
     var self   = this,
         street = self.street,
         ctx    = Game.context;
-    
-    if (Game.enable_frustration) {
-      self.manage_frustration();  
-    }
 
     if (Game.debug===true) {
       ctx.beginPath();
@@ -983,6 +1006,12 @@ var Car = function(car_hash){
       
       ctx.drawImage(self.image, self.current_pos.left, self.current_pos.top);
        
+    }
+
+    if (Game.enable_frustration) {
+      if (frustration = self.manage_frustration()) {
+        ctx.drawImage(frustration.image, self.current_pos.left + frustration.left, self.current_pos.top + frustration.top);
+      }
     }
 
   };
