@@ -11,35 +11,25 @@ Game = {
   ended               : false,
   muted               : false,
 
-  touch_device        : (navigator.platform.indexOf("iPad") != -1),
-  
-  with_css3_animation : true,
-
-  with_sound          : false,
-  with_phonegap_sound : false,   // we use the phonegap sound library for iOS
-  with_sm2_sound      : true,    // soundmanager2 is what we use for regular web presentation
-
   can_adjust_speed    : true,    // clicking or swiping on a car will increase its speed (UNDER CONSTRUCTION)
 
-  raw_sounds          : SOUNDS,
-  sounds              : {},
-  
-  streets             : [],
-  barriers            : {},
-  intersections       : [],
+  streets             : [],     // array of Street objects
+  barriers            : {},     // hash of barrier hitboxes
+  intersections       : [],     // array of intersection hitboxes
   
   max_speed           : MAX_SPEED,
   max_frustration     : 100,
   enable_frustration  : true,
   
-  maker_freq          : MAKER_FREQUENCY,
-  max_cars_per_street : MAX_CARS_PER_STREET,
-  car_types           : CARS,
-  car_odds            : CAR_ODDS,
+  maker_freq          : MAKER_FREQUENCY,        // how often does a Maker add a new car to the road
+  max_cars_per_street : MAX_CARS_PER_STREET,    
+  car_types           : CARS,                   // library of car settings and assets
+  car_odds            : CAR_ODDS,               // the likelihood that a particular car will be added
 
-  images_dir          : IMAGES_DIR,
-  sounds_dir          : SOUNDS_DIR,
+  images_dir          : IMAGES_DIR,             // path to images
+  sounds_dir          : SOUNDS_DIR,             // path to sounds
 
+  // cache of the images representing various levels of vehicular frustration
   frustration_assets  : _.map(FRUSTRATIONS, function(f){ 
                           var img = new Image();
                           img.src = IMAGES_DIR + f[0];
@@ -49,15 +39,27 @@ Game = {
                                     top    : f[3], 
                                     left   : f[4] };
                         }),
+
+  touch_device        : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
   
-  deferred_renders    : [], 
+  with_sound          : true,
+  with_phonegap_sound : false,   // we use the Phonegap sound library for iOS
+  with_sm2_sound      : false,   // SoundManager2 is what we use for regular web presentation
+  with_sjs_sound      : true,    // SoundJS is another sound library we're fucking around with  
+
+  raw_sounds          : SOUNDS,  // our library of sounds
+  sounds              : {},
+  
+
   // sometimes we want to defer rendering on some items 
   // until all of the cars have been rendered, e.g., the frustration indicators
+  deferred_renders    : [], 
+
 
   db_name             : "traffix",
   high_score_key      : "high_score",
 
-  high_score_key_full : ["traffix", "01", "high_score"].join("_"),
+  high_score_key_full : ["traffix", MAP_NAME, "high_score"].join("_"),
 
   initialize : function(auto_start){
     
@@ -89,7 +91,7 @@ Game = {
     Game.initialize_speed_changer();
 
     if (Game.enable_frustration) {
-      // Game.initialize_frustration();  
+      Game.initialize_frustration();  
     }
 
     if (auto_start===true) {
@@ -252,10 +254,10 @@ Game = {
           if (_.isArray(media_or_arr)) {
             _.each(media_or_arr, function(media, index){
               var new_k = [key, index].join("");
-              Game.sounds[new_k] = new Media(media);
+              Game.sounds[new_k] = new Media(Game.sounds_dir + media);
             });
           } else {
-            Game.sounds[key] = new Media(media_or_arr);
+            Game.sounds[key] = new Media(Game.sounds_dir + media_or_arr);
           }          
         });
         
@@ -270,16 +272,34 @@ Game = {
             if (_.isArray(media_or_arr)) {
               _.each(media_or_arr, function(media, index){
                 var new_k = [key, index].join("");
-                var new_obj = soundManager.createSound({ id : new_k, url : media, autoLoad : true });
+                var new_obj = soundManager.createSound({ id : new_k, url : Game.sounds_dir + media, autoLoad : true });
                 Game.sounds[new_k] = new_obj;
               });
             } else {
-              Game.sounds[key] = soundManager.createSound({ id : key, url : media_or_arr, autoLoad : true });
+              Game.sounds[key] = soundManager.createSound({ id : key, url : Game.sounds_dir + media_or_arr, autoLoad : true });
             }
             
           });
 
         });
+
+      } else if (Game.with_sjs_sound) {
+        
+        _.each(Game.raw_sounds, function(media_or_arr, key){
+            
+          if (_.isArray(media_or_arr)) {
+            _.each(media_or_arr, function(media, index){
+              var new_k = [key, index].join("");
+              var new_obj = soundManager.createSound({ id : new_k, url : Game.sounds_dir + media, autoLoad : true });
+              Game.sounds[new_k] = new_obj;
+            });
+          } else {
+            Game.sounds[key] = soundManager.createSound({ id : key, url : Game.sounds_dir + media_or_arr, autoLoad : true });
+          }
+          
+        });
+
+        SoundJS.addBatch();
 
       }
     }
@@ -464,9 +484,7 @@ Game = {
 
   start_streets : function(){
 
-    if (Game.with_sound) {
-      Game.start_theme();
-    }
+    Game.play_sound_theme();
 
     _.each(Game.streets,function(street){
       street.start();
@@ -493,13 +511,13 @@ Game = {
   },
 
   pause : function(){
+    
     Game.paused = true;
     
     $("#overlay").show();
     
-    if (Game.with_sound) {
-      Game.stop_theme();
-    }
+    Game.stop_sound_theme();
+    
   },
 
   resume : function() {
@@ -509,26 +527,23 @@ Game = {
     
     Game.animate();
 
-    if (Game.with_sound) {
-      Game.start_theme();
-    }
+    Game.play_sound_theme();
+    
   },
 
   quit : function() {
-    if (Game.with_sound) {
-      Game.stop_theme();
-    }
-
+    
+    Game.stop_sound_theme();
+    
     document.location.reload();
+
   },
 
   mute : function(){
     $(".bttn.mute").addClass('muted').text('Un-mute');
     Game.with_sound = false;
     Game.muted = true;
-    _.each(Game.sounds,function(media, key) {
-      Game.sounds[key].stop();
-    });
+    Game.stop_all_sounds();
   },
 
   unmute : function(){
@@ -536,20 +551,46 @@ Game = {
     Game.with_sound = true;
     Game.muted = false;
     if (Game.started) {
-      Game.start_theme();
+      Game.play_sound_theme();
     }
   },
 
-  start_theme : function(){
-    if (Game.with_sm2_sound) {
-      Game.sounds.theme.play({ loops : 99 });
-    } else {
-      Game.sounds.theme.play({ numberOfLoops : 99 });  
+  play_sound_theme : function(){
+    Game.play_sound('theme', true);
+  },
+
+  stop_sound_theme : function(){
+    Game.stop_sound('theme');
+  },
+
+  play_sound : function(sound, loop) {
+    if (Game.with_sound) {
+      if (Game.with_phonegap_sound) {
+        
+      } else if (Game.with_sm2_sound) {
+        
+      } else if (Game.with_sjs_sound) {
+        
+      }
     }
   },
 
-  stop_theme : function(){
-    Game.sounds.theme.stop();
+  stop_sound : function(sound) {
+    if (Game.with_sound) {
+      if (Game.with_phonegap_sound) {
+        
+      } else if (Game.with_sm2_sound) {
+        
+      } else if (Game.with_sjs_sound) {
+        
+      }
+    }
+  },
+
+  stop_all_sounds : function() {
+    _.each(Game.sounds,function(media, key) {
+      Game.stop_sound(key);
+    });
   },
 
   // if passed a callback, will delay for X seconds, then run it
@@ -575,11 +616,9 @@ Game = {
     
     Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
 
-    if (Game.with_sound) {
-      _.delay(function(){
-        Game.sounds.countdown.play();    
-      },1000);
-    }
+    _.delay(function(){
+      Game.play_sound('countdown');
+    },1000);
 
     Game.main.everyTime(1000,'countdown',function(){
 
@@ -605,9 +644,7 @@ Game = {
 
   reset : function(return_to_intro){
     
-    if (Game.with_sound) {
-      Game.sounds.theme.stop();
-    }
+    Game.stop_sound_theme();
 
     Game.stop_streets();
     Game.frus_cont.stopTime('frustrating');
@@ -626,19 +663,7 @@ Game = {
   },
 
   initialize_frustration : function(){
-
     Game.frustration = 0;
-    
-    // Game.frus_bar.width(0);
-
-    // Game.frus_cont.
-    //   stopTime('frustrating').
-    //   everyTime(1000, 'frustrating', function(){
-    //     Game.adjust_frustration();
-    //     if (Game.frustration >= Game.max_frustration) {
-    //       Game.end_with_frustration();
-    //     }
-    //   });
   },
 
   adjust_frustration : function(){
@@ -727,9 +752,8 @@ Game = {
       $(this).animate({ opacity : 0 });  
     });
 
-    if (Game.with_sound) {
-      Game.sounds.explosion.play();
-    }
+    Game.play_sound('explosion');
+    
   },
 
   compare_positions : function(p1, p2){
@@ -861,7 +885,11 @@ var Car = function(car_hash){
     
     this.initialize_origins(); 
     this.initialize_intersecting();
-    this.initialize_frustration();
+    
+    if (Game.enable_frustration) {
+      this.initialize_frustration();  
+    }
+    
     this.initialize_sounds();
 
     if (Game.debug===true) {
@@ -909,15 +937,16 @@ var Car = function(car_hash){
   this.initialize_sounds = function() {
     if (this.sounds) {
       console.log('ambulance sound', Game.sounds_dir + this.sounds[0]);
-      if (Game.with_sound) {
-        if (Game.with_phonegap_sound) {
-          this.sound_loop = new Media( Game.sounds_dir + this.sounds[0] );
-          this.sound_loop.play({ numberOfLoops : 99 });
-        } else if (Game.with_sm2_sound) {
-          this.sound_loop = soundManager.createSound({ id : this.name, url : Game.sounds_dir + this.sounds[0], autoLoad : true });
-          this.sound_loop.play({ loops : 99 });
-        }
-      }
+      // TODO
+      // if (Game.with_sound) {
+      //   if (Game.with_phonegap_sound) {
+      //     this.sound_loop = new Media( Game.sounds_dir + this.sounds[0] );
+      //     this.sound_loop.play({ numberOfLoops : 99 });
+      //   } else if (Game.with_sm2_sound) {
+      //     this.sound_loop = soundManager.createSound({ id : this.name, url : Game.sounds_dir + this.sounds[0], autoLoad : true });
+      //     this.sound_loop.play({ loops : 99 });
+      //   }
+      // }
     }
   };
 
@@ -991,10 +1020,8 @@ var Car = function(car_hash){
     
     if (self.actual_travel_time == self.frustration_thresholds[0]) {
       
-      if (Game.with_sound) {
-        var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
-        Game.sounds[horn_name].play();
-      }
+      var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
+      Game.play_sound(horn_name);
 
     } else if (self.actual_travel_time > self.frustration_thresholds[0] && self.actual_travel_time < self.frustration_thresholds[1]) {
       // show frustration graphic
@@ -1008,10 +1035,8 @@ var Car = function(car_hash){
         return Game.frustration_assets[0];
       }
 
-      if (Game.with_sound) {
-        var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
-        Game.sounds[horn_name].play();
-      }
+      var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
+      Game.play_sound(horn_name);
     
     } else if (self.actual_travel_time > self.frustration_thresholds[1] && self.actual_travel_time < self.frustration_thresholds[2]) {
       
@@ -1025,10 +1050,8 @@ var Car = function(car_hash){
         return Game.frustration_assets[1];
       }
 
-      if (Game.with_sound) {
-        var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
-        Game.sounds[horn_name].play();
-      }
+      var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
+      Game.play_sound(horn_name);
 
     } else if (self.actual_travel_time > self.frustration_thresholds[2] && self.actual_travel_time < self.frustration_thresholds[3]) {
       
@@ -1042,10 +1065,8 @@ var Car = function(car_hash){
         return Game.frustration_assets[2];  
       }
             
-      if (Game.with_sound) {
-        var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
-        Game.sounds[horn_name].play();
-      }
+      var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
+      Game.play_sound(horn_name);
     
     } else if (self.actual_travel_time > self.frustration_thresholds[3] && self.actual_travel_time < self.ideal_travel_time) {
       
@@ -1119,7 +1140,6 @@ var Car = function(car_hash){
        speed = self.calculate_speed();
 
     self.moving = true;
-    //self.remove_frustration_cloud();
 
   };
 

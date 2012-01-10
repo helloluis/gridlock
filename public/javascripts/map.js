@@ -36,6 +36,8 @@ a car bumping into another car on the same street.
 
 */
 
+var MAP_NAME = "manila";
+
 var STREETS = [
   // name, orientation, top, left, width, height
   ["amber_left_lane1",   "horizontal",  200,   0,     1024,  20 ],
@@ -143,17 +145,19 @@ var SOUNDS_DIR = "sounds/";
 // all sounds and music
 var SOUNDS = { 
   horns_short   : [
-    "sounds/horn1.mp3",
-    "sounds/horn2.mp3",
-    "sounds/horn3.mp3",
-    "sounds/horn4.mp3" 
+    "horn1.mp3",
+    "horn2.mp3",
+    "horn3.mp3",
+    "horn4.mp3" 
   ],
   horns_long    : [
-    "sounds/horn_long1.mp3",
-    "sounds/horn_long2.mp3"
+    "horn_long1.mp3",
+    "horn_long2.mp3"
   ],
-  horn_truck    : "sounds/horn_truck.mp3",
-  countdown     : "sounds/countdown.mp3",
-  theme         : "sounds/bg.mp3",
-  explosion     : "sounds/explosion_short.mp3"
+  horn_truck    : "horn_truck.mp3",
+  countdown     : "countdown.mp3",
+  theme         : "bg.mp3",
+  explosion     : "explosion_short.mp3"
 };
+
+
