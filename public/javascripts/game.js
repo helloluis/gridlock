@@ -5,6 +5,8 @@ Game = {
   score               : 0,
   frustration         : 0,
   high_score          : 0,
+  
+  fps                 : FPS,
 
   started             : false,
   paused              : true,
@@ -42,14 +44,13 @@ Game = {
 
   touch_device        : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
   
-  with_sound          : true,
+  with_sound          : false,
   with_phonegap_sound : false,   // we use the Phonegap sound library for iOS
   with_sm2_sound      : false,   // SoundManager2 is what we use for regular web presentation
-  with_sjs_sound      : true,    // SoundJS is another sound library we're fucking around with  
+  with_sjs_sound      : false,    // SoundJS is another sound library we're fucking around with  
 
   raw_sounds          : SOUNDS,  // our library of sounds
   sounds              : {},
-  
 
   // sometimes we want to defer rendering on some items 
   // until all of the cars have been rendered, e.g., the frustration indicators
@@ -109,12 +110,15 @@ Game = {
       // window.oRequestAnimationFrame ||
       // window.msRequestAnimationFrame ||
       return function(callback){
-        window.setTimeout(callback, 1000 / 30); // we only need 30 fps coz we're third-world that way
+        window.setTimeout(callback, 1000 / Game.fps); 
       };
     })();
 
-    Game.canvas  = document.getElementById('cars');
-    Game.context = Game.canvas.getContext('2d');
+    Game.car_canvas  = document.getElementById('cars');
+    Game.car_context = Game.car_canvas.getContext('2d');
+
+    Game.frustration_canvas = document.getElementById('frustrations');
+    Game.frustration_context = Game.frustration_canvas.getContext('2d');
 
     if (Game.debug==true) {
       $(".neighborhood").css({'background':"#121212"});
@@ -153,7 +157,7 @@ Game = {
                 var horiz_match = Game.compare_positions( hit1, c1 ),
                     vert_match  = Game.compare_positions( hit2, c2 );
                 
-                console.log( 'clicked', e.pageX, e.pageY, 'car pos', c.current_pos.left, c.current_pos.top );
+                // console.log( 'clicked', e.pageX, e.pageY, 'car pos', c.current_pos.left, c.current_pos.top );
 
                 if (horiz_match && vert_match) {
                   c.change_speed(true);  
@@ -173,7 +177,7 @@ Game = {
     
     if (Game.started && !Game.paused && !Game.ended) {
       //clear 
-      Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
+      Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
       Game.deferred_renders = new Array;
 
       if (Game.debug==true) {
@@ -412,25 +416,25 @@ Game = {
     _.each(Game.streets, function(street){
       _.each(street.barriers, function(b){
         if (b.active) {
-          Game.context.beginPath();
-          Game.context.rect( b.left, b.top, b.width, b.height);
-          Game.context.fillStyle = b.color;
-          Game.context.fill();  
+          Game.car_context.beginPath();
+          Game.car_context.rect( b.left, b.top, b.width, b.height);
+          Game.car_context.fillStyle = b.color;
+          Game.car_context.fill();  
         }
       });
-      Game.context.beginPath();
-      Game.context.rect( street.left, street.top, street.width, street.height );
-      Game.context.lineWidth = 2;
-      Game.context.strokeStyle = "#333";
-      Game.context.stroke();
+      Game.car_context.beginPath();
+      Game.car_context.rect( street.left, street.top, street.width, street.height );
+      Game.car_context.lineWidth = 2;
+      Game.car_context.strokeStyle = "#333";
+      Game.car_context.stroke();
     });
 
     _.each(Game.intersections, function(inter){
-      Game.context.beginPath();
-      Game.context.rect( inter.left, inter.top, inter.width, inter.height );
-      Game.context.lineWidth = 2;
-      Game.context.strokeStyle = "#0ff";
-      Game.context.stroke();
+      Game.car_context.beginPath();
+      Game.car_context.rect( inter.left, inter.top, inter.width, inter.height );
+      Game.car_context.lineWidth = 2;
+      Game.car_context.strokeStyle = "#0ff";
+      Game.car_context.stroke();
     });
 
   },
@@ -614,7 +618,7 @@ Game = {
     var int = 3;
     Game.messages.css({ display : 'block', opacity : '1' });
     
-    Game.context.clearRect(0,0,Game.canvas.width, Game.canvas.height);
+    Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
 
     _.delay(function(){
       Game.play_sound('countdown');
@@ -1093,7 +1097,7 @@ var Car = function(car_hash){
     
     var self   = this,
         street = self.street,
-        ctx    = Game.context;
+        ctx    = Game.car_context;
 
     if (Game.debug===true) {
       ctx.beginPath();
@@ -1447,6 +1451,8 @@ var Maker = function(){
       return self.car_types.jeepney;
     } else if (rand < self.car_odds.van) {
       return self.car_types.van;
+    } else if (rand < self.car_odds.hatch) {
+      return self.car_types.hatch;
     } else {
       if (_.isArray(self.car_types.car.assets[0])) {
         var selected_assets = self.car_types.car.assets[ Math.floor(Math.random()*self.car_types.car.assets.length) ];
