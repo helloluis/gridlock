@@ -5,6 +5,8 @@ Game = {
   score               : 0,
   frustration         : 0,
   high_score          : 0,
+  
+  fps                 : FPS,
 
   started             : false,
   paused              : true,
@@ -107,7 +109,7 @@ Game = {
       // window.oRequestAnimationFrame ||
       // window.msRequestAnimationFrame ||
       return function(callback){
-        window.setTimeout(callback, 1000 / 30); // we only need 30 fps coz we're third-world that way
+        window.setTimeout(callback, 1000 / Game.fps); 
       };
     })();
 

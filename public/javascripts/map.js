@@ -94,6 +94,8 @@ var INTERSECTIONS = [
   [ 'baker dexter', 502, 652, 95, 45 ],
 ];
 
+// we only need 30 fps coz we're third-world that way
+var FPS = 30;
 
 // once a Maker hits MAX_CARS_PER_STREET, it stops generating new cars until the user
 // has managed to remove some more. 8 is a purely arbitrary number.
