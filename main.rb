@@ -8,6 +8,8 @@ get '/' do
 	redirect '/index.html'
 end
 
+set :protection, :except => :frame_options
+
 
 # require File.dirname(__FILE__) + '/vendor/gems/environment'
 # Bundler.require_env
