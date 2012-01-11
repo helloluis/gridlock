@@ -821,7 +821,7 @@ Game = {
       Game.started = false;
       Game.ended = true;
       Game.store_high_score(Game.score);
-      Game.play_sound('frustration');
+      Game.play_sound('frustration',false,50);
       Game.show_message("<h1>How Frustrating!</h1>");
       Game.reset();  
     }
