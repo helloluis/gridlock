@@ -629,21 +629,26 @@ Game = {
   },
 
   stop_sound : function(sound) {
-    if (Game.with_sound) {
-      if (Game.with_phonegap_sound) {
-        Game.sounds[sound].stop();
-      } else if (Game.with_sm2_sound) {
-        Game.sounds[sound].stop();
-      } else if (Game.with_sjs_sound) {
-        Game.sounds[sound].stop();
-      }
+  
+    if (Game.with_phonegap_sound) {
+      Game.sounds[sound].stop();
+    } else if (Game.with_sm2_sound) {
+      console.log('stopping ', sound);
+      Game.sounds[sound].stop();
+    } else if (Game.with_sjs_sound) {
+      Game.sounds[sound].stop();
     }
+    
   },
 
   stop_all_sounds : function() {
-    _.each(Game.sounds,function(media, key) {
-      Game.stop_sound(key);
-    });
+    if (Game.with_phonegap_sound) {
+      _.each(Game.sounds,function(media, key) {
+        Game.stop_sound(key);
+      });
+    } else if (Game.with_sm2_sound) {
+      soundManager.stopAll();
+    }
   },
 
   // if passed a callback, will delay for X seconds, then run it
