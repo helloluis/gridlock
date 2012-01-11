@@ -26,6 +26,7 @@
   <script src="javascripts/underscore.js"></script>
   <script src="javascripts/jquery-timers.js"></script>
   <script src="javascripts/soundmanager2-nodebug-jsmin.js"></script>
+  <script src="javascripts/loader.js"></script>
   <script src="javascripts/map.js"></script>
   <script src="javascripts/game.js"></script>
 
@@ -139,7 +140,8 @@
 
   <script>
     $(function(){
-      Game.initialize();
+      Game.preload();
+      //Game.initialize();
     });
   </script>
 

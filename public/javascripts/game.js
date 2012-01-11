@@ -2,6 +2,8 @@ Game = {
 
   debug               : false,  // set to TRUE to visualize barriers and intersections
 
+  loader              : new PxLoader(),
+
   score               : 0,
   frustration         : 0,
   high_score          : 0,
@@ -27,27 +29,20 @@ Game = {
   max_cars_per_street : MAX_CARS_PER_STREET,    
   car_types           : CARS,                   // library of car settings and assets
   car_odds            : CAR_ODDS,               // the likelihood that a particular car will be added
+  neighborhood        : NEIGHBORHOOD,           // graphics used for the neighborhood layers
 
   images_dir          : IMAGES_DIR,             // path to images
   sounds_dir          : SOUNDS_DIR,             // path to sounds
 
   // cache of the images representing various levels of vehicular frustration
-  frustration_assets  : _.map(FRUSTRATIONS, function(f){ 
-                          var img = new Image();
-                          img.src = IMAGES_DIR + f[0];
-                          return {  image  : img, 
-                                    width  : f[1], 
-                                    height : f[2], 
-                                    top    : f[3], 
-                                    left   : f[4] };
-                        }),
+  frustration_assets  : [],
 
   touch_device        : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
   
-  with_sound          : false,
+  with_sound          : true,
   with_phonegap_sound : false,   // we use the Phonegap sound library for iOS
-  with_sm2_sound      : false,   // SoundManager2 is what we use for regular web presentation
-  with_sjs_sound      : false,    // SoundJS is another sound library we're fucking around with  
+  with_sm2_sound      : true,    // SoundManager2 is what we use for regular web presentation
+  with_sjs_sound      : false,   // SoundJS is another sound library we're fucking around with  
 
   raw_sounds          : SOUNDS,  // our library of sounds
   sounds              : {},
@@ -56,11 +51,40 @@ Game = {
   // until all of the cars have been rendered, e.g., the frustration indicators
   deferred_renders    : [], 
 
-
   db_name             : "traffix",
   high_score_key      : "high_score",
 
   high_score_key_full : ["traffix", MAP_NAME, "high_score"].join("_"),
+
+  preload : function(){
+
+    _.each(Game.car_types, function(car){
+      _.each(_.flatten(car.assets),function(fc){
+        Game.loader.addImage( Game.images_dir + fc );
+      });
+    });
+
+    _.each(Game.neighborhood, function(n){
+      Game.loader.addImage( Game.images_dir + n );
+    });
+
+    _.each(FRUSTRATIONS, function(f){
+      Game.loader.addImage( Game.images_dir + f[0] );
+    });
+
+    Game.initialize_sounds();
+
+    Game.loader.addProgressListener(function(e) { 
+      console.log(e.completedCount + ' / ' + e.totalCount);
+    });
+
+    Game.loader.addCompletionListener(function(){
+      Game.initialize();  
+    });
+
+    Game.loader.start();
+
+  },
 
   initialize : function(auto_start){
     
@@ -249,10 +273,9 @@ Game = {
 
   },
 
-  // phonegap function
   initialize_sounds : function() {
     if (Game.with_sound){
-      if (Game.with_phonegap_sound && typeof Media!=="undefined") {
+      if (Game.with_phonegap_sound) {
 
         _.each(Game.raw_sounds, function(media_or_arr, key){
           if (_.isArray(media_or_arr)) {
@@ -307,6 +330,12 @@ Game = {
 
       }
     }
+  },
+
+  initialize_sound : function( key, media ) {
+    
+    soundManager.createSound({ id : new_k, url : Game.sounds_dir + media, autoLoad : true, onsuspend : function(){ Game.loader.onTimeOut(self); } });
+
   },
 
   initialize_buttons : function(){
@@ -570,11 +599,11 @@ Game = {
   play_sound : function(sound, loop) {
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
-        
+        Game.sounds[sound].play();
       } else if (Game.with_sm2_sound) {
-        
+        Game.sounds[sound].play();
       } else if (Game.with_sjs_sound) {
-        
+        Game.sounds[sound].play();
       }
     }
   },
@@ -668,6 +697,16 @@ Game = {
 
   initialize_frustration : function(){
     Game.frustration = 0;
+
+    Game.frustrations_assets = _.map(FRUSTRATIONS, function(f){ 
+                                  var img = new Image();
+                                  img.src = IMAGES_DIR + f[0];
+                                  return {  image  : img, 
+                                            width  : f[1], 
+                                            height : f[2], 
+                                            top    : f[3], 
+                                            left   : f[4] };
+                                });
   },
 
   adjust_frustration : function(){
