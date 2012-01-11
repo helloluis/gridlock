@@ -56,7 +56,7 @@ Game = {
 
   high_score_key_full : ["traffix", MAP_NAME, "high_score"].join("_"),
 
-  preload : function(){
+  preload : function(auto_start){
 
     _.each(Game.car_types, function(car){
       _.each(_.flatten(car.assets),function(fc){
@@ -79,7 +79,7 @@ Game = {
     });
 
     Game.loader.addCompletionListener(function(){
-      Game.initialize();  
+      Game.initialize(auto_start);  
     });
 
     Game.loader.start();
@@ -345,6 +345,7 @@ Game = {
     });
 
     $(".restart").click(function(){
+      document.location.hash="autostart";
       document.location.reload();
     });
     
@@ -698,7 +699,7 @@ Game = {
   initialize_frustration : function(){
     Game.frustration = 0;
 
-    Game.frustrations_assets = _.map(FRUSTRATIONS, function(f){ 
+    Game.frustration_assets = _.map(FRUSTRATIONS, function(f){ 
                                   var img = new Image();
                                   img.src = IMAGES_DIR + f[0];
                                   return {  image  : img, 
@@ -707,6 +708,7 @@ Game = {
                                             top    : f[3], 
                                             left   : f[4] };
                                 });
+    
   },
 
   adjust_frustration : function(){
@@ -1051,7 +1053,7 @@ var Car = function(car_hash){
       Math.round(this.ideal_travel_time/2),
       Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.35)),
       Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.2)),
-      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.05))
+      Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.03))
     ];
   };
 
@@ -1136,7 +1138,8 @@ var Car = function(car_hash){
     
     var self   = this,
         street = self.street,
-        ctx    = Game.car_context;
+        ctx    = Game.car_context,
+        frus   = Game.frustration_context;
 
     if (Game.debug===true) {
       ctx.beginPath();
@@ -1159,7 +1162,7 @@ var Car = function(car_hash){
       if (frustration = self.manage_frustration()) {
         Game.deferred_renders.push([ 
             function(f, p) {
-              ctx.drawImage( f.image, 
+              frus.drawImage( f.image, 
                              (p.left + f.left), 
                              (p.top + f.top) );
             }, 
@@ -1197,7 +1200,7 @@ var Car = function(car_hash){
     } else if (!faster && Math.ceil(this.speed) > 2) {
       this.speed -= 1;
     }
-    console.log('new speed', this.speed);
+    //console.log('new speed', this.speed);
   };
 
   this.restart = function(reset_polling) {

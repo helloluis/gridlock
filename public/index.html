@@ -67,7 +67,8 @@
     <div class="help">
       <div class="help_illustration help_illustration_intersection">show intersection</div>
       <div class="help_illustration help_illustration_frustration">show frustration</div>
-      <p>Fix that traffic problem by managing those busy intersections! Don't let the drivers get too frustrated!</p>
+      <p>Fix that traffic problem by managing those busy intersections! 
+      Don't let the drivers get too frustrated!</p>
     </div>
     <h2 class="bttn start_game">Play!</h2>
     <h3 class="bttn credits">Credits</h3>
@@ -133,15 +134,19 @@
 <div id="credits" class="screen">
   <div class="screen_inner">
     <h1>Credits</h1>
-    <p>A traffic control game by Ryan Sumo (<a href="http://twitter.com/ryansumo">@ryansumo</a>) and Luis Buenaventura (<a href="http://twitter.com/helloluis">@helloluis</a>).</p>
+    <p>A traffic control game by Ryan Sumo (<a href="http://twitter.com/ryansumo">@ryansumo</a>) and Luis Buenaventura (<a href="http://twitter.com/helloluis">@helloluis</a>). Follow <a href="http://twitter.com/traffixgame" title="@TraffixGame on Twitter">@traffixgame</a> for new maps and other trafficky updates.</p>
+    <p>Special thanks to:</p>
+    <ul>
+      <li></li>
+    </ul>   
     <h2 class="bttn intro">Back to Home</h2>
   </div>
 </div>
 
   <script>
     $(function(){
-      Game.preload();
-      //Game.initialize();
+      var auto_start = document.location.hash.indexOf("autostart")!==-1;
+      Game.preload(auto_start);
     });
   </script>
 
