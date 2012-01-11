@@ -162,7 +162,8 @@ var SOUNDS = {
   horn_truck    : "horn_truck.mp3",
   countdown     : "countdown.mp3",
   theme         : "bg.mp3",
-  explosion     : "explosion_short.mp3"
+  explosion     : "explosion_short.mp3",
+  frustration   : "frustration.mp3"
 };
 
 

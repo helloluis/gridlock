@@ -202,6 +202,9 @@ Game = {
     if (Game.started && !Game.paused && !Game.ended) {
       //clear 
       Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
+      
+      Game.frustration_context.clearRect(0,0,Game.frustration_canvas.width, Game.frustration_canvas.height);
+
       Game.deferred_renders = new Array;
 
       if (Game.debug==true) {
@@ -590,33 +593,49 @@ Game = {
   },
 
   play_sound_theme : function(){
-    Game.play_sound('theme', true);
+    Game.play_sound('theme', true, 50);
   },
 
   stop_sound_theme : function(){
     Game.stop_sound('theme');
   },
 
-  play_sound : function(sound, loop) {
+  play_sound : function(sound, loop, volume) {
+    
+    if (volume===undefined) { volume = 100; }
+
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
         Game.sounds[sound].play();
       } else if (Game.with_sm2_sound) {
-        Game.sounds[sound].play();
+        if (loop) {
+          Game.loop_sound(sound,volume);
+        } else {
+          Game.sounds[sound].play({ volume : volume });  
+        }
       } else if (Game.with_sjs_sound) {
         Game.sounds[sound].play();
       }
     }
   },
 
+  loop_sound : function(sound, volume) {
+    Game.sounds[sound].play({ 
+      volume   : volume,
+      onfinish : function(){
+        Game.loop_sound(sound, volume);
+      }
+    });
+  },
+
   stop_sound : function(sound) {
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
-        
+        Game.sounds[sound].stop();
       } else if (Game.with_sm2_sound) {
-        
+        Game.sounds[sound].stop();
       } else if (Game.with_sjs_sound) {
-        
+        Game.sounds[sound].stop();
       }
     }
   },
@@ -667,6 +686,7 @@ Game = {
         Game.started = true;
         Game.paused = false;
         Game.messages.hide();
+        Game.start_controls();
         Game.start_streets();
         $(".pause, .quit, .mute").removeClass('disabled');
       } 
@@ -721,7 +741,7 @@ Game = {
     var self = this;
     self.stoplights = STOPLIGHTS;
 
-    $(".stoplight").each(function(idx, el){
+    $(".stoplight").hide().each(function(idx, el){
       
       var elem   = $(el),
           light  = self.stoplights[idx],
@@ -763,11 +783,45 @@ Game = {
 
   },
 
+  start_controls : function() {
+    
+    var i = 0;
+
+    $(".stoplight").each(function(idx, el){
+      var el     = $(el), 
+          off    = el.offset(), 
+          orig   = _.clone(el.offset()),
+          width  = el.width(),
+          height = el.height();
+
+      el.css({
+        opacity : 0,
+        display : 'block'
+      });
+
+      _.delay(function(){
+        el.animate({
+          top : "+=2",
+          left : "+=2",
+          opacity : 1
+        },200).
+        animate({
+          top : "-=2",
+          left : "-=2"
+        },200);  
+      },(i*300));
+      
+      i+=1;
+      
+    });
+  },
+
   end_with_frustration : function(){
     if (!Game.ended) {
       Game.started = false;
       Game.ended = true;
       Game.store_high_score(Game.score);
+      Game.play_sound('frustration');
       Game.show_message("<h1>How Frustrating!</h1>");
       Game.reset();  
     }

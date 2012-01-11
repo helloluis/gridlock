@@ -374,8 +374,8 @@ if (!Array.prototype.indexOf) {
  * PxLoader plugin to load images
  */
 function PxLoaderImage(url, tags, priority) {
-    var self = this;
-        loader = null;
+    var self   = this;
+        loader = false;
 
     this.img = new Image();
     this.tags = tags;
