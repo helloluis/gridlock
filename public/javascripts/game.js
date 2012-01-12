@@ -152,7 +152,8 @@ Game = {
 
   initialize_speed_changer : function(){
     if (this.can_adjust_speed) {
-      $(".street").click(function(e){ 
+
+      var click = function(e){ 
         if (Game.started && !Game.paused && !Game.ended) {
           
           var street_name = $(this).attr('data-name');
@@ -181,8 +182,6 @@ Game = {
                 var horiz_match = Game.compare_positions( hit1, c1 ),
                     vert_match  = Game.compare_positions( hit2, c2 );
                 
-                // console.log( 'clicked', e.pageX, e.pageY, 'car pos', c.current_pos.left, c.current_pos.top );
-
                 if (horiz_match && vert_match) {
                   c.change_speed(true);  
                 }
@@ -190,7 +189,14 @@ Game = {
             });
           }
         }
-      }); 
+      };
+      
+      if (Game.touch_device) {
+        $(".street").tappable(click);
+      } else {
+        $(".street").unbind('click').click(click);
+      }
+ 
     }
   },
 
