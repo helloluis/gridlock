@@ -52,21 +52,25 @@
 <body>
 
 <div id="loader" class="screen">
-  <div class="screen_inner">
-    <h1>Traffix!</h1>
-    <p>Loading ...</p>
-    <ul id="progress"></ul>
-    <div id="loader" style="visibility:hidden"></div>
-    <div id="assets" style="visibility:hidden"></div>
-  </div>
+  <h2 class='loading'>Loading</h2>
 </div>
 
 <div id="intro" class="screen" style="display:none">
   <div class="screen_inner">
     <h1>Traffix!</h1>
     <div class="help">
-      <div class="help_illustration help_illustration_intersection">show intersection</div>
-      <div class="help_illustration help_illustration_frustration">show frustration</div>
+      <div id="help_intersection" class="help_illustration help_illustration_intersection">
+        <canvas id="help_intersection_canvas" width="270" height="275"></canvas>
+        <div class="help_background"></div>
+      </div>
+      <div id="help_frustration" class="help_illustration help_illustration_frustration">
+        <canvas id="help_frustration_canvas" width="270" height="275"></canvas>
+        <div class="help_background"></div>
+      </div>
+      <div id="help_acceleration" class="help_illustration help_illustration_acceleration">
+        <canvas id="help_acceleration_canvas" width="270" height="275"></canvas>
+        <div class="help_background"></div>
+      </div>
       <p>Fix that traffic problem by managing those busy intersections! 
       Don't let the drivers get too frustrated! (You can click on cars to make them go faster.)</p>
     </div>

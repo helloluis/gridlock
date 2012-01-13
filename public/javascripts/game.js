@@ -34,6 +34,9 @@ Game = {
   images_dir          : IMAGES_DIR,             // path to images
   sounds_dir          : SOUNDS_DIR,             // path to sounds
 
+  // help menu canvases
+  help_canvases       : { 'intersection' : {}, 'frustration' : {}, 'acceleration' : {} },
+
   // cache of the images representing various levels of vehicular frustration
   frustration_assets  : [],
 
@@ -72,7 +75,27 @@ Game = {
       Game.loader.addImage( Game.images_dir + f[0] );
     });
 
-    Game.initialize_sounds();
+    _.each(OTHERS, function(o){
+      Game.loader.addImage( Game.images_dir + o );
+    });
+
+    soundManager.onready(function() {
+
+      _.each(Game.raw_sounds, function(media_or_arr, key){
+        
+        if (_.isArray(media_or_arr)) {
+          _.each(media_or_arr, function(media, index){
+            var new_k = [key, index].join("");
+            Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media );
+          });
+        } else {
+          Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr );
+        }
+        
+      });
+
+    });
+
 
     Game.loader.addProgressListener(function(e) { 
       console.log(e.completedCount + ' / ' + e.totalCount);
@@ -82,7 +105,10 @@ Game = {
       Game.initialize(auto_start);  
     });
 
-    Game.loader.start();
+    _.delay(function(){
+      Game.loader.start();  
+    }, 500);
+    
 
   },
 
@@ -90,7 +116,10 @@ Game = {
     
     jQuery.fx.interval = 50;
 
-    // TODO: Add Loader somewhere here
+    Game.initialize_animation_frame();
+
+    Game.initialize_menus();
+
     Game.initialize_canvas();
 
     Game.initialize_mobile_behaviours();
@@ -125,7 +154,23 @@ Game = {
 
   },
 
-  initialize_canvas : function(){
+  initialize_menus : function(){
+
+    Help.initialize();
+    
+    // Game.help_canvases.intersection.canvas = document.getElementById('help_intersection');
+    // Game.help_canvases.frustration.canvas  = document.getElementById('help_frustration');
+    // Game.help_canvases.acceleration.canvas = document.getElementById('help_acceleration');
+
+    // Game.help_canvases.intersection.context = Game.help_canvases.intersection.getContext('2d');
+    // Game.help_canvases.frustration.context  = Game.help_canvases.frustration.getContext('2d');
+    // Game.help_canvases.acceleration.context = Game.help_canvases.acceleration.getContext('2d');
+
+    Game.animate_menus();
+
+  },
+
+  initialize_animation_frame : function(){
     
     window.requestAnimFrame = (function(callback){
       // return window.requestAnimationFrame ||
@@ -138,6 +183,10 @@ Game = {
       };
     })();
 
+  },
+
+  initialize_canvas : function(){
+    
     Game.car_canvas  = document.getElementById('cars');
     Game.car_context = Game.car_canvas.getContext('2d');
 
@@ -237,6 +286,23 @@ Game = {
       });  
     }
     
+  },
+
+  animate_menus : function(){
+    
+    if (!Game.started && !Game.paused) {
+      
+      // _.each(Game.help_canvases, function(help_canvas, key){
+      //   help_canvas.context.clearRect(0,0,help_canvas.canvas.width, help_canvas.canvas.height);  
+      // });
+
+
+
+
+      
+
+    }
+
   },
 
   initialize_mobile_behaviours : function(){
@@ -608,8 +674,10 @@ Game = {
 
   play_sound : function(sound, loop, volume) {
     
-    if (volume===undefined) { volume = 100; }
+    if (_.isUndefined(Game.sounds[sound])) { return false; }
 
+    if (volume===undefined) { volume = 100; }
+    
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
         Game.sounds[sound].play();

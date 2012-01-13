@@ -494,6 +494,7 @@ function PxLoaderSound(id, url, tags, priority) {
     this.start = function(pxLoader) {
         // we need the loader ref so we can notify upon completion
         loader = pxLoader;
+        console.log(this.sound);
         this.sound['load']();
     };
 
@@ -521,6 +522,7 @@ function PxLoaderSound(id, url, tags, priority) {
 // add a convenience method to PxLoader for adding a sound
 PxLoader.prototype.addSound = function(id, url, tags, priority) {
     var soundLoader = new PxLoaderSound(id, url, tags, priority);
+    console.log(soundLoader, id, url);
     this.add(soundLoader);
     return soundLoader.sound;
 };

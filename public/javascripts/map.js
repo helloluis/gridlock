@@ -170,3 +170,7 @@ var SOUNDS = {
 var NEIGHBORHOOD = [
   "bg.png", "buildings.png"
 ];
+
+var OTHERS = [
+  "bg_polaroid.png"
+];
