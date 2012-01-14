@@ -135,6 +135,15 @@ var CARS = {
        sounds : [ 'ambulance.mp3' ] }
 };
 
+var LOADING_CARS = [
+  'car2_r.png', 
+  'taxi_r.png', 
+  'car1_r.png', 
+  'jeepney_r.png', 
+  'van_r.png', 
+  'bus_r.png'
+];
+
 var FRUSTRATIONS = [
   // filename, width, height, offset top, offset left
   [ 'frustration_01.png', 40, 40, -20, -25 ],
@@ -171,7 +180,6 @@ var NEIGHBORHOOD = [
   "bg.png", "buildings.png"
 ];
 
-
 var COLLISION_MESSAGES = [
   "Y U NO STOP THEM?",
   "Well, that didn't work.",
@@ -203,6 +211,7 @@ var SUCCESS_MESSAGES = [
   "Crazy!",
   "Ikaw na!",
   "Fantastic!",
-  "You Don't Suck After All!",
-  ""
+  "You Don't Suck After All!"
 ];
+
+var OTHERS = ["bg_polaroid.png"];

@@ -38,20 +38,30 @@ p { line-height:1.5; font-family: 'Boogaloo', Times, sans-serif; }
 em { font-style:italic; }
 
 .screen { position:absolute; top:0; left:0; width:1024px; height:768px; display:none; overflow:hidden; /*background:#444 url(../images/bg.jpg);*/ }
-.screen_inner { position:absolute; top:10%; bottom:10%; left:10%; right:10%; width:70%; height:70%; background:#fff; border-radius:10px; box-shadow:0 0 15px #000; padding:5%; border:10px solid #f90; }
+.screen_inner { position:absolute; top:10%; bottom:10%; left:10%; right:10%; width:80%; height:80%; }
 
-#loader.screen { background:#000; }
+#loader.screen { background:#000; display:block; }
+#loader.screen h2.loading { margin-top:250px; text-align:center; color:#fff; font-size:48px; text-shadow:3px 3px 3px #000; }
+#loader.screen h2.loading_percentage { margin-top:0px; text-align:center; color:#fff; font-size:48px; text-shadow:3px 3px 3px #000; }
+#loading_cars { position:absolute; top:400px; left:0px; width:100%; height:30px; overflow:hidden; }
+#loading_cars img { position:absolute; height:20px; }
+#loading_container { width:0; height:0; display:block; overflow:hidden; visibility:hidden; }
 
-#intro { display:block; background:url(../images/bg.jpg) no-repeat; }
-#intro h1 { text-indent:-2000px; background:url(../images/traffix_logo.png) no-repeat; width:600px; height:250px; margin:-50px 0px 0px -90px; }
+#intro { display:block; background:url(../images/loader.jpg) no-repeat; }
+#intro h1 { position:absolute; text-indent:-2000px; background:url(../images/traffix_logo.png) no-repeat; width:600px; height:250px; top: -50px; left: -60px; }
 a, #intro p strong { color:#fc0; }
 #intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; position:absolute; }
 #intro blockquote { font-size:18px; padding:10px 20px; }
 #intro h3 { padding:10px 0px 0px 0px; margin-bottom:0px; font-size:24px; }
-#intro .high_score_cont { margin-top:20px; }
-.help p { font-size:24px; line-height:1.3; width:350px; }
-.help_illustration { position:absolute; right:0px; top:0px; width:250px; height:250px; border:10px solid #fff; -webkit-transform:rotate(10deg); background:#000; box-shadow:0 0 15px #000; color:#fff; }
-.help_illustration_frustration { top:260px; right:120px; -webkit-transform:rotate(-5deg); }
+#intro .high_score_cont { position:absolute; top:350px; left:20px; }
+.help p { position:absolute; font-size:24px; line-height:1.3; width:350px; text-shadow:2px 2px 3px #000; color:#fff; top:200px; left:20px; }
+.help_illustration { position:absolute; right:-60px; top:-60px; width:350px; height:350px; -webkit-transform:rotate(10deg); background:#000; color:#fff; background:url(../images/bg_polaroid.png); z-index:5; cursor:pointer; }
+.help_illustration .help_background { width: 270px; height:275px; position:absolute; background:url(../images/bg_help.jpg); top:39px; left:41px; z-index:1; }
+.help_illustration .overlay { z-index:3; opacity:0.4; background:#000; position:absolute; width:270px; height:275px; top:39px; left:41px; }
+.help_illustration.selected .overlay { opacity:0; }
+.help_illustration canvas { position:absolute; top:39px; left:41px; z-index:2; }
+.help_illustration_frustration { top:150px; right:120px; -webkit-transform:rotate(-5deg); z-index:4; }
+.help_illustration_acceleration { top:330px; right:-50px; -webkit-transform:rotate(2deg); z-index:3; }
 .bttn { z-index:18; position:absolute; }
 #game .bttn, #game #score, #game .high_score { text-shadow:3px 3px 3px #000; }
 
@@ -60,7 +70,7 @@ a, #intro p strong { color:#fc0; }
 
 .bttn.credits, .bttn.leaderboards { font-size:16px; }
 .bttn.credits { bottom:30px; }
-.bttn.leaderboards { bottom:30px; right:30px; }
+.bttn.leaderboards { bottom:30px; left:150px; }
 .bttn.pause, .bttn.quit { top:20px; left :20px; color:#fff; }
 .bttn.quit { left: 100px; }
 .bttn.mute { bottom:20px; left:20px; color:#fff; }
@@ -77,7 +87,7 @@ a, #intro p strong { color:#fc0; }
 #intro h1, #intro h2 { text-align:center; }
 .bttn, .buttons li { cursor:pointer; }
 
-#messages { position:absolute; top:300px; left:325px; text-align:center; width:400px; height:60px; z-index:20; opacity : 1; display:none; font-size:48px; }
+#messages { position:absolute; top:250px; left:150px; text-align:center; width:700px; height:120px; z-index:20; opacity : 1; display:none; font-size:48px; }
 #messages h1, #messages h2, #messages h3, #messages .countdown { color:#fff; text-shadow:3px 3px 6px #000; }
 #messages h2 { font-size:60px; }
  
@@ -136,3 +146,14 @@ a, #intro p strong { color:#fc0; }
 #overlay { background:rgba(0,0,0,0.7); position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:19; }
 #overlay .overlay_inner { position:absolute; top:40%; left:30%; width:30%; padding:5% 10%; text-align:center; background:#fff; border-radius:10px; }
 #overlay .overlay_inner h1, #overlay .overlay_inner h2 { margin:0px; padding:0px; }
+
+.car.horizontal { width:40px; height:20px; }
+.car.vertical { width:20px; height:40px; }
+.car.blue.horizontal { background:url(../images/car2_l.png); }
+.car.blue.horizontal.right { background:url(../images/car2_r.png); }
+.car.blue.vertical { background:url(../images/car2_d.png); }
+.car.blue.vertical.right { background:url(../images/car2_u.png); }
+.car.yellow.horizontal { background:url(../images/taxi_l.png); }
+.car.yellow.horizontal.right { background:url(../images/taxi_r.png); }
+.car.yellow.vertical { background:url(../images/taxi_d.png); }
+.car.yellow.vertical.right { background:url(../images/taxi_u.png); }

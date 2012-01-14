@@ -1,65 +1,71 @@
 Game = {
 
-  debug               : false,  // set to TRUE to visualize barriers and intersections
+  debug                : false,  // set to TRUE to visualize barriers and intersections
+ 
+  loader               : new PxLoader(),
+ 
+  score                : 0,
+  frustration          : 0,
+  high_score           : 0,
+   
+  fps                  : FPS,
+ 
+  started              : false,
+  paused               : true,
+  ended                : false,
+  muted                : false,
+ 
+  can_adjust_speed     : true,    // clicking or swiping on a car will increase its speed (UNDER CONSTRUCTION)
+ 
+  streets              : [],     // array of Street objects
+  barriers             : {},     // hash of barrier hitboxes
+  intersections        : [],     // array of intersection hitboxes
+   
+  max_speed            : MAX_SPEED,
+  max_frustration      : 100,
+  enable_frustration   : true,
+   
+  maker_freq           : MAKER_FREQUENCY,        // how often does a Maker add a new car to the road
+  max_cars_per_street  : MAX_CARS_PER_STREET,    
+  car_types            : CARS,                   // library of car settings and assets
+  car_odds             : CAR_ODDS,               // the likelihood that a particular car will be added
+  neighborhood         : NEIGHBORHOOD,           // graphics used for the neighborhood layers
+ 
+  images_dir           : IMAGES_DIR,             // path to images
+  sounds_dir           : SOUNDS_DIR,             // path to sounds
 
-  loader              : new PxLoader(),
-
-  score               : 0,
-  frustration         : 0,
-  high_score          : 0,
-  
-  fps                 : FPS,
-
-  started             : false,
-  paused              : true,
-  ended               : false,
-  muted               : false,
-
-  can_adjust_speed    : true,    // clicking or swiping on a car will increase its speed (UNDER CONSTRUCTION)
-
-  streets             : [],     // array of Street objects
-  barriers            : {},     // hash of barrier hitboxes
-  intersections       : [],     // array of intersection hitboxes
-  
-  max_speed           : MAX_SPEED,
-  max_frustration     : 100,
-  enable_frustration  : true,
-  
-  maker_freq          : MAKER_FREQUENCY,        // how often does a Maker add a new car to the road
-  max_cars_per_street : MAX_CARS_PER_STREET,    
-  car_types           : CARS,                   // library of car settings and assets
-  car_odds            : CAR_ODDS,               // the likelihood that a particular car will be added
-  neighborhood        : NEIGHBORHOOD,           // graphics used for the neighborhood layers
-
-  images_dir          : IMAGES_DIR,             // path to images
-  sounds_dir          : SOUNDS_DIR,             // path to sounds
+  // help menu canvases
+  help_canvases        : { 'intersection' : {}, 'frustration' : {}, 'acceleration' : {} },
 
   // cache of the images representing various levels of vehicular frustration
-  frustration_assets  : [],
+  frustration_assets   : [],
 
-  collision_messages  : COLLISION_MESSAGES,
+  collision_messages   : COLLISION_MESSAGES,
   frustration_messages : FRUSTRATION_MESSAGES,
 
-  touch_device        : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
-  
-  with_sound          : true,
-  with_phonegap_sound : false,   // we use the Phonegap sound library for iOS
-  with_sm2_sound      : true,    // SoundManager2 is what we use for regular web presentation
-  with_sjs_sound      : false,   // SoundJS is another sound library we're fucking around with  
-
-  raw_sounds          : SOUNDS,  // our library of sounds
-  sounds              : {},
+  touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
+   
+  with_sound           : true,
+  with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
+  with_sm2_sound       : true,    // SoundManager2 is what we use for regular web presentation
+  with_sjs_sound       : false,   // SoundJS is another sound library we're fucking around with  
+ 
+  raw_sounds           : SOUNDS,  // our library of sounds
+  sounds               : {},
 
   // sometimes we want to defer rendering on some items 
   // until all of the cars have been rendered, e.g., the frustration indicators
-  deferred_renders    : [], 
+  deferred_renders     : [], 
 
-  db_name             : "traffix",
-  high_score_key      : "high_score",
+  db_name              : "traffix",
+  high_score_key       : "high_score",
 
-  high_score_key_full : ["traffix", MAP_NAME, "high_score"].join("_"),
+  high_score_key_full  : ["traffix", MAP_NAME, "high_score"].join("_"),
 
   preload : function(auto_start){
+
+    Game.loading_screen = $("#loader"),
+      loader_percentage = $(".loading_percentage", Game.loading_screen);
 
     _.each(Game.car_types, function(car){
       _.each(_.flatten(car.assets),function(fc){
@@ -75,17 +81,45 @@ Game = {
       Game.loader.addImage( Game.images_dir + f[0] );
     });
 
-    Game.initialize_sounds();
+    _.each(OTHERS, function(o){
+      Game.loader.addImage( Game.images_dir + o );
+    });
 
+    soundManager.onready(function() {
+
+      _.each(Game.raw_sounds, function(media_or_arr, key){
+        
+        if (_.isArray(media_or_arr)) {
+          _.each(media_or_arr, function(media, index){
+            var new_k = [key, index].join("");
+            Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media );
+          });
+        } else {
+          Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr );
+        }
+        
+      });
+
+    });
+
+    loader_percentage.text("0%");
     Game.loader.addProgressListener(function(e) { 
-      console.log(e.completedCount + ' / ' + e.totalCount);
+      var percentage = Math.round((e.completedCount/e.totalCount)*100);
+      loader_percentage.text( percentage + "%" );
     });
 
     Game.loader.addCompletionListener(function(){
+      console.log('completed');
+      TraffixLoader.stop();
       Game.initialize(auto_start);  
     });
 
-    Game.loader.start();
+    TraffixLoader.initialize();
+
+    _.delay(function(){
+      Game.loader.start();  
+    }, 500);
+    
 
   },
 
@@ -93,7 +127,10 @@ Game = {
     
     jQuery.fx.interval = 50;
 
-    // TODO: Add Loader somewhere here
+    Game.initialize_animation_frame();
+
+    Game.initialize_menus();
+
     Game.initialize_canvas();
 
     Game.initialize_mobile_behaviours();
@@ -128,7 +165,13 @@ Game = {
 
   },
 
-  initialize_canvas : function(){
+  initialize_menus : function(){
+
+    Help.initialize();
+
+  },
+
+  initialize_animation_frame : function(){
     
     window.requestAnimFrame = (function(callback){
       // return window.requestAnimationFrame ||
@@ -141,6 +184,10 @@ Game = {
       };
     })();
 
+  },
+
+  initialize_canvas : function(){
+    
     Game.car_canvas  = document.getElementById('cars');
     Game.car_context = Game.car_canvas.getContext('2d');
 
@@ -155,7 +202,8 @@ Game = {
 
   initialize_speed_changer : function(){
     if (this.can_adjust_speed) {
-      $(".street").click(function(e){ 
+
+      var click = function(e){ 
         if (Game.started && !Game.paused && !Game.ended) {
           
           var street_name = $(this).attr('data-name');
@@ -184,8 +232,6 @@ Game = {
                 var horiz_match = Game.compare_positions( hit1, c1 ),
                     vert_match  = Game.compare_positions( hit2, c2 );
                 
-                // console.log( 'clicked', e.pageX, e.pageY, 'car pos', c.current_pos.left, c.current_pos.top );
-
                 if (horiz_match && vert_match) {
                   c.change_speed(true);  
                 }
@@ -193,7 +239,14 @@ Game = {
             });
           }
         }
-      }); 
+      };
+      
+      if (Game.touch_device) {
+        $(".street").tappable(click);
+      } else {
+        $(".street").unbind('click').click(click);
+      }
+ 
     }
   },
 
@@ -203,12 +256,8 @@ Game = {
   animate : function() {
     
     if (Game.started && !Game.paused && !Game.ended) {
-      //clear 
-      Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
       
-      Game.frustration_context.clearRect(0,0,Game.frustration_canvas.width, Game.frustration_canvas.height);
-
-      Game.deferred_renders = new Array;
+      Game.clear_canvases();
 
       if (Game.debug==true) {
         Game.show_game_objects();  
@@ -234,6 +283,16 @@ Game = {
       });  
     }
     
+  },
+
+  clear_canvases : function(){
+    
+    Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
+      
+    Game.frustration_context.clearRect(0,0,Game.frustration_canvas.width, Game.frustration_canvas.height);
+
+    Game.deferred_renders = new Array;
+
   },
 
   initialize_mobile_behaviours : function(){
@@ -351,8 +410,9 @@ Game = {
     });
 
     $(".restart").click(function(){
-      document.location.hash="autostart";
-      document.location.reload();
+      Game.restart();
+      // document.location.hash="autostart";
+      // document.location.reload();
     });
     
     $(".pause").click(function(){
@@ -511,15 +571,21 @@ Game = {
   },
 
   start : function(){
+
+    Game.score   = 0;
     Game.started = true;
     Game.paused  = true;
     Game.ended   = false;
+    
+    Game.loading_screen.hide();
     Game.intro.hide();
     Game.credits.hide();
     Game.leaderboards.hide();
+    
     Game.main.show();
     Game.credits.hide();
     Game.start_countdown();
+
   },
 
   start_streets : function(){
@@ -579,6 +645,28 @@ Game = {
 
   },
 
+  restart : function() {
+    
+    Game.stop_sound_theme();
+    
+    $(".restart, #messages").hide();
+    
+    Game.start();
+
+  },
+
+  reset : function(return_to_intro){
+    
+    Game.stop_sound_theme();
+
+    Game.stop_streets();
+    
+    Game.frus_cont.stopTime('frustrating');
+
+    $(".restart").show();
+
+  },
+
   mute : function(){
     $(".bttn.mute").addClass('muted').text('Un-mute');
     Game.with_sound = false;
@@ -605,8 +693,10 @@ Game = {
 
   play_sound : function(sound, loop, volume) {
     
-    if (volume===undefined) { volume = 100; }
+    if (_.isUndefined(Game.sounds[sound])) { return false; }
 
+    if (volume===undefined) { volume = 100; }
+    
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
         Game.sounds[sound].play();
@@ -675,7 +765,7 @@ Game = {
     var int = 3;
     Game.messages.css({ display : 'block', opacity : '1' });
     
-    Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
+    Game.clear_canvases();
 
     _.delay(function(){
       Game.play_sound('countdown');
@@ -702,17 +792,6 @@ Game = {
       int-=1;
       
     });
-  },
-
-  reset : function(return_to_intro){
-    
-    Game.stop_sound_theme();
-
-    Game.stop_streets();
-    Game.frus_cont.stopTime('frustrating');
-
-    $(".restart").show();
-
   },
 
   arrived : function() {
@@ -893,19 +972,20 @@ var Street = function(){
   this.intersections   = [];
   this.lefthand        = false;
 
-  this.initialize    = function(game, street) {
-    this.game        = Game;
-    this.name        = street[0];
-    this.css_name    = street[0].replace(/\_(right|left)/,'').replace(/\_lane[\d]/,'');
+  this.initialize      = function(game, street) {
+    this.game          = Game;
+    this.name          = street[0];
+    this.cars          = new Array;
+    this.css_name      = street[0].replace(/\_(right|left)/,'').replace(/\_lane[\d]/,'');
+      
+    this.lefthand      = this.name.indexOf('left')!==-1;
+    this.orientation   = street[1];
+    this.top           = street[2];
+    this.left          = street[3];
+    this.width         = street[4];
+    this.height        = street[5];
     
-    this.lefthand    = this.name.indexOf('left')!==-1;
-    this.orientation = street[1];
-    this.top         = street[2];
-    this.left        = street[3];
-    this.width       = street[4];
-    this.height      = street[5];
-  
-    this.maker       = new Maker(Game, this);
+    this.maker         = new Maker(Game, this);
 
     this.initialize_barriers();
     this.initialize_intersections();
@@ -938,6 +1018,7 @@ var Street = function(){
   };
 
   this.stop = function(){
+    this.cars = new Array;
     this.maker.stop();
   };
 
@@ -1531,10 +1612,6 @@ var Maker = function(){
     self.car_types  = Game.car_types;
     self.car_odds   = Game.car_odds;
 
-    //debugger;
-    
-    // self.make();
-
     _.delay(function(){
       
       self.timer = window.setInterval(function(){ self.make(); }, self.frequency);
@@ -1575,6 +1652,7 @@ var Maker = function(){
     var self = this;
     
     if (Game.paused!==true) {
+      console.log('making ', self.street.name);
       if (self.street.cars.length < Game.max_cars_per_street) {
         self.build_car(0);
       }  
