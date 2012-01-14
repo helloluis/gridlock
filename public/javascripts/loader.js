@@ -521,7 +521,6 @@ function PxLoaderSound(id, url, tags, priority) {
 // add a convenience method to PxLoader for adding a sound
 PxLoader.prototype.addSound = function(id, url, tags, priority) {
     var soundLoader = new PxLoaderSound(id, url, tags, priority);
-    console.log(soundLoader, id, url);
     this.add(soundLoader);
     return soundLoader.sound;
 };

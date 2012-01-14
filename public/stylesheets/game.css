@@ -65,8 +65,9 @@ a, #intro p strong { color:#fc0; }
 .bttn { z-index:18; position:absolute; }
 #game .bttn, #game #score, #game .high_score { text-shadow:3px 3px 3px #000; }
 
-.bttn.start_game, .bttn.restart { height:35px; padding:10px; margin-top:10px; border:5px solid #500; margin:0 auto; text-align:center; border-radius: 10px; background:#f90; color:#fff; }
-.bttn.start_game { font-size:30px; padding:10px 30px; bottom:100px; left:50px;  }
+.bttn.start_game, .bttn.restart { position:absolute; height:35px; padding:10px; margin-top:10px; margin:0 auto; text-align:center; color:#fff; text-indent:-2000px; height:90px; font-size:30px; cursor:pointer; }
+.bttn.start_game { bottom:80px; left:20px; width:200px; background:url(../images/bttn_play.png) no-repeat 0 0; }
+.bttn.restart { background:url(../images/bttn_again.png) no-repeat 0 0; text-indent:-2000px; width:296px; display:none; top:470px; left:350px; }
 
 .bttn.credits, .bttn.leaderboards { font-size:16px; }
 .bttn.credits { bottom:30px; }
@@ -93,13 +94,14 @@ a, #intro p strong { color:#fc0; }
  
 
 #score, #high_score { position:absolute; text-align:right; top:20px; right:20px; width:100px; height:50px; font-size:48px; color:#fff; z-index:20; }
+#score.higher_score { color:#ff0; }
 #high_score { font-size:24px; top:70px; right:25px; }
 
 #map, .neighborhood, .street, .buildings, .intersection { position:absolute; }
 #map { top:0px; left:0px; width:100%; height:100%; }
 .neighborhood, .buildings { top:0px; left:0px; background:url(../images/bg.jpg); width:100%; height:100%; }
 .buildings { top:0px; left:0px; background:url(../images/buildings.png); width:100%; height:100%; z-index:12; }
-.street{z-index:14; cursor:pointer;}
+.street{z-index:14; cursor:pointer;-webkit-tap-highlight-color: rgba(0,0,0,0)}
 .street.horizontal.lanes_4 { width:100%; height: 100px; }
 .street.horizontal.lanes_2 { width:100%; height: 50px; }
 .street.vertical.lanes_2 { width:50px; height: 100%; }
@@ -126,7 +128,7 @@ a, #intro p strong { color:#fc0; }
 .hitbox { position:absolute; background:#0fc; }
 
 .intersection { width:50px; height:50px; z-index:14; }
-.stoplight { position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:3; background:url(../images/control_horizontal.png) no-repeat 50% 50%; opacity:0.7; }
+.stoplight { position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:3; background:url(../images/control_horizontal.png) no-repeat 50% 50%; opacity:0.7; -webkit-tap-highlight-color: rgba(0,0,0,0) }
 .stoplight.vertical { -webkit-transform:rotate(90deg) translateZ(0); }
 .explosion { position:absolute; z-index:13; background-image: url(../images/explosion.png); width:80px; height:80px; background-repeat:no-repeat; }
 .frustration { position:absolute; width:15px; height:15px; background-image: url(../images/frustration.png); z-index:9; }
@@ -140,8 +142,6 @@ a, #intro p strong { color:#fc0; }
 .intersection.baker { top:500px; height:50px; }
 .intersection.chang { left:250px; width:100px; }
 .intersection.dexter { left:650px; width:100px; }
-
-.restart { position:absolute; top:470px; left:400px; width:200px; height:60px; font-size:36px; color:#fff; text-align:center; display:none; cursor:pointer; }
 
 #overlay { background:rgba(0,0,0,0.7); position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:19; }
 #overlay .overlay_inner { position:absolute; top:40%; left:30%; width:30%; padding:5% 10%; text-align:center; background:#fff; border-radius:10px; }

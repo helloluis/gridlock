@@ -507,30 +507,49 @@ Game = {
     });
   },
 
-  show_game_objects : function(){
-    // temporary
-    _.each(Game.streets, function(street){
-      _.each(street.barriers, function(b){
-        if (b.active) {
-          Game.car_context.beginPath();
-          Game.car_context.rect( b.left, b.top, b.width, b.height);
-          Game.car_context.fillStyle = b.color;
-          Game.car_context.fill();  
-        }
-      });
-      Game.car_context.beginPath();
-      Game.car_context.rect( street.left, street.top, street.width, street.height );
-      Game.car_context.lineWidth = 2;
-      Game.car_context.strokeStyle = "#333";
-      Game.car_context.stroke();
-    });
+  initialize_controls : function(){
+    
+    var self = this;
+    self.stoplights = STOPLIGHTS;
 
-    _.each(Game.intersections, function(inter){
-      Game.car_context.beginPath();
-      Game.car_context.rect( inter.left, inter.top, inter.width, inter.height );
-      Game.car_context.lineWidth = 2;
-      Game.car_context.strokeStyle = "#0ff";
-      Game.car_context.stroke();
+    $(".stoplight").hide().each(function(idx, el){
+      
+      var elem   = $(el),
+          light  = self.stoplights[idx],
+          click  = function(){
+            if (Game.started && !Game.paused && !Game.ended) {
+              if (elem.hasClass('horizontal')) {
+                elem.removeClass('horizontal').addClass('vertical');
+              } else {
+                elem.addClass('horizontal').removeClass('vertical');
+              }
+
+              var new_orientation = elem.hasClass('horizontal') ? 'horizontal' : 'vertical';
+              
+              var barriers_to_activate   = light[ new_orientation=='horizontal' ? 1 : 0 ],
+                  barriers_to_deactivate = light[ new_orientation=='horizontal' ? 0 : 1 ];
+
+              _.each(Game.streets, function(street){
+                _.each(street.barriers, function(street_barrier) {
+
+                  if (_.include(barriers_to_activate, street_barrier.name)) {
+                    street_barrier.active = true;
+                  } else if (_.include(barriers_to_deactivate, street_barrier.name)) {
+                    street_barrier.active = false;
+                  }
+                });
+              });
+            } 
+          }
+      
+      elem.removeClass('vertical').addClass('horizontal');
+
+      if (Game.touch_device) {
+        elem.tappable(click);
+      } else {
+        elem.unbind('click').click(click);
+      }
+
     });
 
   },
@@ -573,6 +592,8 @@ Game = {
   start : function(){
 
     Game.score   = 0;
+    Game.score_cont.text("0");
+
     Game.started = true;
     Game.paused  = true;
     Game.ended   = false;
@@ -581,6 +602,7 @@ Game = {
     Game.intro.hide();
     Game.credits.hide();
     Game.leaderboards.hide();
+    Game.hide_message();    
     
     Game.main.show();
     Game.credits.hide();
@@ -606,6 +628,12 @@ Game = {
       street.stop();
     });
 
+  },
+
+  clear_intersections : function(){
+    _.each(Game.intersections, function(intersection){
+      intersection.cars = [ [], [] ];
+    });
   },
 
   control_all_barriers : function(value){
@@ -660,6 +688,8 @@ Game = {
     Game.stop_sound_theme();
 
     Game.stop_streets();
+
+    Game.clear_intersections();
     
     Game.frus_cont.stopTime('frustrating');
 
@@ -757,7 +787,7 @@ Game = {
   },
 
   hide_message : function(){
-    Game.messages.css({ display : 'none' });
+    Game.messages.html("").css({ display : 'none' });
   },
 
   start_countdown : function() {
@@ -794,13 +824,26 @@ Game = {
     });
   },
 
-  arrived : function() {
-    Game.increment_score();
+  arrived : function( car ) {
+    Game.increment_score( car.score );
   },
 
-  increment_score : function(){
-    Game.score+=1;
-    Game.score_cont.text(Game.score);
+  increment_score : function( score ){
+    
+    Game.score+=(score || 1);
+    
+    Game.score_cont.
+      text(Game.score).
+      animate({'font-size' : "64px"},100).
+      delay(50).
+      animate({'font-size' : '48px'},50);
+
+    Game.play_sound('arrived');
+
+    if (Game.score > Game.high_score) {
+      Game.score_cont.addClass('higher_score');
+    }
+
   },
 
   initialize_frustration : function(){
@@ -821,53 +864,6 @@ Game = {
   adjust_frustration : function(){
     var w = (Game.frustration/Game.max_frustration) * Game.frus_cont.innerWidth();
     Game.frus_bar.width(w);
-  },
-
-  initialize_controls : function(){
-    
-    var self = this;
-    self.stoplights = STOPLIGHTS;
-
-    $(".stoplight").hide().each(function(idx, el){
-      
-      var elem   = $(el),
-          light  = self.stoplights[idx],
-          click  = function(){
-            if (Game.started && !Game.paused && !Game.ended) {
-              if (elem.hasClass('horizontal')) {
-                elem.removeClass('horizontal').addClass('vertical');
-              } else {
-                elem.addClass('horizontal').removeClass('vertical');
-              }
-
-              var new_orientation = elem.hasClass('horizontal') ? 'horizontal' : 'vertical';
-              
-              var barriers_to_activate   = light[ new_orientation=='horizontal' ? 1 : 0 ],
-                  barriers_to_deactivate = light[ new_orientation=='horizontal' ? 0 : 1 ];
-
-              _.each(Game.streets, function(street){
-                _.each(street.barriers, function(street_barrier) {
-
-                  if (_.include(barriers_to_activate, street_barrier.name)) {
-                    street_barrier.active = true;
-                  } else if (_.include(barriers_to_deactivate, street_barrier.name)) {
-                    street_barrier.active = false;
-                  }
-                });
-              });
-            } 
-          }
-      
-      elem.removeClass('vertical').addClass('horizontal');
-
-      if (Game.touch_device) {
-        elem.tappable(click);
-      } else {
-        elem.unbind('click').click(click);
-      }
-
-    });
-
   },
 
   start_controls : function() {
@@ -948,6 +944,34 @@ Game = {
     var x1 = p1[0] < p2[0] ? p1 : p2;
     var x2 = p1[0] < p2[0] ? p2 : p1;
     return x1[1] > x2[0] || x1[0] === x2[0] ? true : false;
+  },
+
+  show_game_objects : function(){
+    // temporary
+    _.each(Game.streets, function(street){
+      _.each(street.barriers, function(b){
+        if (b.active) {
+          Game.car_context.beginPath();
+          Game.car_context.rect( b.left, b.top, b.width, b.height);
+          Game.car_context.fillStyle = b.color;
+          Game.car_context.fill();  
+        }
+      });
+      Game.car_context.beginPath();
+      Game.car_context.rect( street.left, street.top, street.width, street.height );
+      Game.car_context.lineWidth = 2;
+      Game.car_context.strokeStyle = "#333";
+      Game.car_context.stroke();
+    });
+
+    _.each(Game.intersections, function(inter){
+      Game.car_context.beginPath();
+      Game.car_context.rect( inter.left, inter.top, inter.width, inter.height );
+      Game.car_context.lineWidth = 2;
+      Game.car_context.strokeStyle = "#0ff";
+      Game.car_context.stroke();
+    });
+
   }
 
 };
@@ -1029,9 +1053,10 @@ var Car = function(car_hash){
   this.width                 = car_hash && car_hash.width  ? car_hash.width  : 20;
   this.height                = car_hash && car_hash.height ? car_hash.height : 35;
   this.color                 = car_hash && car_hash.colors ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
-  this.type                  = car_hash && car_hash.type ? car_hash.type : 'car';
+  this.type                  = car_hash && car_hash.type   ? car_hash.type   : 'car';
   this.image_assets          = car_hash && car_hash.assets ? car_hash.assets : false;
   this.sounds                = car_hash && car_hash.sounds ? car_hash.sounds : false;
+  this.score                 = car_hash && car_hash.score  ? car_hash.score  : 1;
   this.street                = false;
   this.moving                = false;
   this.frustration           = 0;
@@ -1652,7 +1677,6 @@ var Maker = function(){
     var self = this;
     
     if (Game.paused!==true) {
-      console.log('making ', self.street.name);
       if (self.street.cars.length < Game.max_cars_per_street) {
         self.build_car(0);
       }  

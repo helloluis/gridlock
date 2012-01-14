@@ -116,21 +116,22 @@ var CARS = {
     width     : 20, 
     height    : 40, 
     frustrates_by : 7,
+    score     : 1,
     assets    : [ 
       // from right, from left, from top, from bottom
       [ 'car2_r.png', 'car2_l.png', 'car2_d.png', 'car2_u.png' ], 
       [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ], 
     ]
   },
-  hatch       : { type : 'hatch',     width : 20, height : 35, frustrates_by : 7,
+  hatch       : { type : 'hatch',     width : 20, height : 35, frustrates_by : 7, score : 1,
       assets  : [ 'car1_r.png', 'car1_l.png', 'car1_d.png', 'car1_u.png' ] },
-  jeepney     : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, 
+  jeepney     : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, score : 3,
        assets : [ 'jeepney_r.png', 'jeepney_l.png', 'jeepney_d.png', 'jeepney_u.png' ] },
-  van         : { type : 'van',       width : 20, height : 45, frustrates_by : 5, 
+  van         : { type : 'van',       width : 20, height : 45, frustrates_by : 5, score : 2,
        assets : [ 'van_r.png', 'van_l.png', 'van_d.png', 'van_u.png' ] },
-  bus         : { type : 'bus',       width : 20, height : 60, frustrates_by : 4,   
-       assets : [ 'bus_r.png', 'bus_l.png', 'bus_d.png', 'bus_u.png' ]   },
-  ambulance   : { type : 'ambulance', width : 20, height : 45, frustrates_by : 4, speed : 5,  
+  bus         : { type : 'bus',       width : 20, height : 60, frustrates_by : 4, score : 4,
+       assets : [ 'bus_r.png', 'bus_l.png', 'bus_d.png', 'bus_u.png' ] },
+  ambulance   : { type : 'ambulance', width : 20, height : 45, frustrates_by : 4, speed : 5, score : 5, 
        assets : [ 'ambulance_r.png', 'ambulance_l.png', 'ambulance_d.png', 'ambulance_u.png' ],
        sounds : [ 'ambulance.mp3' ] }
 };
@@ -172,7 +173,8 @@ var SOUNDS = {
   countdown     : "countdown.mp3",
   theme         : "bg.mp3",
   explosion     : "explosion_short.mp3",
-  frustration   : "frustration.mp3"
+  frustration   : "frustration.mp3",
+  arrived       : "kaching.mp3"
 };
 
 
