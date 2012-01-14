@@ -61,6 +61,9 @@ Game = {
 
   preload : function(auto_start){
 
+    var loader_dom = $("#loader"),
+        loader_percentage = $(".loading_percentage", loader_dom);
+
     _.each(Game.car_types, function(car){
       _.each(_.flatten(car.assets),function(fc){
         Game.loader.addImage( Game.images_dir + fc );
@@ -96,14 +99,19 @@ Game = {
 
     });
 
-
+    loader_percentage.text("0%");
     Game.loader.addProgressListener(function(e) { 
-      console.log(e.completedCount + ' / ' + e.totalCount);
+      var percentage = Math.round((e.completedCount/e.totalCount)*100);
+      loader_percentage.text( percentage + "%" );
     });
 
     Game.loader.addCompletionListener(function(){
+      console.log('completed');
+      TraffixLoader.stop();
       Game.initialize(auto_start);  
     });
+
+    TraffixLoader.initialize();
 
     _.delay(function(){
       Game.loader.start();  
@@ -157,7 +165,7 @@ Game = {
   initialize_menus : function(){
 
     Help.initialize();
-    
+
     // Game.help_canvases.intersection.canvas = document.getElementById('help_intersection');
     // Game.help_canvases.frustration.canvas  = document.getElementById('help_frustration');
     // Game.help_canvases.acceleration.canvas = document.getElementById('help_acceleration');
@@ -166,7 +174,7 @@ Game = {
     // Game.help_canvases.frustration.context  = Game.help_canvases.frustration.getContext('2d');
     // Game.help_canvases.acceleration.context = Game.help_canvases.acceleration.getContext('2d');
 
-    Game.animate_menus();
+    // Game.animate_menus();
 
   },
 

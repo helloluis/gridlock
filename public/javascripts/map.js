@@ -135,6 +135,15 @@ var CARS = {
        sounds : [ 'ambulance.mp3' ] }
 };
 
+var LOADING_CARS = [
+  'car2_r.png', 
+  'taxi_r.png', 
+  'car1_r.png', 
+  'jeepney_r.png', 
+  'van_r.png', 
+  'bus_r.png'
+];
+
 var FRUSTRATIONS = [
   // filename, width, height, offset top, offset left
   [ 'frustration_01.png', 40, 40, -20, -25 ],

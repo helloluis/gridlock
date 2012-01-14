@@ -26,9 +26,12 @@
   <script src="javascripts/underscore.js"></script>
   <script src="javascripts/jquery-timers.js"></script>
   <script src="javascripts/soundmanager2-nodebug-jsmin.js"></script>
-  <script src="javascripts/loader.js"></script>
   <script src="javascripts/map.js"></script>
+  <script src="javascripts/loader.js"></script>
+  <script src="javascripts/traffix_loader.js"></script>
   <script src="javascripts/game.js"></script>
+  <script src="javascripts/help.js"></script>
+  
 
   <style>
   @font-face {
@@ -53,22 +56,28 @@
 
 <div id="loader" class="screen">
   <h2 class='loading'>Loading</h2>
+  <h2 class='loading_percentage'>Loading</h2>
+  <div id="loading_cars"></div>
+  <div id="loading_container"></div>
 </div>
 
 <div id="intro" class="screen" style="display:none">
   <div class="screen_inner">
     <h1>Traffix!</h1>
     <div class="help">
-      <div id="help_intersection" class="help_illustration help_illustration_intersection">
-        <canvas id="help_intersection_canvas" width="270" height="275"></canvas>
+      <div id="help_intersection" class="help_illustration help_illustration_intersection selected">
+        <div class="overlay"></div>
+        <!-- <canvas id="help_intersection_canvas" width="270" height="275"></canvas> -->
         <div class="help_background"></div>
       </div>
       <div id="help_frustration" class="help_illustration help_illustration_frustration">
-        <canvas id="help_frustration_canvas" width="270" height="275"></canvas>
+        <div class="overlay"></div>
+        <!-- <canvas id="help_frustration_canvas" width="270" height="275"></canvas> -->
         <div class="help_background"></div>
       </div>
       <div id="help_acceleration" class="help_illustration help_illustration_acceleration">
-        <canvas id="help_acceleration_canvas" width="270" height="275"></canvas>
+        <div class="overlay"></div>
+        <!-- <canvas id="help_acceleration_canvas" width="270" height="275"#></canvas> -->
         <div class="help_background"></div>
       </div>
       <p>Fix that traffic problem by managing those busy intersections! 
