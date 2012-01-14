@@ -37,6 +37,9 @@ Game = {
   // cache of the images representing various levels of vehicular frustration
   frustration_assets  : [],
 
+  collision_messages  : COLLISION_MESSAGES,
+  frustration_messages : FRUSTRATION_MESSAGES,
+
   touch_device        : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
   
   with_sound          : true,
@@ -827,7 +830,8 @@ Game = {
       Game.ended = true;
       Game.store_high_score(Game.score);
       Game.play_sound('frustration',false,50);
-      Game.show_message("<h1>How Frustrating!</h1>");
+      var message = Game.frustration_messages[Math.floor(Math.random()*Game.collision_messages.length)];
+      Game.show_message( "<h2>" + message + "</h2>" );
       Game.reset();  
     }
   },
@@ -838,7 +842,8 @@ Game = {
       Game.ended = true;
       Game.generate_explosion( exploding_car );
       Game.store_high_score(Game.score);
-      Game.show_message("<h1>Boom!</h1>");
+      var message = Game.collision_messages[Math.floor(Math.random()*Game.collision_messages.length)];
+      Game.show_message( "<h2>" + message + "</h2>" );
       Game.reset();  
     }
   },

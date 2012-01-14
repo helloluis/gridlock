@@ -170,3 +170,39 @@ var SOUNDS = {
 var NEIGHBORHOOD = [
   "bg.png", "buildings.png"
 ];
+
+
+var COLLISION_MESSAGES = [
+  "Y U NO STOP THEM?",
+  "Well, that didn't work.",
+  "Hmm, let's try that again.",
+  "The idea is to prevent collisions, genius.",
+  "This isn't a demolition derby.",
+  "A bit accident-prone, are we?",
+  "BOOM!",
+  "KA-BOOOOM!",
+  "You like making things explode, huh?",
+  "Asleep at the wheel?"
+];
+
+var FRUSTRATION_MESSAGES = [
+  "How frustrating!",
+  "You disappoint us.",
+  "Hmm, let's try that again.",
+  "Too slow. Too slow.",
+  "Too hard for you?",
+  "Fruit Ninja might be a better game for you",
+  "Too much time playing PvZ?",
+  "They honk because they care.",
+  "Honking means they're getting annoyed at you"
+];
+
+var SUCCESS_MESSAGES = [
+  "Awesome!",
+  "Cool!",
+  "Crazy!",
+  "Ikaw na!",
+  "Fantastic!",
+  "You Don't Suck After All!",
+  ""
+];

@@ -53,6 +53,7 @@ a, #intro p strong { color:#fc0; }
 .help_illustration { position:absolute; right:0px; top:0px; width:250px; height:250px; border:10px solid #fff; -webkit-transform:rotate(10deg); background:#000; box-shadow:0 0 15px #000; color:#fff; }
 .help_illustration_frustration { top:260px; right:120px; -webkit-transform:rotate(-5deg); }
 .bttn { z-index:18; position:absolute; }
+#game .bttn, #game #score, #game .high_score { text-shadow:3px 3px 3px #000; }
 
 .bttn.start_game, .bttn.restart { height:35px; padding:10px; margin-top:10px; border:5px solid #500; margin:0 auto; text-align:center; border-radius: 10px; background:#f90; color:#fff; }
 .bttn.start_game { font-size:30px; padding:10px 30px; bottom:100px; left:50px;  }
@@ -76,12 +77,13 @@ a, #intro p strong { color:#fc0; }
 #intro h1, #intro h2 { text-align:center; }
 .bttn, .buttons li { cursor:pointer; }
 
-#messages { position:absolute; top:300px; left:325px; text-align:center; width:400px; height:60px; z-index:20; opacity : 1; display:none; }
-#messages h1, #messages h2, #messages h3, #messages .countdown { color:#fff; }
+#messages { position:absolute; top:300px; left:325px; text-align:center; width:400px; height:60px; z-index:20; opacity : 1; display:none; font-size:48px; }
+#messages h1, #messages h2, #messages h3, #messages .countdown { color:#fff; text-shadow:3px 3px 6px #000; }
+#messages h2 { font-size:60px; }
  
 
-#score, #high_score { position:absolute; text-align:right; top:20px; right:20px; width:200px; height:50px; font-size:36px; color:#fff; z-index:20; }
-#high_score { font-size:16px; top:60px; right:25px; }
+#score, #high_score { position:absolute; text-align:right; top:20px; right:20px; width:100px; height:50px; font-size:48px; color:#fff; z-index:20; }
+#high_score { font-size:24px; top:70px; right:25px; }
 
 #map, .neighborhood, .street, .buildings, .intersection { position:absolute; }
 #map { top:0px; left:0px; width:100%; height:100%; }
