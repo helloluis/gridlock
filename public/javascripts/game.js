@@ -62,7 +62,7 @@ Game = {
   // Essentially, each car would need to compensate for its parent street's position on the map
   // before comparing its own position with any other cars'. Is this as simple as just adding the
   // top and left coordinates of the street to the car's? Srsly?
-  multiple_canvases    : true,  
+  multiple_canvases    : false,  
   canvases             : {},
   contexts             : {},
 
@@ -1424,8 +1424,11 @@ var Car = function(car_hash){
   // streets may overlap with the current car's path. this is a game-ending situation in all cases.
   this.is_colliding = function(){
     
-    var self1 = [this.current_pos.left, this.current_pos.left + this.width],
-        self2 = [this.current_pos.top,  this.current_pos.top + this.height];
+    var current_left = Game.multiple_canvases ? (this.current_pos.left + this.street.left) : this.current_pos.left,
+        current_top  = Game.multiple_canvases ? (this.current_pos.top + this.street.top) : this.current_pos.top;
+
+    var self1 = [current_left, current_left + this.width],
+        self2 = [current_top,  current_top + this.height];
     
     // is it at an intersection?
     if (intersection = this.is_at_intersection(self1, self2)) {
@@ -1454,8 +1457,10 @@ var Car = function(car_hash){
         for (var i=index-1; i >= 0; i--) {
           
           var leader = this.street.cars[i],
-              p1     = [leader.current_pos.left, leader.current_pos.left + this.leader.width],
-              p2     = [leader.current_pos.top,  leader.current_pos.top  + this.leader.height];
+              cur_l  = Game.multiple_canvases ? (leader.current_pos.left + this.street.left) : leader.current_pos.left,
+              cur_t  = Game.multiple_canvases ? (leader.current_pos.top  + this.street.top) :  leader.current_pos.top,
+              p1     = [cur_l, cur_l + this.leader.width],
+              p2     = [cur_t, cur_t + this.leader.height];
           
           var horiz_match = this.compare_positions( self1, p1 ),
               vert_match  = this.compare_positions( self2, p2 );
@@ -1550,9 +1555,11 @@ var Car = function(car_hash){
     
     if (intersection.cars[other].length) {
       for (var i=0; i < intersection.cars[other].length; i++) {
-        var c   = intersection.cars[other][i],
-            c1  = [ c.current_pos.left, c.current_pos.left + c.width ],
-            c2  = [ c.current_pos.top,  c.current_pos.top + c.height ];
+        var c      = intersection.cars[other][i],
+            cur_l  = Game.multiple_canvases ? (c.current_pos.left + c.street.left) : c.current_pos.left,
+            cur_t  = Game.multiple_canvases ? (c.current_pos.top  + c.street.top) :  c.current_pos.top,
+            c1     = [ cur_l, cur_l + c.width ],
+            c2     = [ cur_t, cur_t + c.height ];
         
         var horiz_match = self.compare_positions( self1, c1 ),
             vert_match  = self.compare_positions( self2, c2 );
