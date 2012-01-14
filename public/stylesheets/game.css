@@ -64,7 +64,7 @@ a, #intro p strong { color:#fc0; }
 .help_illustration_frustration { top:150px; right:120px; -webkit-transform:rotate(-5deg); z-index:4; }
 .help_illustration_acceleration { top:330px; right:-50px; -webkit-transform:rotate(2deg); z-index:3; }
 .help_illustration_acceleration .help_background { background-image:url(../images/bg_help_acceleration.jpg); }
-.bttn { z-index:18; position:absolute; }
+.bttn { z-index:18; position:absolute; -webkit-tap-highlight-color: rgba(0,0,0,0) }
 #game .bttn, #game #score, #game .high_score { text-shadow:3px 3px 3px #000; }
 
 .bttn.start_game, .bttn.restart { position:absolute; height:35px; padding:10px; margin-top:10px; margin:0 auto; text-align:center; color:#fff; text-indent:-2000px; height:90px; font-size:30px; cursor:pointer; }
@@ -98,6 +98,8 @@ a, #intro p strong { color:#fc0; }
 #score, #high_score { position:absolute; text-align:right; top:20px; right:20px; width:100px; height:50px; font-size:48px; color:#fff; z-index:20; }
 #score.higher_score { color:#ff0; }
 #high_score { font-size:24px; top:70px; right:25px; }
+
+#debugger { position:absolute; top :0px; left:0px; width:100%; height:30px; z-index:30; font-size:12px; color:#fff }
 
 #map, .neighborhood, .street, .buildings, .intersection { position:absolute; }
 #map { top:0px; left:0px; width:100%; height:100%; }

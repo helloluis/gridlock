@@ -3,7 +3,9 @@ Game = {
   debug                : false,  // set to TRUE to visualize barriers and intersections
  
   loader               : new PxLoader(),
- 
+  
+  enable_preloading    : false,
+  
   score                : 0,
   frustration          : 0,
   high_score           : 0,
@@ -116,14 +118,22 @@ Game = {
       var percentage = Math.round((e.completedCount/e.totalCount)*100);
       loader_percentage.text( percentage + "%" );
     });
-
-    Game.loader.addCompletionListener(function(){
-      console.log('completed');
-      TraffixLoader.stop();
-      Game.initialize(auto_start);  
-    });
-
-    TraffixLoader.initialize();
+    
+    if (Game.enable_preloading){
+      
+      TraffixLoader.initialize();
+      
+      Game.loader.addCompletionListener(function(){
+        console.log('completed');
+        TraffixLoader.stop();
+        Game.initialize(auto_start);  
+      });
+      
+    } else {
+      
+      Game.initialize(auto_start);
+      
+    }
 
     _.delay(function(){
       Game.loader.start();  
@@ -236,7 +246,7 @@ Game = {
 
           var hit1 = [ e.pageX - 15, e.pageX + 15 ],
               hit2 = [ e.pageY - 15, e.pageY + 15 ];
-          
+
           if (Game.debug) {
             $("<div></div>").
               addClass('hitbox').
@@ -268,7 +278,7 @@ Game = {
       };
       
       if (Game.touch_device) {
-        $(".street").tappable(click);
+        //$(".street").tappable(click);
       } else {
         $(".street").unbind('click').click(click);
       }
@@ -579,6 +589,7 @@ Game = {
       elem.removeClass('vertical').addClass('horizontal');
 
       if (Game.touch_device) {
+        // new MBP.fastButton(elem, click);
         elem.tappable(click);
       } else {
         elem.unbind('click').click(click);
