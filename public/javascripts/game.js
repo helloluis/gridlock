@@ -7,6 +7,9 @@ Game = {
   score                : 0,
   frustration          : 0,
   high_score           : 0,
+
+  width                : MAP_WIDTH,
+  height               : MAP_HEIGHT,
    
   fps                  : FPS,
  
@@ -34,9 +37,6 @@ Game = {
   images_dir           : IMAGES_DIR,             // path to images
   sounds_dir           : SOUNDS_DIR,             // path to sounds
 
-  // help menu canvases
-  help_canvases        : { 'intersection' : {}, 'frustration' : {}, 'acceleration' : {} },
-
   // cache of the images representing various levels of vehicular frustration
   frustration_assets   : [],
 
@@ -56,6 +56,15 @@ Game = {
   // sometimes we want to defer rendering on some items 
   // until all of the cars have been rendered, e.g., the frustration indicators
   deferred_renders     : [], 
+
+  // Doesn't currently work because having small slivers of canvases means each car has a 
+  // different coordinate system, so we need to rethink how we compute for collisions.
+  // Essentially, each car would need to compensate for its parent street's position on the map
+  // before comparing its own position with any other cars'. Is this as simple as just adding the
+  // top and left coordinates of the street to the car's? Srsly?
+  multiple_canvases    : true,  
+  canvases             : {},
+  contexts             : {},
 
   db_name              : "traffix",
   high_score_key       : "high_score",
@@ -188,9 +197,26 @@ Game = {
 
   initialize_canvas : function(){
     
-    Game.car_canvas  = document.getElementById('cars');
-    Game.car_context = Game.car_canvas.getContext('2d');
+    if (Game.multiple_canvases) {
+      var orig_canvas = $("#cars"),
+          orig_width  = Game.width,
+          orig_height = Game.height;
 
+      _.each(STREETS, function(street){
+        $("<canvas id='" + street[0] + "' width='" + street[4] + "' height='" + street[5] + "' class='street_canvas'></canvas>").
+          css({ top : street[2], left : street[3] }).
+          insertAfter(orig_canvas);
+        Game.canvases[street[0]] = document.getElementById(street[0]);
+        Game.contexts[street[0]] = Game.canvases[street[0]].getContext('2d');
+      });
+
+      $("#cars").remove();
+
+    } else {
+      Game.car_canvas  = document.getElementById('cars');
+      Game.car_context = Game.car_canvas.getContext('2d');  
+    }
+    
     Game.frustration_canvas = document.getElementById('frustrations');
     Game.frustration_context = Game.frustration_canvas.getContext('2d');
 
@@ -287,9 +313,16 @@ Game = {
 
   clear_canvases : function(){
     
-    Game.car_context.clearRect(0,0,Game.car_canvas.width, Game.car_canvas.height);
+    if (Game.multiple_canvases) {
+      _.each(Game.contexts, function(context, key){
+        context.clearRect(0,0,Game.width,Game.height);  
+      });
+
+    } else {
+      Game.car_context.clearRect(0,0,Game.width, Game.height);  
+    }
       
-    Game.frustration_context.clearRect(0,0,Game.frustration_canvas.width, Game.frustration_canvas.height);
+    Game.frustration_context.clearRect(0,0,Game.width, Game.height);
 
     Game.deferred_renders = new Array;
 
@@ -463,8 +496,9 @@ Game = {
   initialize_streets : function(){
 
     _.each( STREETS, function(street_data){
-      var street = new Street();  
-      street.initialize( Game, street_data );
+      var street  = new Street(),
+          context = Game.multiple_canvases ? Game.contexts[street_data[0]] : Game.car_context;
+      street.initialize( Game, street_data, context );
       Game.streets.push( street );
     });
     
@@ -996,7 +1030,7 @@ var Street = function(){
   this.intersections   = [];
   this.lefthand        = false;
 
-  this.initialize      = function(game, street) {
+  this.initialize      = function(game, street, context) {
     this.game          = Game;
     this.name          = street[0];
     this.cars          = new Array;
@@ -1004,12 +1038,14 @@ var Street = function(){
       
     this.lefthand      = this.name.indexOf('left')!==-1;
     this.orientation   = street[1];
-    this.top           = street[2];
-    this.left          = street[3];
+    this.top           = Game.multiple_canvases && this.orientation=='horizontal' ? 0 : street[2];
+    this.left          = Game.multiple_canvases && this.orientation=='vertical'   ? 0 : street[3];
     this.width         = street[4];
     this.height        = street[5];
     
     this.maker         = new Maker(Game, this);
+
+    this.context       = context;
 
     this.initialize_barriers();
     this.initialize_intersections();
@@ -1308,7 +1344,7 @@ var Car = function(car_hash){
     
     var self   = this,
         street = self.street,
-        ctx    = Game.car_context,
+        ctx    = self.street.context,
         frus   = Game.frustration_context;
 
     if (Game.debug===true) {

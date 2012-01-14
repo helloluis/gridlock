@@ -38,6 +38,10 @@ a car bumping into another car on the same street.
 
 var MAP_NAME = "manila";
 
+var MAP_WIDTH = 1024;
+
+var MAP_HEIGHT = 768;
+
 var STREETS = [
   // name, orientation, top, left, width, height
   ["amber_left_lane1",   "horizontal",  200,   0,     1024,  20 ],
