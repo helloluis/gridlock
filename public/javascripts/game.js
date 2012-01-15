@@ -4,7 +4,7 @@ Game = {
  
   loader               : false,
   
-  enable_preloading    : true,
+  enable_preloading    : false,
   
   score                : 0,
   frustration          : 0,
@@ -105,26 +105,10 @@ Game = {
       Game.loader.add(img);
     });
 
-    soundManager.debugMode = true;
-    soundManager.consoleOnly = true;
-    // soundManager.waitForWindowLoad = true;
-
-    // _.each(Game.raw_sounds, function(media_or_arr, key){
-        
-    //   if (_.isArray(media_or_arr)) {
-    //     _.each(media_or_arr, function(media, index){
-    //       var new_k = [key, index].join("");
-    //       Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
-    //     });
-    //   } else {
-    //     Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
-    //   }
-      
-    // });
+    // soundManager.debugMode = true;
+    // soundManager.consoleOnly = true;
 
     soundManager.onready(function() {
-      
-      console.log('soundManager ready!');
 
       _.each(Game.raw_sounds, function(media_or_arr, key){
         
@@ -432,6 +416,25 @@ Game = {
           }          
         });
         
+      } else if (Game.with_sm2_sound && Game.enable_preloading===false) {
+        
+        soundManager.onready(function() {
+
+          _.each(Game.raw_sounds, function(media_or_arr, key){
+            
+            if (_.isArray(media_or_arr)) {
+              _.each(media_or_arr, function(media, index){
+                var new_k = [key, index].join("");
+                Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
+              });
+            } else {
+              Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
+            }
+            
+          });
+
+        });
+
       }
     }
   },
@@ -1113,6 +1116,7 @@ var Car = function(car_hash){
   this.frustration_level2    = 5;
   this.travel_time_modifier  = car_hash && car_hash.frustrates_by ? car_hash.frustrates_by : 6;
   // this is the number we use to modify ideal_travel_time, for frustration purposes
+  // the lower the modifier is, the more likely a car will end the game by frustration
 
   // this.speed                 = Math.round((Math.random()*2)+2); // pixels per frame
   this.speed                 = car_hash && car_hash.speed ? car_hash.speed : (Math.random()*3)+2; // pixels per frame 

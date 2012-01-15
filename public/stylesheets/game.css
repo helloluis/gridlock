@@ -71,7 +71,6 @@ a, #intro p strong { color:#fc0; }
 .help_illustration_acceleration { top:350px; right:-80px; -webkit-transform:rotate(2deg); z-index:3; }
 .help_illustration_acceleration .help_background { background-image:url(../images/bg_help_acceleration.jpg); }
 .finger { background:url(../images/finger.png); width:40px; height:100px; position:absolute; z-index:3; visibility: hidden; display:block; }
-/*.finger.tapped { border:1px solid #ff0; }*/
 
 
 /* BUTTONS */
