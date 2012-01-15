@@ -105,7 +105,7 @@ Game = {
     soundManager.debugMode = true;
     soundManager.consoleOnly = true;
     soundManager.waitForWindowLoad = true;
-    
+
     soundManager.onready(function() {
       
       console.log('soundManager ready!');
@@ -139,7 +139,8 @@ Game = {
       Game.loader.addCompletionListener(function(){
         console.log('completed');
         TraffixLoader.stop();
-        Game.initialize(auto_start);  
+        Game.play_sound('horns_short1');
+        Game.initialize(auto_start);
       });
       
     } else {
