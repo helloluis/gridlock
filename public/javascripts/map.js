@@ -44,12 +44,12 @@ var MAP_HEIGHT = 768;
 
 var STREETS = [
   // name, orientation, top, left, width, height
-  ["amber_left_lane1",   "horizontal",  200,   0,     1024,  20 ],
-  ["amber_left_lane2",   "horizontal",  220,   0,     1024,  20 ],
-  ["amber_right_lane1",  "horizontal",  250,   0,     1024,  20 ],
-  ["amber_right_lane2",  "horizontal",  275,   0,     1024,  20 ],
-  ["baker_left",         "horizontal",  502,   0,     1024,  20 ],
-  ["baker_right",        "horizontal",  523,   0,     1024,  20 ],
+  ["amber_left_lane1",   "horizontal",  210,   0,     1024,  20 ],
+  ["amber_left_lane2",   "horizontal",  230,   0,     1024,  20 ],
+  ["amber_right_lane1",  "horizontal",  260,   0,     1024,  20 ],
+  ["amber_right_lane2",  "horizontal",  285,   0,     1024,  20 ],
+  ["baker_left",         "horizontal",  512,   0,     1024,  20 ],
+  ["baker_right",        "horizontal",  533,   0,     1024,  20 ],
   ['chang_left_lane1',   "vertical",    0,     253,   20,    768 ],
   ['chang_left_lane2',   "vertical",    0,     276,   20,    768 ],
   ['chang_right_lane1',  "vertical",    0,     306,   20,    768 ],
@@ -63,14 +63,14 @@ var STREETS = [
 
 var BARRIERS = [
   // name, top, left, width, height
-  ['amber_right_barrier1',  250, 237, 15, 50, 'horizontal', 'amber chang',   false, "#fff" ],
-  ['amber_right_barrier2',  250, 637, 15, 50, 'horizontal', 'amber dexter',  false, "#eee" ],
-  ['amber_left_barrier1',   200, 347, 15, 50, 'horizontal', 'amber chang',   false, "#ddd" ],
-  ['amber_left_barrier2',   200, 747, 15, 50, 'horizontal', 'amber dexter',  false, "#ccc" ],
-  ['baker_right_barrier1',  525, 237, 15, 25, 'horizontal', 'baker chang',   false, "#bbb" ],
-  ['baker_right_barrier2',  525, 637, 15, 25, 'horizontal', 'baker dexter',  false, "#aaa" ],
-  ['baker_left_barrier1',   500, 347, 15, 25, 'horizontal', 'baker chang',   false, "#999" ],
-  ['baker_left_barrier2',   500, 747, 15, 25, 'horizontal', 'baker dexter',  false, "#888" ],
+  ['amber_right_barrier1',  260, 237, 15, 50, 'horizontal', 'amber chang',   false, "#fff" ],
+  ['amber_right_barrier2',  260, 637, 15, 50, 'horizontal', 'amber dexter',  false, "#eee" ],
+  ['amber_left_barrier1',   210, 347, 15, 50, 'horizontal', 'amber chang',   false, "#ddd" ],
+  ['amber_left_barrier2',   210, 747, 15, 50, 'horizontal', 'amber dexter',  false, "#ccc" ],
+  ['baker_right_barrier1',  535, 237, 15, 25, 'horizontal', 'baker chang',   false, "#bbb" ],
+  ['baker_right_barrier2',  535, 637, 15, 25, 'horizontal', 'baker dexter',  false, "#aaa" ],
+  ['baker_left_barrier1',   510, 347, 15, 25, 'horizontal', 'baker chang',   false, "#999" ],
+  ['baker_left_barrier2',   510, 747, 15, 25, 'horizontal', 'baker dexter',  false, "#888" ],
   ['chang_right_barrier1',  295, 310, 50, 15, 'horizontal', 'amber chang',   true,  "#999" ],
   ['chang_right_barrier2',  545, 310, 50, 15, 'horizontal', 'baker chang',   true,  "#aaa" ],
   ['chang_left_barrier1',   190, 253, 50, 15, 'horizontal', 'amber chang',   true,  "#bbb" ],
@@ -94,10 +94,10 @@ var STOPLIGHTS = [
 
 // intersections from left to right, top to bottom
 var INTERSECTIONS = [
-  [ 'amber chang',  202, 252, 95, 95 ],
-  [ 'amber dexter', 202, 652, 95, 95 ],
-  [ 'baker chang',  502, 252, 95, 45 ],
-  [ 'baker dexter', 502, 652, 95, 45 ],
+  [ 'amber chang',  212, 252, 95, 95 ],
+  [ 'amber dexter', 212, 652, 95, 95 ],
+  [ 'baker chang',  512, 252, 95, 45 ],
+  [ 'baker dexter', 512, 652, 95, 45 ],
 ];
 
 // we only need 30 fps coz we're third-world that way

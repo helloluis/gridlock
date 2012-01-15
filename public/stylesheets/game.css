@@ -131,8 +131,8 @@ a, #intro p strong { color:#fc0; }
 #cars, .street_canvas, #frustrations { z-index:10; position:absolute; top:0px; left:0px; }
 #frustrations { z-index:13; }
 
-#amber { top:200px; left:0px; }
-#baker { top:500px; left:0px; }
+#amber { top:210px; left:0px; }
+#baker { top:510px; left:0px; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
@@ -149,8 +149,8 @@ a, #intro p strong { color:#fc0; }
 #frustration .bar { position:absolute; top:0; left:0; width:0; height:100%; background:#900; }
 
 .intersection.big .stoplight { top:0px; }
-.intersection.amber { top:200px; height:100px; }
-.intersection.baker { top:500px; height:50px; }
+.intersection.amber { top:210px; height:100px; }
+.intersection.baker { top:510px; height:50px; }
 .intersection.chang { left:250px; width:100px; }
 .intersection.dexter { left:650px; width:100px; }
 

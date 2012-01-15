@@ -105,23 +105,6 @@ Game = {
       Game.loader.add(img);
     });
 
-    soundManager.debugMode = true;
-    soundManager.consoleOnly = true;
-    // soundManager.waitForWindowLoad = true;
-
-    // _.each(Game.raw_sounds, function(media_or_arr, key){
-        
-    //   if (_.isArray(media_or_arr)) {
-    //     _.each(media_or_arr, function(media, index){
-    //       var new_k = [key, index].join("");
-    //       Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
-    //     });
-    //   } else {
-    //     Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
-    //   }
-      
-    // });
-
     soundManager.onready(function() {
       
       console.log('soundManager ready!');
@@ -432,6 +415,25 @@ Game = {
           }          
         });
         
+      } else if (Game.with_sm2_sound && Game.enable_preloading===false) {
+        
+        soundManager.onready(function() {
+
+          _.each(Game.raw_sounds, function(media_or_arr, key){
+            
+            if (_.isArray(media_or_arr)) {
+              _.each(media_or_arr, function(media, index){
+                var new_k = [key, index].join("");
+                Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
+              });
+            } else {
+              Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
+            }
+            
+          });
+
+        });
+
       }
     }
   },
