@@ -4,7 +4,7 @@ Game = {
  
   loader               : new PxLoader(),
   
-  enable_preloading    : false,
+  enable_preloading    : true,
   
   score                : 0,
   frustration          : 0,
