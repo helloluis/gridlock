@@ -71,14 +71,14 @@ var BARRIERS = [
   ['baker_right_barrier2',  535, 637, 15, 25, 'horizontal', 'baker dexter',  false, "#aaa" ],
   ['baker_left_barrier1',   510, 347, 15, 25, 'horizontal', 'baker chang',   false, "#999" ],
   ['baker_left_barrier2',   510, 747, 15, 25, 'horizontal', 'baker dexter',  false, "#888" ],
-  ['chang_right_barrier1',  295, 310, 50, 15, 'horizontal', 'amber chang',   true,  "#999" ],
-  ['chang_right_barrier2',  545, 310, 50, 15, 'horizontal', 'baker chang',   true,  "#aaa" ],
-  ['chang_left_barrier1',   190, 253, 50, 15, 'horizontal', 'amber chang',   true,  "#bbb" ],
-  ['chang_left_barrier2',   487, 253, 50, 15, 'horizontal', 'baker chang',   true,  "#ccc" ],
-  ['dexter_right_barrier1', 295, 710, 50, 15, 'horizontal', 'amber dexter',  true,  "#ddd" ],
-  ['dexter_right_barrier2', 545, 710, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ],
-  ['dexter_left_barrier1',  190, 655, 50, 15, 'horizontal', 'amber dexter',  true,  "#fff" ],
-  ['dexter_left_barrier2',  487, 655, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ]
+  ['chang_right_barrier1',  305, 310, 50, 15, 'horizontal', 'amber chang',   true,  "#999" ],
+  ['chang_right_barrier2',  555, 310, 50, 15, 'horizontal', 'baker chang',   true,  "#aaa" ],
+  ['chang_left_barrier1',   200, 253, 50, 15, 'horizontal', 'amber chang',   true,  "#bbb" ],
+  ['chang_left_barrier2',   497, 253, 50, 15, 'horizontal', 'baker chang',   true,  "#ccc" ],
+  ['dexter_right_barrier1', 305, 710, 50, 15, 'horizontal', 'amber dexter',  true,  "#ddd" ],
+  ['dexter_right_barrier2', 555, 710, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ],
+  ['dexter_left_barrier1',  200, 655, 50, 15, 'horizontal', 'amber dexter',  true,  "#fff" ],
+  ['dexter_left_barrier2',  497, 655, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ]
 ];
 
 

@@ -58,7 +58,7 @@ a, #intro p strong { color:#fc0; }
 
 /* HELP */
 .help p { position:absolute; font-size:24px; line-height:1.3; width:350px; text-shadow:2px 2px 3px #000; color:#fff; top:200px; left:20px; }
-.help_illustration { position:absolute; right:-60px; top:-60px; width:350px; height:350px; -webkit-transform:rotate(10deg); background:#000; color:#fff; background:url(../images/bg_polaroid.png); z-index:5; cursor:pointer; }
+.help_illustration { position:absolute; right:-60px; top:-60px; width:350px; height:350px; -webkit-transform:rotate(10deg); background:#000; color:#fff; background:url(../images/bg_polaroid.png); z-index:5; cursor:pointer; -webkit-tap-highlight-color: rgba(0,0,0,0) }
 .help_illustration_intersection .stoplight, .help_illustration_frustration .stoplight { top:133px; left:163px; width:50px; height:50px; display:block; z-index:2; }
 .help_illustration .help_background { width: 270px; height:275px; position:absolute; background:url(../images/bg_help.jpg); top:39px; left:41px; z-index:1; overflow:hidden; }
 .help_illustration .overlay { z-index:5; opacity:0.4; background:#000; position:absolute; width:270px; height:275px; top:39px; left:41px; }
@@ -138,9 +138,9 @@ a, #intro p strong { color:#fc0; }
 
 .hitbox { position:absolute; background:#0fc; }
 
-.intersection { width:50px; height:50px; z-index:14; }
+.intersection { width:50px; height:50px; z-index:14; -webkit-tap-highlight-color: rgba(0,0,0,0) }
 .stoplight { position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:3; background:url(../images/control_horizontal.png) no-repeat 50% 50%; opacity:0.7; -webkit-tap-highlight-color: rgba(0,0,0,0) }
-.stoplight.vertical { -webkit-transform:rotate(90deg) translateZ(0); }
+.stoplight.vertical { -webkit-transform:rotate(90deg) translateZ(0); -webkit-tap-highlight-color: rgba(0,0,0,0) }
 .explosion { position:absolute; z-index:13; background-image: url(../images/explosion.png); width:80px; height:80px; background-repeat:no-repeat; }
 .frustration { position:absolute; width:15px; height:15px; background-image: url(../images/frustration.png); z-index:9; }
 .frustration.major { background-image:url(../images/frustration_major.png); }
