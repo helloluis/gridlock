@@ -497,8 +497,8 @@ function PxLoaderSound(id, url, tags, priority) {
     this.start = function(pxLoader) {
         // we need the loader ref so we can notify upon completion
         loader = pxLoader;
-        soundManager['load'](id);
-        console.log('starting load', id);
+        console.log('starting load', this.sound['load']());
+        this.sound['load']();
         //this.sound['load']();
     };
 

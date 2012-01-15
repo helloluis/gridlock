@@ -103,6 +103,7 @@ Game = {
     });
 
     soundManager.debugMode = true;
+    soundManager.consoleOnly = true;
 
     soundManager.onready(function() {
 
