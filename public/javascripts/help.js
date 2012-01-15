@@ -332,9 +332,9 @@ Help = {
     this.frustration.cont.empty();
     this.acceleration.cont.empty();
 
-    this.intersection.animating = false;
-    this.acceleration.animating = false;
-    this.frustration.animating  = false;
+    self.intersection.animating = false;
+    self.acceleration.animating = false;
+    self.frustration.animating  = false;
 
   }
 	
