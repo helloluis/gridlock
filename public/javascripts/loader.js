@@ -375,7 +375,7 @@ if (!Array.prototype.indexOf) {
  */
 function PxLoaderImage(url, tags, priority) {
     var self   = this;
-        loader = false;
+        loader = null;
 
     this.img = new Image();
     this.tags = tags;
