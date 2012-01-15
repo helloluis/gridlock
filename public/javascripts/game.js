@@ -165,7 +165,7 @@ Game = {
 
     _.delay(function(){
       Game.loader.start();  
-    }, 500);
+    }, 1000);
     
 
   },
