@@ -104,8 +104,11 @@ Game = {
 
     soundManager.debugMode = true;
     soundManager.consoleOnly = true;
-
+    soundManager.waitForWindowLoad = true;
+    
     soundManager.onready(function() {
+      
+      console.log('soundManager ready!');
 
       _.each(Game.raw_sounds, function(media_or_arr, key){
         
