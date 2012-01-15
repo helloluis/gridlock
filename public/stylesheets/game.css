@@ -65,10 +65,13 @@ a, #intro p strong { color:#fc0; }
 .help_illustration.selected .overlay { opacity:0; }
 .help_illustration canvas { position:absolute; top:39px; left:41px; z-index:2; }
 .help_illustration_frustration { top:150px; right:120px; -webkit-transform:rotate(-5deg); z-index:4; }
-.help_illustration_acceleration { top:330px; right:-50px; -webkit-transform:rotate(2deg); z-index:3; }
+.help_illustration_frustration .frustration { position:absolute; width:40px; height:40px; background:url(../images/frustration_01.png); visibility:hidden; z-index:3; }
+.help_illustration_frustration .frustration.frustration02 { background:url(../images/frustration_02.png); }
+.help_illustration_frustration .frustration.frustration03 { background:url(../images/frustration_03.png); }
+.help_illustration_acceleration { top:350px; right:-80px; -webkit-transform:rotate(2deg); z-index:3; }
 .help_illustration_acceleration .help_background { background-image:url(../images/bg_help_acceleration.jpg); }
-.finger { background:#fda; width:40px; height:100px; position:absolute; z-index:3; visibility: hidden; display:block; }
-.finger.tapped { border:1px solid #ff0; }
+.finger { background:url(../images/finger.png); width:40px; height:100px; position:absolute; z-index:3; visibility: hidden; display:block; }
+/*.finger.tapped { border:1px solid #ff0; }*/
 
 
 /* BUTTONS */

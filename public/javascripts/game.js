@@ -640,6 +640,8 @@ Game = {
     Game.credits.hide();
     Game.start_countdown();
 
+    Help.stop_all();
+
   },
 
   start_streets : function(){
