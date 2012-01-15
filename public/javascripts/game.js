@@ -102,6 +102,8 @@ Game = {
       Game.loader.add(img);
     });
 
+    soundManager.debugMode = true;
+
     soundManager.onready(function() {
 
       _.each(Game.raw_sounds, function(media_or_arr, key){
