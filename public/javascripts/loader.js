@@ -374,7 +374,7 @@ if (!Array.prototype.indexOf) {
  * PxLoader plugin to load images
  */
 function PxLoaderImage(url, tags, priority) {
-    var self   = this;
+    var self   = this,
         loader = null;
 
     this.img = new Image();
@@ -407,6 +407,7 @@ function PxLoaderImage(url, tags, priority) {
     this.start = function(pxLoader) {
         // we need the loader ref so we can notify upon completion
         loader = pxLoader;
+        console.log(pxLoader);
 
         // NOTE: Must add event listeners before the src is set. We
         // also need to use the readystatechange because sometimes
@@ -460,7 +461,7 @@ PxLoader.prototype.addImage = function(url, tags, priority) {
  * PxLoader plugin to load sound using SoundManager2
  */
 function PxLoaderSound(id, url, tags, priority) {
-    var self = this;
+    var self = this,
         loader = null;
 
     this.tags = tags;

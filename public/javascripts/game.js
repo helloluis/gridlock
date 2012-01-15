@@ -81,20 +81,25 @@ Game = {
 
     _.each(Game.car_types, function(car){
       _.each(_.flatten(car.assets),function(fc){
-        Game.loader.addImage( Game.images_dir + fc );
+        var img = new PxLoaderImage(Game.images_dir + fc);
+        Game.loader.add(img);
+        //Game.loader.addImage( Game.images_dir + fc );
       });
     });
 
     _.each(Game.neighborhood, function(n){
-      Game.loader.addImage( Game.images_dir + n );
+      var img = new PxLoaderImage(Game.images_dir + n);
+        Game.loader.add(img);
     });
 
     _.each(FRUSTRATIONS, function(f){
-      Game.loader.addImage( Game.images_dir + f[0] );
+      var img = new PxLoaderImage(Game.images_dir + f[0]);
+        Game.loader.add(img);
     });
 
     _.each(OTHERS, function(o){
-      Game.loader.addImage( Game.images_dir + o );
+      var img = new PxLoaderImage(Game.images_dir + o);
+      Game.loader.add(img);
     });
 
     soundManager.onready(function() {
