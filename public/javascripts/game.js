@@ -76,6 +76,8 @@ Game = {
 
   preload : function(auto_start){
 
+    Game.dom = $("#game");
+
     Game.loader = new PxLoader();
 
     Game.loading_screen = $("#loader"),
@@ -544,7 +546,7 @@ Game = {
     var self = this;
     self.stoplights = STOPLIGHTS;
 
-    $(".stoplight").hide().each(function(idx, el){
+    $(".stoplight", Game.dom).hide().each(function(idx, el){
       
       var elem   = $(el),
           light  = self.stoplights[idx],
