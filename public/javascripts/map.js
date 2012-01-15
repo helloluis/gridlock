@@ -185,7 +185,7 @@ var SOUND_FORMATS = { web : "mp3", ios : "wav" };
 
 
 var NEIGHBORHOOD = [
-  "bg.png", "buildings.png"
+  "bg.jpg", "buildings.png"
 ];
 
 var COLLISION_MESSAGES = [
