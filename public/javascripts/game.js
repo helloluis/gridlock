@@ -2,7 +2,7 @@ Game = {
 
   debug                : false,  // set to TRUE to visualize barriers and intersections
  
-  loader               : new PxLoader(),
+  loader               : false,
   
   enable_preloading    : true,
   
@@ -76,6 +76,8 @@ Game = {
 
   preload : function(auto_start){
 
+    Game.loader = new PxLoader();
+
     Game.loading_screen = $("#loader"),
       loader_percentage = $(".loading_percentage", Game.loading_screen);
 
@@ -83,7 +85,6 @@ Game = {
       _.each(_.flatten(car.assets),function(fc){
         var img = new PxLoaderImage(Game.images_dir + fc);
         Game.loader.add(img);
-        //Game.loader.addImage( Game.images_dir + fc );
       });
     });
 
