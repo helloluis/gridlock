@@ -491,11 +491,14 @@ function PxLoaderSound(id, url, tags, priority) {
             }
         }
     });
+    
+    console.log('creating sound', this.sound);
 
     this.start = function(pxLoader) {
         // we need the loader ref so we can notify upon completion
         loader = pxLoader;
         this.sound['load']();
+        console.log('starting load', this.sound);
     };
 
     this.checkStatus = function() {
