@@ -164,22 +164,24 @@ var SOUNDS_DIR = "sounds/";
 // all sounds and music
 var SOUNDS = { 
   horns_short   : [
-    "horn1.mp3",
-    "horn2.mp3",
-    "horn3.mp3",
-    "horn4.mp3" 
+    "horn1",
+    "horn2",
+    "horn3",
+    "horn4" 
   ],
   horns_long    : [
-    "horn_long1.mp3",
-    "horn_long2.mp3"
+    "horn_long1",
+    "horn_long2"
   ],
-  horn_truck    : "horn_truck.mp3",
-  countdown     : "countdown.mp3",
-  theme         : "bg.mp3",
-  explosion     : "explosion_short.mp3",
-  frustration   : "frustration.mp3",
-  arrived       : "kaching.mp3"
+  horn_truck    : "horn_truck",
+  countdown     : "countdown",
+  theme         : "bg",
+  explosion     : "explosion_short",
+  frustration   : "frustration",
+  arrived       : "kaching"
 };
+
+var SOUND_FORMATS = { web : "mp3", ios : "wav" };
 
 
 var NEIGHBORHOOD = [
