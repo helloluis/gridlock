@@ -1009,7 +1009,7 @@ Game = {
       Game.ended = true;
       Game.store_high_score(Game.score);
       Game.play_sound('frustration',false,50);
-      var message = Game.frustration_messages[Math.floor(Math.random()*Game.collision_messages.length)];
+      var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
       Game.show_message( "<h2>" + message + "</h2>" );
       Game.reset();  
     }
