@@ -183,6 +183,13 @@ var SOUNDS = {
 
 var SOUND_FORMATS = { web : "mp3", ios : "aifc" };
 
+var SOUND_SPRITE = "sprite01.mp3";
+
+var SOUND_SPRITE_MAP = {
+  'ambulance'    : { start : 0.00, end : 7.3 },
+  'theme'        : { start : 8.00, end : 80.0, loop : true },
+  'horns_short1' : { start : 81.00, end : 81.8 }
+};
 
 var NEIGHBORHOOD = [
   "bg.jpg", "buildings.png"

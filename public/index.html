@@ -26,6 +26,8 @@
   <script src="javascripts/jquery-timers.js"></script>
   <script src="javascripts/soundmanager2-nodebug-jsmin.js"></script>
   <script src="javascripts/mbp.fastbutton.js"></script>
+  <script src="javascripts/Jukebox.js"></script>
+  <script src="javascripts/JukeboxManager.js"></script>
   <script src="javascripts/map.js"></script>
   <script src="javascripts/loader.js"></script>
   <script src="javascripts/traffix_loader.js"></script>
@@ -87,7 +89,7 @@
       <p>Fix that traffic problem by managing those busy intersections! 
       Don't let the drivers get too frustrated!<br /> (Remember: You can click on cars to make them go faster.)</p>
     </div>
-    <h2 class="bttn start_game">Play!</h2>
+    <h2 class="bttn start_game" onclick="initAutoplayingJukebox()">Play!</h2>
     <h3 class="bttn credits">Credits</h3>
     <h3 class="bttn leaderboards">Leaderboards</h3>
     <div class="high_score_cont">
@@ -147,7 +149,6 @@
 </div>
 
 
-
 <div id="credits" class="screen">
   <div class="screen_inner">
     <h1>Credits</h1>
@@ -161,9 +162,15 @@
 </div>
 
   <script>
+    var initAutoplayingJukebox;
+
     $(function(){
       var auto_start = document.location.hash.indexOf("autostart")!==-1;
       Game.preload(auto_start);
+
+      initAutoplayingJukebox = function(){
+        Game.initialize_sounds();
+      }
     });
   </script>
 

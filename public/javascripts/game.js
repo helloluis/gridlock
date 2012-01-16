@@ -5,6 +5,8 @@ Game = {
   loader               : false,
   
   enable_preloading    : true,
+
+  is_iOS               : false, // we want to switch turn off enable_preloading and turn on is_iOS when deploying to PhoneGap
   
   score                : 0,
   frustration          : 0,
@@ -49,7 +51,8 @@ Game = {
    
   with_sound           : true,
   with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
-  with_sm2_sound       : true,    // SoundManager2 is what we use for regular web presentation
+  with_sm2_sound       : true,   // SoundManager2 is what we use for regular web presentation
+  with_jukebox_sound   : false,    // Zynga Jukebox
   
   sound_format         : "." + SOUND_FORMATS[(navigator.platform.indexOf("iPad") != -1) ? 'ios' : 'web'],
  
@@ -105,24 +108,26 @@ Game = {
       Game.loader.add(img);
     });
 
-    soundManager.onready(function() {
-      
-      console.log('soundManager ready!');
+    if (Game.with_sm2_sound) {
+      soundManager.onready(function() {
+        
+        console.log('soundManager ready!');
 
-      _.each(Game.raw_sounds, function(media_or_arr, key){
-        
-        if (_.isArray(media_or_arr)) {
-          _.each(media_or_arr, function(media, index){
-            var new_k = [key, index].join("");
-            Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
-          });
-        } else {
-          Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
-        }
-        
+        _.each(Game.raw_sounds, function(media_or_arr, key){
+          
+          if (_.isArray(media_or_arr)) {
+            _.each(media_or_arr, function(media, index){
+              var new_k = [key, index].join("");
+              Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
+            });
+          } else {
+            Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
+          }
+          
+        });
+
       });
-
-    });
+    }
 
     loader_percentage.text("0%");
 
@@ -434,6 +439,18 @@ Game = {
 
         });
 
+      } else if (Game.with_jukebox_sound) {
+        
+        if (!Game.jukebox || Game.is_iOS) {
+          var settings = { 
+            resources : [ SOUNDS_DIR + SOUND_SPRITE ],
+            autoplay  : 'theme',
+            spritemap : SOUND_SPRITE_MAP
+          };
+
+          Game.jukebox = new Jukebox(settings); 
+        }
+
       }
     }
   },
@@ -642,6 +659,8 @@ Game = {
     
     Game.main.show();
     Game.credits.hide();
+
+    Game.stop_sound_theme();
     Game.start_countdown();
 
   },
@@ -754,6 +773,7 @@ Game = {
   },
 
   stop_sound_theme : function(){
+    console.log('stopping theme');
     Game.stop_sound('theme');
   },
 
@@ -772,8 +792,9 @@ Game = {
         } else {
           Game.sounds[sound].play({ volume : volume });  
         }
-      } else if (Game.with_sjs_sound) {
-        Game.sounds[sound].play();
+      } else if (Game.with_jukebox_sound) {
+        // Game.sounds[sound].play();
+        JUKEBOX.stop();
       }
     }
   },
@@ -788,14 +809,14 @@ Game = {
   },
 
   stop_sound : function(sound) {
-  
+
     if (Game.with_phonegap_sound) {
       Game.sounds[sound].stop();
     } else if (Game.with_sm2_sound) {
-      console.log('stopping ', sound);
       Game.sounds[sound].stop();
-    } else if (Game.with_sjs_sound) {
-      Game.sounds[sound].stop();
+    } else if (Game.with_jukebox_sound) {
+      console.log('stopping jukebox', JUKEBOX);
+      JUKEBOX.stop();
     }
     
   },
@@ -807,6 +828,8 @@ Game = {
       });
     } else if (Game.with_sm2_sound) {
       soundManager.stopAll();
+    } else if (Game.with_jukebox_sound) {
+      JUKEBOX.stop();
     }
   },
 
