@@ -157,7 +157,18 @@ var FRUSTRATIONS = [
   [ 'frustration_04.png', 40, 40, -20, -25 ]
 ];
 
-var CAR_ODDS = { 'hatch' : 0.4, 'van' : 0.2, 'jeepney' : 0.15, 'bus' : 0.04, 'ambulance' : 0.01 };
+var CAR_ODDS = { 'car' : [1,40], 'hatch' : [41,60], 'van' : [61,75], 'jeepney' : [75,90], 'bus' : [91,99], 'ambulance' : [99,100] };
+
+// in order for the global car odds to go up, a player
+// has to hit a certain number of points. we start at 0.5,
+// in other words, a car is only half as likely to be spawned
+// as "normal".
+var CAR_ODD_LEVELS = [
+  [ 0,   0.3  ],
+  [ 30,  0.5  ],
+  [ 60,  0.7  ],
+  [ 100, 1.0  ]
+];
 
 var SOUNDS_DIR = "sounds/";
 

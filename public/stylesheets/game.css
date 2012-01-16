@@ -139,6 +139,8 @@ a, #intro p strong { color:#fc0; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
+#critical { z-index:13; position:absolute; top:0; left:0; width:1024px; height:768px; background:url(../images/critical.png); opacity:0; }
+
 .hitbox { position:absolute; background:#0fc; }
 
 .intersection { width:50px; height:50px; z-index:14; -webkit-tap-highlight-color: rgba(0,0,0,0) }

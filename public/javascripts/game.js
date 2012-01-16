@@ -12,6 +12,8 @@ Game = {
   frustration          : 0,
   high_score           : 0,
 
+  difficulty_increases : true, // if set to false, we don't make the game harder as time goes on
+
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
    
@@ -36,10 +38,14 @@ Game = {
   max_cars_per_street  : MAX_CARS_PER_STREET,    
   car_types            : CARS,                   // library of car settings and assets
   car_odds             : CAR_ODDS,               // the likelihood that a particular car will be added
+  car_odd_levels       : CAR_ODD_LEVELS.reverse(),         // modifiers for our car-creation randomness, basically making fewer cars spawn early on in the game
   neighborhood         : NEIGHBORHOOD,           // graphics used for the neighborhood layers
- 
+
   images_dir           : IMAGES_DIR,             // path to images
   sounds_dir           : SOUNDS_DIR,             // path to sounds
+
+  is_critical          : false,                  // if traffic condition is critical, we overlay the scary red borders on the screen
+  critical_cars        : [],                     // cars that are about to end the game
 
   // cache of the images representing various levels of vehicular frustration
   frustration_assets   : [],
@@ -51,8 +57,8 @@ Game = {
    
   with_sound           : true,
   with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
-  with_sm2_sound       : true,   // SoundManager2 is what we use for regular web presentation
-  with_jukebox_sound   : false,    // Zynga Jukebox
+  with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
+  with_jukebox_sound   : true,    // Zynga Jukebox
   
   sound_format         : "." + SOUND_FORMATS[(navigator.platform.indexOf("iPad") != -1) ? 'ios' : 'web'],
  
@@ -144,7 +150,7 @@ Game = {
       TraffixLoader.initialize();
       
       Game.loader.addCompletionListener(function(){
-        console.log('completed');
+        // console.log('completed');
         TraffixLoader.stop();
         Game.play_sound('horns_short1');
         Game.initialize(auto_start);
@@ -194,6 +200,8 @@ Game = {
     Game.initialize_high_score();
 
     Game.initialize_speed_changer();
+
+    Game.global_car_odds = Game.difficulty_increases ? Game.car_odd_levels[Game.car_odd_levels.length-1][1] : 1;
 
     if (Game.enable_frustration) {
       Game.initialize_frustration();  
@@ -650,6 +658,10 @@ Game = {
     Game.score   = 0;
     Game.score_cont.text("0");
 
+    Game.critical_cars = new Array;
+    
+    Game.check_critical();
+
     Game.started = true;
     Game.paused  = true;
     Game.ended   = false;
@@ -699,6 +711,16 @@ Game = {
       _.each(street.barriers,function(barrier){
         barrier.active=value;
       });
+    });
+  },
+
+  check_critical : function(){
+    Game.dom.stopTime('check_critical').everyTime(1000, 'check_critical', function(){
+      if (Game.critical_cars.length>0) {
+        $("#critical").animate({ opacity : 1 },500);
+      } else {
+        $("#critical").animate({ opacity : 0 },500);
+      }
     });
   },
 
@@ -818,8 +840,8 @@ Game = {
     } else if (Game.with_sm2_sound) {
       Game.sounds[sound].stop();
     } else if (Game.with_jukebox_sound) {
-      console.log('stopping jukebox', JUKEBOX);
-      JUKEBOX.stop();
+      console.log('stopping jukebox');
+      Game.jukebox.stop();
     }
     
   },
@@ -832,7 +854,7 @@ Game = {
     } else if (Game.with_sm2_sound) {
       soundManager.stopAll();
     } else if (Game.with_jukebox_sound) {
-      JUKEBOX.stop();
+      Game.jukebox.stop();
     }
   },
 
@@ -914,6 +936,18 @@ Game = {
       Game.score_cont.addClass('higher_score');
     }
 
+    Game.increment_car_odds();
+
+  },
+
+  increment_car_odds : function(){
+    if (Game.difficulty_increases) {
+      if (arr = _.detect(Game.car_odd_levels, function(level){ return Game.score >= level[0]; })) {
+        Game.global_car_odds = arr[1];
+        console.log('new car odds', Game.global_car_odds);
+        return Game.global_car_odds;  
+      }
+    }
   },
 
   initialize_frustration : function(){
@@ -1328,12 +1362,13 @@ var Car = function(car_hash){
 
     } else if (self.actual_travel_time == self.frustration_thresholds[1]) {
       
-      if (self.moving===false) {
-        return Game.frustration_assets[0];
-      }
 
       var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
       Game.play_sound(horn_name);
+
+      if (self.moving===false) {
+        return Game.frustration_assets[0];
+      }
     
     } else if (self.actual_travel_time > self.frustration_thresholds[1] && self.actual_travel_time < self.frustration_thresholds[2]) {
       
@@ -1343,12 +1378,15 @@ var Car = function(car_hash){
 
     } else if (self.actual_travel_time == self.frustration_thresholds[2]) {
       
-      if (self.moving===false) {
-        return Game.frustration_assets[1];
-      }
+      // add to critical cars array
+      Game.critical_cars.push(self);
 
       var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
       Game.play_sound(horn_name);
+
+      if (self.moving===false) {
+        return Game.frustration_assets[1];
+      }
 
     } else if (self.actual_travel_time > self.frustration_thresholds[2] && self.actual_travel_time < self.frustration_thresholds[3]) {
       
@@ -1357,17 +1395,16 @@ var Car = function(car_hash){
       }
     
     } else if (self.actual_travel_time === self.frustration_thresholds[3]) {
-      
+           
+      var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
+      Game.play_sound(horn_name);
+
       if (self.moving===false) {
         return Game.frustration_assets[2];  
       }
-            
-      var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
-      Game.play_sound(horn_name);
     
     } else if (self.actual_travel_time > self.frustration_thresholds[3] && self.actual_travel_time < self.ideal_travel_time) {
-      
-      //console.log(self.actual_travel_time, self.ideal_travel_time);
+
       if (self.moving===false) {
         return Game.frustration_assets[3];  
       }
@@ -1704,6 +1741,11 @@ var Car = function(car_hash){
       follower.leader = false;
     }
 
+    // remove from Game.critical_cars array
+    if (crit_idx = Game.critical_cars.indexOf(self)) {
+      Game.critical_cars.splice(crit_idx,1);
+    }
+
     // remove from street.cars array
     this.street.cars.splice(idx,1);
 
@@ -1719,15 +1761,15 @@ var Car = function(car_hash){
 
 var Maker = function(){
   
-  this.initialize   = function(street) {
- 
-    var self        = this;
-    self.street     = street;
-    self.frequency  = Math.round(Game.maker_freq + (Math.random()*(Game.maker_freq/2)));
-    self.max_cars   = Game.max_cars_per_street;
-    self.iterations = 0;
-    self.car_types  = Game.car_types;
-    self.car_odds   = Game.car_odds;
+  this.initialize    = function(street) {
+  
+    var self         = this;
+    self.street      = street;
+    self.frequency   = Math.round(Game.maker_freq + (Math.random()*(Game.maker_freq/2)));
+    self.max_cars    = Game.max_cars_per_street;
+    self.iterations  = 0;
+    self.car_types   = Game.car_types;
+    self.car_odds    = Game.car_odds;
 
     _.delay(function(){
       
@@ -1740,26 +1782,24 @@ var Maker = function(){
   };
 
   this.generate = function(){
+
     var self = this,
-        rand = Math.random();
+        rand = Math.ceil(Math.random()*100),
+        car  = false;
     
-    if (rand < self.car_odds.ambulance) {
-      return self.car_types.ambulance;
-    } else if (rand < self.car_odds.bus) {
-      return self.car_types.bus;
-    } else if (rand < self.car_odds.jeepney) {
-      return self.car_types.jeepney;
-    } else if (rand < self.car_odds.van) {
-      return self.car_types.van;
-    } else if (rand < self.car_odds.hatch) {
-      return self.car_types.hatch;
+    _.each(self.car_odds, function(range, type){
+      if ( rand >= Math.round(range[0]*Game.global_car_odds) && 
+           rand <= Math.round(range[1]*Game.global_car_odds) ) {
+          car = self.car_types[type];
+        }
+    });
+
+    if (car && _.isArray(car.assets[0])) {
+      var selected_assets = car.assets[ Math.floor(Math.random()*car.assets.length) ];
+      return _.extend( _.clone(car), { assets : selected_assets });
     } else {
-      if (_.isArray(self.car_types.car.assets[0])) {
-        var selected_assets = self.car_types.car.assets[ Math.floor(Math.random()*self.car_types.car.assets.length) ];
-        return _.extend( _.clone(self.car_types.car), { assets : selected_assets });
-      } else {
-        return self.car_types.car;  
-      }
+      if (!car) { console.log('no car'); }
+      return car;  
     }
     
   };
@@ -1777,14 +1817,17 @@ var Maker = function(){
   };
 
   this.build_car = function(i){
-    var self     = this,
-        car_hash = self.generate(),
-        car_name = [self.street.name, self.iterations, i].join("-"),
-        car      = new Car(car_hash);
+    var self     = this;
     
-    self.street.cars.push( car ); 
+    if (car_hash = self.generate()) {
+      
+      var car_name = [self.street.name, self.iterations, i].join("-"),
+          car      = new Car(car_hash);
+    
+      self.street.cars.push( car ); 
 
-    car.initialize(car_name, self.street, self.street.orientation);
+      car.initialize(car_name, self.street, self.street.orientation);
+    }
 
   };
 

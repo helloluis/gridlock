@@ -499,7 +499,6 @@ function PxLoaderSound(id, url, tags, priority) {
         loader = pxLoader;
         console.log('starting load', this.sound['load']());
         this.sound['load']();
-        //this.sound['load']();
     };
 
     this.checkStatus = function() {
