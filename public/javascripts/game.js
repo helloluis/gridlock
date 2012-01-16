@@ -57,8 +57,8 @@ Game = {
    
   with_sound           : true,
   with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
-  with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
-  with_jukebox_sound   : true,    // Zynga Jukebox
+  with_sm2_sound       : true,   // SoundManager2 is what we use for regular web presentation
+  with_jukebox_sound   : false,    // Zynga Jukebox
   
   sound_format         : "." + SOUND_FORMATS[(navigator.platform.indexOf("iPad") != -1) ? 'ios' : 'web'],
  
@@ -424,10 +424,10 @@ Game = {
           if (_.isArray(media_or_arr)) {
             _.each(media_or_arr, function(media, index){
               var new_k = [key, index].join("");
-              Game.sounds[new_k] = new Media(Game.sounds_dir + media + Game.sound_format);
+              Game.sounds[new_k] = Game.sounds_dir + media + Game.sound_format;
             });
           } else {
-            Game.sounds[key] = new Media(Game.sounds_dir + media_or_arr + Game.sound_format);
+            Game.sounds[key] = Game.sounds_dir + media_or_arr + Game.sound_format;
           }          
         });
         
@@ -798,7 +798,6 @@ Game = {
   },
 
   stop_sound_theme : function(){
-    console.log('stopping theme');
     Game.stop_sound('theme');
   },
 
@@ -810,7 +809,8 @@ Game = {
     
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
-        Game.sounds[sound].play();
+        console.log(Game.sounds[sound]);
+        PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
       } else if (Game.with_sm2_sound) {
         if (loop) {
           Game.loop_sound(sound,volume);
@@ -836,12 +836,15 @@ Game = {
   stop_sound : function(sound) {
 
     if (Game.with_phonegap_sound) {
-      Game.sounds[sound].stop();
+      // Game.sounds[sound].stop();
+      // PhoneGap.exec("SoundPlug.stop");
+
     } else if (Game.with_sm2_sound) {
       Game.sounds[sound].stop();
+
     } else if (Game.with_jukebox_sound) {
-      console.log('stopping jukebox');
       Game.jukebox.stop();
+
     }
     
   },
