@@ -34,7 +34,7 @@ h1, h2, p { color:#333; margin-bottom:0.5em;}
 h1 { font-size:64px; font-family: 'Fugaz One', Helvetica, sans-serif; letter-spacing:-2px; text-shadow:0 3px 8px #333; }
 h1.countdown { font-size:100px; }
 h2, h3, label, .bttn, #score, #high_score { font-size:24px; font-family: 'Boogaloo', Times, sans-serif; margin-bottom:20px; }
-p { line-height:1.5; font-family: 'Boogaloo', Times, sans-serif; }
+p, .car_score { line-height:1.5; font-family: 'Boogaloo', Times, sans-serif; }
 em { font-style:italic; }
 
 .screen { position:absolute; top:0; left:0; width:1024px; height:768px; display:none; overflow:hidden; /*background:#444 url(../images/bg.jpg);*/ }
@@ -173,3 +173,5 @@ a, #intro p strong { color:#fc0; }
 .car.yellow.horizontal.right { background:url(../images/taxi_r.png); }
 .car.yellow.vertical { background:url(../images/taxi_d.png); }
 .car.yellow.vertical.right { background:url(../images/taxi_u.png); }
+
+.car_score { font-size:20px; color:#fff; position:absolute; z-index:20; opacity : 1; color:#ff0; }
