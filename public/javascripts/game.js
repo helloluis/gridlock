@@ -47,6 +47,8 @@ Game = {
   is_critical          : false,                  // if traffic condition is critical, we overlay the scary red borders on the screen
   critical_cars        : [],                     // cars that are about to end the game
 
+  show_arrived_score   : true,                   // show a little floating +score for every arrived car
+
   // cache of the images representing various levels of vehicular frustration
   frustration_assets   : [],
 
@@ -1754,6 +1756,19 @@ var Car = function(car_hash){
 
     if (this.sound_loop) {
       this.sound_loop.stop();
+    }
+
+    if (Game.show_arrived_score) {
+      var cur_top  = this.orientation=='horizontal' ? ( this.lefthand ? this.street.top-20 : this.street.top+20 ) : ( this.lefthand ? this.street.height : this.street.top),
+          cur_left = this.orientation=='horizontal' ? ( this.lefthand ? this.street.left : this.street.width ) : ( this.lefthand ? this.street.left - 20 : this.street.left + 20),
+          end_top  = this.orientation=='horizontal' ? ( this.lefthand ?  "-=50" : "-=50" ) : ( this.lefthand ?  "-=50" : "+=50" ),
+          end_left = this.orientation=='horizontal' ? ( this.lefthand ?  "+=50" : "-=50" ) : ( this.lefthand ?  "-=50" : "+=50" );
+
+      $("<div class='car_score'></div>").
+        text("+" + this.score).
+        css({ top : cur_top, left : cur_left }).
+        animate({ top : end_top, left : end_left, opacity : 0 },{ duration : 2000, complete : function(){ $(this).remove(); } }).
+        appendTo(Game.dom);
     }
 
     Game.frustration -= this.frustration;
