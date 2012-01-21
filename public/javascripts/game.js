@@ -690,7 +690,7 @@ Game = {
 
     _.delay(function(){
       Game.play_sound_theme();  
-    },2000);
+    },500);
 
     _.each(Game.streets,function(street){
       street.start();
