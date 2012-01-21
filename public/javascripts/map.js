@@ -192,7 +192,7 @@ var SOUNDS = {
   arrived       : "kaching"
 };
 
-var SOUND_FORMATS = { web : "mp3", ios : "aifc" };
+var SOUND_FORMATS = { web : "mp3", ios : "wav" };
 
 var SOUND_SPRITE = "sprite01.mp3";
 

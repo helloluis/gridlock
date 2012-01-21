@@ -59,8 +59,8 @@ Game = {
    
   with_sound           : true,
   with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
-  with_sm2_sound       : true,   // SoundManager2 is what we use for regular web presentation
-  with_jukebox_sound   : false,    // Zynga Jukebox
+  with_sm2_sound       : true,    // SoundManager2 is what we use for regular web presentation
+  with_jukebox_sound   : false,   // Zynga Jukebox
   
   sound_format         : "." + SOUND_FORMATS[(navigator.platform.indexOf("iPad") != -1) ? 'ios' : 'web'],
  
@@ -429,7 +429,11 @@ Game = {
               Game.sounds[new_k] = Game.sounds_dir + media + Game.sound_format;
             });
           } else {
-            Game.sounds[key] = Game.sounds_dir + media_or_arr + Game.sound_format;
+            if (key==='theme') {
+              Game.sounds[key] = new Media(Game.sounds_dir + media_or_arr + Game.sound_format);
+            } else {
+              Game.sounds[key] = Game.sounds_dir + media_or_arr + Game.sound_format;   
+            }
           }          
         });
         
@@ -684,7 +688,9 @@ Game = {
 
   start_streets : function(){
 
-    Game.play_sound_theme();
+    _.delay(function(){
+      Game.play_sound_theme();  
+    },2000);
 
     _.each(Game.streets,function(street){
       street.start();
@@ -811,8 +817,14 @@ Game = {
     
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
+        if (loop) {
+          console.log('looping ' + sound);
+          Game.loop_sound(sound, volume);
+        } else {
+          PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
+        }
         console.log(Game.sounds[sound]);
-        PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
+        
       } else if (Game.with_sm2_sound) {
         if (loop) {
           Game.loop_sound(sound,volume);
@@ -820,19 +832,33 @@ Game = {
           Game.sounds[sound].play({ volume : volume });  
         }
       } else if (Game.with_jukebox_sound) {
-        // Game.sounds[sound].play();
         JUKEBOX.stop();
       }
     }
   },
 
   loop_sound : function(sound, volume) {
-    Game.sounds[sound].play({ 
-      volume   : volume,
-      onfinish : function(){
-        Game.loop_sound(sound, volume);
-      }
-    });
+    if (Game.with_phonegap_sound) {
+      
+      console.log('playing ' + sound);
+      
+      Game.sounds[sound].play();
+
+      Game.theme_timer = setInterval(function(){ 
+          Game.sounds[sound].play(); 
+          console.log('looping theme'); 
+        }, 23980);
+      
+    } else {
+      
+      Game.sounds[sound].
+          play({ 
+            volume   : volume,
+            onfinish : function(){
+            Game.loop_sound(sound, volume);
+          }
+        }); 
+    }
   },
 
   stop_sound : function(sound) {
@@ -840,6 +866,8 @@ Game = {
     if (Game.with_phonegap_sound) {
       // Game.sounds[sound].stop();
       // PhoneGap.exec("SoundPlug.stop");
+      clearInterval(Game.theme_timer);
+      Game.sounds[sound].stop()
 
     } else if (Game.with_sm2_sound) {
       Game.sounds[sound].stop();
