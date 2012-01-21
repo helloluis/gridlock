@@ -1490,11 +1490,12 @@ var Car = function(car_hash){
 
   this.change_speed = function(faster) {
     if (faster) {
-      if (Math.ceil(this.speed)+1 < Game.max_speed) {
-        this.speed += 2;
-      } else {
-        this.speed = Game.max_speed;
-      }
+      this.speed = Game.max_speed;
+      // if (Math.ceil(this.speed)+1 < Game.max_speed) {
+      //   this.speed += 2;
+      // } else {
+      //   this.speed = Game.max_speed;
+      // }
     } else if (!faster && Math.ceil(this.speed) > 2) {
       this.speed -= 1;
     }
