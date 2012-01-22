@@ -12,6 +12,10 @@ Game = {
   frustration          : 0,
   high_score           : 0,
 
+  frames               : 0,    // global frame counter, don't really know what for yet
+
+  seconds              : 0,    // global timer, in seconds, so only increments once every 1000 millisec
+
   difficulty_increases : true, // if set to false, we don't make the game harder as time goes on
 
   width                : MAP_WIDTH,
@@ -24,7 +28,7 @@ Game = {
   ended                : false,
   muted                : false,
  
-  can_adjust_speed     : true,    // clicking or swiping on a car will increase its speed (UNDER CONSTRUCTION)
+  can_adjust_speed     : false,  // clicking or swiping on a car will increase its speed (UNDER CONSTRUCTION)
  
   streets              : [],     // array of Street objects
   barriers             : {},     // hash of barrier hitboxes
@@ -320,6 +324,10 @@ Game = {
         $(".street").unbind('click').click(click);
       }
  
+    } else {
+      
+      $(".help_acceleration_text").hide();
+
     }
   },
 
@@ -330,6 +338,8 @@ Game = {
     
     if (Game.started && !Game.paused && !Game.ended) {
       
+      Game.frames+=1;
+
       Game.clear_canvases();
 
       if (Game.debug==true) {
@@ -715,6 +725,17 @@ Game = {
 
   },
 
+  start_counters : function(){
+    
+    this.frames = 0;
+    this.seconds = 0;
+
+    this.dom.everyTime(1000, function(){
+      Game.seconds += 1;
+    });
+
+  },
+
   clear_intersections : function(){
     _.each(Game.intersections, function(intersection){
       intersection.cars = [ [], [] ];
@@ -938,6 +959,7 @@ Game = {
         Game.started = true;
         Game.paused = false;
         Game.messages.hide();
+        Game.start_counters();
         Game.start_controls();
         Game.start_streets();
         $(".pause, .quit, .mute").removeClass('disabled');
@@ -982,10 +1004,12 @@ Game = {
 
   increment_car_odds : function(){
     if (Game.difficulty_increases) {
-      if (arr = _.detect(Game.car_odd_levels, function(level){ return Game.score >= level[0]; })) {
-        Game.global_car_odds = arr[1];
-        // console.log('new car odds', Game.global_car_odds);
-        return Game.global_car_odds;  
+      if (Game.global_car_odds!=1.0) {
+        if (arr = _.detect(Game.car_odd_levels, function(level){ return Game.score >= level[0]; })) {
+          Game.global_car_odds = arr[1];
+          // console.log('new car odds', Game.global_car_odds);
+          return Game.global_car_odds;  
+        }  
       }
     }
   },
@@ -1196,13 +1220,15 @@ var Street = function(){
 
 var Car = function(car_hash){
   
-  this.width                 = car_hash && car_hash.width  ? car_hash.width  : 20;
-  this.height                = car_hash && car_hash.height ? car_hash.height : 35;
-  this.color                 = car_hash && car_hash.colors ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
-  this.type                  = car_hash && car_hash.type   ? car_hash.type   : 'car';
-  this.image_assets          = car_hash && car_hash.assets ? car_hash.assets : false;
-  this.sounds                = car_hash && car_hash.sounds ? car_hash.sounds : false;
-  this.score                 = car_hash && car_hash.score  ? car_hash.score  : 1;
+  this.width                 = car_hash && car_hash.width   ? car_hash.width     : 20;
+  this.height                = car_hash && car_hash.height  ? car_hash.height    : 35;
+  this.color                 = car_hash && car_hash.colors  ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
+  this.type                  = car_hash && car_hash.type    ? car_hash.type      : 'car';
+  this.image_assets          = car_hash && car_hash.assets  ? car_hash.assets    : false;
+  this.sounds                = car_hash && car_hash.sounds  ? car_hash.sounds    : false;
+  this.score                 = car_hash && car_hash.score   ? car_hash.score     : 1;
+  this.animate               = car_hash && car_hash.animate ? true               : false;
+  this.animation             = car_hash && car_hash.animate ? car_hash.animation : {};
   this.street                = false;
   this.moving                = false;
   this.frustration           = 0;
@@ -1211,13 +1237,13 @@ var Car = function(car_hash){
   this.frustration_threshold = 3;
   this.frustration_level1    = 4;
   this.frustration_level2    = 5;
-  this.travel_time_modifier  = car_hash && car_hash.frustrates_by ? car_hash.frustrates_by : 6;
+
   // this is the number we use to modify ideal_travel_time, for frustration purposes
+  this.travel_time_modifier  = car_hash && car_hash.frustrates_by ? car_hash.frustrates_by : 6;
 
-  // this.speed                 = Math.round((Math.random()*2)+2); // pixels per frame
-  this.speed                 = car_hash && car_hash.speed ? car_hash.speed : (Math.random()*3)+2; // pixels per frame 
   // might want to go back to the original integer version of this if you want to save CPU cycles on iPad 1 devices
-
+  this.speed                 = car_hash && car_hash.speed ? car_hash.speed : (Math.random()*4)+4; // pixels per frame 
+  
   this.intersecting          = {};
   this.on_street             = false;
   this.orientation           = 'horizontal';
@@ -1259,12 +1285,22 @@ var Car = function(car_hash){
       this.color = colors[Math.floor(Math.random()*colors.length)];  
 
     } else {
-      
+  
       this.image = new Image();
 
       this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
         (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
-        (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );
+        (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );      
+
+      if (this.animate) {
+
+        this.current_frame = 0;
+        this.step = this.animation.step;
+        this.last_game_frame = Game.frames; 
+        // we store the current Game.frame number that this Car is created on, 
+        // then wait until (this.last_game_frame+this.step) before switching to the next frame
+
+      }
 
     }
 
@@ -1298,20 +1334,10 @@ var Car = function(car_hash){
   this.initialize_sounds = function() {
     if (this.sounds) {
       this.sound_loop = this.play_sound_loop();
-      // console.log('ambulance sound', Game.sounds_dir + this.sounds[0]);
-      // TODO
-      // if (Game.with_sound) {
-      //   if (Game.with_phonegap_sound) {
-      //     this.sound_loop = new Media( Game.sounds_dir + this.sounds[0] );
-      //     this.sound_loop.play({ numberOfLoops : 99 });
-      //   } else if (Game.with_sm2_sound) {
-      //     this.sound_loop = soundManager.createSound({ id : this.name, url : Game.sounds_dir + this.sounds[0], autoLoad : true });
-      //     this.sound_loop.play({ loops : 99 });
-      //   }
-      // }
     }
   };
 
+  // TODO!
   this.play_sound_loop = function(){
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
@@ -1483,7 +1509,26 @@ var Car = function(car_hash){
 
     } else {
       
-      ctx.drawImage(self.image, self.current_pos.left, self.current_pos.top);
+      if (this.animate) {
+
+        if (Game.frames == this.last_game_frame+this.step) {
+          if (this.current_frame < this.animation.frames-1) {
+            this.current_frame += 1;  
+          } else {
+            this.current_frame = 0;
+          }
+          this.last_game_frame = Game.frames;
+        } 
+
+        var sx = 0 + (this.width*this.current_frame);
+
+        ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height); 
+
+      } else {
+
+        ctx.drawImage(self.image, self.current_pos.left, self.current_pos.top);  
+
+      }
        
     }
 
