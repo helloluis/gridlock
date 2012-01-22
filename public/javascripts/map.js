@@ -142,7 +142,7 @@ var CARS = {
   ambulance       : { type : 'ambulance', width : 20, height : 45, frustrates_by : 3, speed : 8, score : 5, 
       assets      : [ 'ambulance_r_anim.png', 'ambulance_l_anim.png', 'ambulance_d_anim.png', 'ambulance_u_anim.png' ],
       animate     : true,
-      animation   : { step : 24, frames : 2 },
+      animation   : { step : 12, frames : 4 },
       sounds      : [ 'ambulance.mp3' ] 
     }
 };
