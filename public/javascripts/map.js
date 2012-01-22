@@ -100,14 +100,15 @@ var INTERSECTIONS = [
   [ 'baker dexter', 512, 652, 95, 45 ],
 ];
 
-// we only need 30 fps coz we're third-world that way
-var FPS = 30;
+// we only need 24 fps coz we're third-world that way
+var FPS = 24;
 
 // once a Maker hits MAX_CARS_PER_STREET, it stops generating new cars until the user
 // has managed to remove some more. 8 is a purely arbitrary number.
-var MAX_CARS_PER_STREET = 10;
+var MAX_CARS_PER_STREET = 14;
 
-var MAX_SPEED = 6;
+// the maximum number of pixels a car moves forward per frame
+var MAX_SPEED = 8; 
 
 var MAKER_FREQUENCY = 5000;
 
@@ -115,29 +116,35 @@ var IMAGES_DIR = "images/";
 
 // all car types
 var CARS = {
-  car         : { 
-    type      : 'car', 
-    width     : 20, 
-    height    : 40, 
-    frustrates_by : 6,
-    score     : 1,
-    assets    : [ 
-      // from right, from left, from top, from bottom
-      [ 'car2_r.png', 'car2_l.png', 'car2_d.png', 'car2_u.png' ], 
-      [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ], 
-    ]
-  },
-  hatch       : { type : 'hatch',     width : 20, height : 35, frustrates_by : 6, score : 1,
-      assets  : [ 'car1_r.png', 'car1_l.png', 'car1_d.png', 'car1_u.png' ] },
-  jeepney     : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, score : 3,
-       assets : [ 'jeepney_r.png', 'jeepney_l.png', 'jeepney_d.png', 'jeepney_u.png' ] },
-  van         : { type : 'van',       width : 20, height : 45, frustrates_by : 4, score : 2,
-       assets : [ 'van_r.png', 'van_l.png', 'van_d.png', 'van_u.png' ] },
-  bus         : { type : 'bus',       width : 20, height : 60, frustrates_by : 3, score : 4,
-       assets : [ 'bus_r.png', 'bus_l.png', 'bus_d.png', 'bus_u.png' ] },
-  ambulance   : { type : 'ambulance', width : 20, height : 45, frustrates_by : 3, speed : 5, score : 5, 
-       assets : [ 'ambulance_r.png', 'ambulance_l.png', 'ambulance_d.png', 'ambulance_u.png' ],
-       sounds : [ 'ambulance.mp3' ] }
+  car               : { 
+      type          : 'car', 
+      width         : 20, 
+      height        : 40, 
+      frustrates_by : 6,
+      score         : 1,
+      assets        : [ 
+        [ 'car2_r.png', 'car2_l.png', 'car2_d.png', 'car2_u.png' ], 
+        [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ], 
+      ]
+    },
+  hatch           : { type : 'hatch',     width : 20, height : 35, frustrates_by : 6, score : 1,
+      assets      : [ 'car1_r.png', 'car1_l.png', 'car1_d.png', 'car1_u.png' ] 
+    },
+  jeepney         : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, score : 3,
+      assets      : [ 'jeepney_r.png', 'jeepney_l.png', 'jeepney_d.png', 'jeepney_u.png' ] 
+    },
+  van             : { type : 'van',       width : 20, height : 45, frustrates_by : 4, score : 2,
+      assets      : [ 'van_r.png', 'van_l.png', 'van_d.png', 'van_u.png' ] 
+    },
+  bus             : { type : 'bus',       width : 20, height : 60, frustrates_by : 3, speed : 5, score : 4,
+      assets      : [ 'bus_r.png', 'bus_l.png', 'bus_d.png', 'bus_u.png' ] 
+    },
+  ambulance       : { type : 'ambulance', width : 20, height : 45, frustrates_by : 3, speed : 8, score : 5, 
+      assets      : [ 'ambulance_r.png', 'ambulance_l.png', 'ambulance_d.png', 'ambulance_u.png' ],
+      animate     : true,
+      animation   : { step : 24, frames : 2 },
+      sounds      : [ 'ambulance.mp3' ] 
+    }
 };
 
 var LOADING_CARS = [
@@ -160,7 +167,7 @@ var FRUSTRATIONS = [
 var CAR_ODDS = { 'car' : [1,40], 'hatch' : [41,60], 'van' : [61,75], 'jeepney' : [75,90], 'bus' : [91,99], 'ambulance' : [99,100] };
 
 // in order for the global car odds to go up, a player
-// has to hit a certain number of points. we start at 0.5,
+// has to hit a certain number of points. we start at 0.3,
 // in other words, a car is only half as likely to be spawned
 // as "normal".
 var CAR_ODD_LEVELS = [

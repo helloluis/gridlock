@@ -486,7 +486,7 @@ function PxLoaderSound(id, url, tags, priority) {
 
             // see if we have loaded the file
             if (bytesLoaded > 0 && (bytesLoaded === bytesTotal)) {
-                console.log('previously loaded', id);
+                //console.log('previously loaded', id);
                 loader.onLoad(self);
             }
         }
@@ -497,7 +497,7 @@ function PxLoaderSound(id, url, tags, priority) {
     this.start = function(pxLoader) {
         // we need the loader ref so we can notify upon completion
         loader = pxLoader;
-        console.log('starting load', this.sound['load']());
+        //console.log('starting load', this.sound['load']());
         this.sound['load']();
     };
 
