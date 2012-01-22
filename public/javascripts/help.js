@@ -152,7 +152,7 @@ Help = {
         light  = $(".stoplight", obj.dom).show().addClass('horizontal').removeClass('vertical'),
         finger = $(".finger", obj.dom).css({ 'visibility' : 'hidden' }),
         coords = {  blue   : { x : 400, y : [ 90, 70, 90] },
-                    yellow : { x : [ 100, 122, 100], y : -100 },
+                    yellow : { x : [ 100, 122, 100], y : -100 }
                  };
     
     // looping functions for both blue and yellow cars

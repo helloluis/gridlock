@@ -59,7 +59,7 @@ TraffixLoader = {
             left : origin_left
           }).
           animate({
-            left : dest_left,
+            left : dest_left
           },1000).
           appendTo(self.dom); 
       }
