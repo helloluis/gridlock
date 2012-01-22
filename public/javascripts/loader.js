@@ -1,4 +1,4 @@
-/**
+//**
  * PixelLab Resource Loader
  * Loads resources while providing progress updates.
  */
@@ -127,8 +127,8 @@ function PxLoader(settings) {
         // trigger requests for each resource
         for (var i = 0, len = entries.length; i < len; i++) {
             var entry = entries[i];
-            entry.resource.start(this);
             entry.status = ResourceState.WAITING;
+            entry.resource.start(this);
         }
 
         // do an initial status check soon since items may be loaded from the cache
@@ -368,13 +368,15 @@ if (!Array.prototype.indexOf) {
     };
 }
 
+
+
 // @depends PxLoader.js
 
 /**
  * PxLoader plugin to load images
  */
 function PxLoaderImage(url, tags, priority) {
-    var self   = this,
+    var self = this,
         loader = null;
 
     this.img = new Image();
@@ -399,21 +401,21 @@ function PxLoaderImage(url, tags, priority) {
     };
 
     var removeEventHandlers = function() {
-        self.img.removeEventListener('load', onLoad);
-        self.img.removeEventListener('readystatechange', onReadyStateChange);
-        self.img.removeEventListener('load', onError);
+        self.unbind('load', onLoad);
+        self.unbind('readystatechange', onReadyStateChange);
+        self.unbind('error', onError);
     };
 
     this.start = function(pxLoader) {
         // we need the loader ref so we can notify upon completion
         loader = pxLoader;
-        
+
         // NOTE: Must add event listeners before the src is set. We
         // also need to use the readystatechange because sometimes
         // load doesn't fire when an image is in the cache.
-        self.img.addEventListener('load', onLoad);
-        self.img.addEventListener('readystatechange', onReadyStateChange);
-        self.img.addEventListener('error', onError);
+        self.bind('load', onLoad);
+        self.bind('readystatechange', onReadyStateChange);
+        self.bind('error', onError);
 
         self.img.src = url;
     };
@@ -442,6 +444,25 @@ function PxLoaderImage(url, tags, priority) {
     this.getName = function() {
         return url;
     }
+    
+    // cross-browser event binding
+    this.bind = function(eventName, eventHandler) {
+        if (self.img.addEventListener) {
+            self.img.addEventListener(eventName, eventHandler, false); 
+        } else if (self.img.attachEvent) {
+            self.img.attachEvent('on'+eventName, eventHandler);
+        }
+    }
+
+    // cross-browser event un-binding
+    this.unbind = function(eventName, eventHandler) {
+        if (self.img.removeEventListener) {
+            self.img.removeEventListener(eventName, eventHandler); 
+        } else if (self.img.detachEvent) {
+            self.img.detachEvent('on'+eventName, eventHandler);
+        }
+    }
+
 }
 
 // add a convenience method to PxLoader for adding an image
@@ -452,6 +473,8 @@ PxLoader.prototype.addImage = function(url, tags, priority) {
     // return the img element to the caller
     return imageLoader.img;
 };
+
+
 
 
 // @depends PxLoader.js
@@ -486,19 +509,27 @@ function PxLoaderSound(id, url, tags, priority) {
 
             // see if we have loaded the file
             if (bytesLoaded > 0 && (bytesLoaded === bytesTotal)) {
-                //console.log('previously loaded', id);
                 loader.onLoad(self);
             }
         }
     });
-    
-    //console.log('creating sound', this.sound);
 
     this.start = function(pxLoader) {
         // we need the loader ref so we can notify upon completion
         loader = pxLoader;
-        //console.log('starting load', this.sound['load']());
-        this.sound['load']();
+
+        // On iOS, soundManager2 uses a global audio object so we can't
+        // preload multiple sounds. We'll have to hope they load quickly
+        // when we need to play them. Unfortunately, SM2 doesn't expose
+        // a property to indicate its using a global object. For now we'll
+        // use the same test they do: only when on an iDevice
+        var iDevice = navigator.userAgent.match(/(ipad|iphone|ipod)/i);
+        if (iDevice) {
+            loader.onTimeout(self);
+        }
+        else {
+            this.sound['load']();
+        }
     };
 
     this.checkStatus = function() {
@@ -507,11 +538,11 @@ function PxLoaderSound(id, url, tags, priority) {
             case 1: // loading
                 break;
             case 2: // failed/error
-                //console.log('error', id);
                 loader.onError(self);
+                break;
             case 3: // loaded/success
-                //console.log('loaded now', id);
                 loader.onLoad(self);
+                break;
         }
     };
 
