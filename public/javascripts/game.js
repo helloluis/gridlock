@@ -64,7 +64,6 @@ Game = {
   with_sound           : true,
   with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
   with_sm2_sound       : true,    // SoundManager2 is what we use for regular web presentation
-  with_jukebox_sound   : false,   // Zynga Jukebox
   
   sound_format         : "." + SOUND_FORMATS[(navigator.platform.indexOf("iPad") != -1) ? 'ios' : 'web'],
  
@@ -859,8 +858,6 @@ Game = {
         } else {
           Game.sounds[sound].play({ volume : volume });  
         }
-      } else if (Game.with_jukebox_sound) {
-        JUKEBOX.stop();
       }
     }
   },
@@ -899,9 +896,6 @@ Game = {
 
     } else if (Game.with_sm2_sound) {
       Game.sounds[sound].stop();
-
-    } else if (Game.with_jukebox_sound) {
-      Game.jukebox.stop();
 
     }
     
