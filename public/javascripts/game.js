@@ -582,6 +582,13 @@ Game = {
     var self = this;
     self.stoplights = STOPLIGHTS;
 
+    // prevent gray overlay when tapping in iOS?
+    $('body').live('touchstart', function(e){
+      if(e.target.localName != 'select'){
+        e.preventDefault(); 
+      }
+    });
+
     $(".stoplight", Game.dom).hide().each(function(idx, el){
       
       var elem   = $(el),
