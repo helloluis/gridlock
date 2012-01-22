@@ -122,7 +122,7 @@ Game = {
 
       soundManager.onready(function() {
         
-        console.log('soundManager ready!');
+        // console.log('soundManager ready!');
 
         _.each(Game.raw_sounds, function(media_or_arr, key){
           
@@ -825,12 +825,12 @@ Game = {
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
         if (loop) {
-          console.log('looping ' + sound);
+          // console.log('looping ' + sound);
           Game.loop_sound(sound, volume);
         } else {
           PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
         }
-        console.log(Game.sounds[sound]);
+        // console.log(Game.sounds[sound]);
         
       } else if (Game.with_sm2_sound) {
         if (loop) {
@@ -847,13 +847,13 @@ Game = {
   loop_sound : function(sound, volume) {
     if (Game.with_phonegap_sound) {
       
-      console.log('playing ' + sound);
+      // console.log('playing ' + sound);
       
       Game.sounds[sound].play();
 
       Game.theme_timer = setInterval(function(){ 
           Game.sounds[sound].play(); 
-          console.log('looping theme'); 
+          // console.log('looping theme'); 
         }, 23980);
       
     } else {
@@ -984,7 +984,7 @@ Game = {
     if (Game.difficulty_increases) {
       if (arr = _.detect(Game.car_odd_levels, function(level){ return Game.score >= level[0]; })) {
         Game.global_car_odds = arr[1];
-        console.log('new car odds', Game.global_car_odds);
+        // console.log('new car odds', Game.global_car_odds);
         return Game.global_car_odds;  
       }
     }
@@ -1852,7 +1852,7 @@ var Maker = function(){
       var selected_assets = car.assets[ Math.floor(Math.random()*car.assets.length) ];
       return _.extend( _.clone(car), { assets : selected_assets });
     } else {
-      if (!car) { console.log('no car'); }
+      // if (!car) { console.log('no car'); }
       return car;  
     }
     
