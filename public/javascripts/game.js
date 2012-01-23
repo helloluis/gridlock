@@ -131,6 +131,8 @@ Game = {
       if (Game.with_sm2_sound) {
       
         soundManager.waitForWindowLoad = true;
+        soundManager.debugMode = true;
+        soundManager.consoleOnly = true;
 
         soundManager.onready(function() {
 
