@@ -14,7 +14,7 @@ function PxLoader(settings) {
 
     // delay before logging since last progress change
     if (settings.loggingDelay == null) {
-        settings.loggingDelay = 20 * 1000; // log stragglers after 20 secs
+        settings.loggingDelay = 1000; // log stragglers after 20 secs
     }
 
     // stop waiting if no progress has been made in the moving time window
