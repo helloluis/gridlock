@@ -210,7 +210,7 @@ var SOUND_SPRITE_MAP = {
 };
 
 var NEIGHBORHOOD = [
-  "bg.jpg", "buildings.png"
+  "bg.jpg"
 ];
 
 var COLLISION_MESSAGES = [
