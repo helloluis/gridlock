@@ -1,4 +1,4 @@
-//**
+/**
  * PixelLab Resource Loader
  * Loads resources while providing progress updates.
  */

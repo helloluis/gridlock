@@ -94,83 +94,79 @@ Game = {
 
     Game.loader = new PxLoader();
 
-    Game.loading_screen = $("#loader"),
-      loader_percentage = $(".loading_percentage", Game.loading_screen);
+    if (Game.enable_preloading) {
 
-    _.each(Game.car_types, function(car){
-      _.each(_.flatten(car.assets),function(fc){
-        var img = new PxLoaderImage(Game.images_dir + fc);
-        Game.loader.add(img);
-      });
-    });
+      Game.loading_screen = $("#loader"),
+        loader_percentage = $(".loading_percentage", Game.loading_screen);
 
-    _.each(Game.neighborhood, function(n){
-      var img = new PxLoaderImage(Game.images_dir + n);
-        Game.loader.add(img);
-    });
-
-    _.each(FRUSTRATIONS, function(f){
-      var img = new PxLoaderImage(Game.images_dir + f[0]);
-        Game.loader.add(img);
-    });
-
-    _.each(OTHERS, function(o){
-      var img = new PxLoaderImage(Game.images_dir + o);
-      Game.loader.add(img);
-    });
-
-    if (Game.with_sm2_sound) {
-      
-      soundManager.waitForWindowLoad = true;
-
-      soundManager.onready(function() {
-        
-        // console.log('soundManager ready!');
-
-        _.each(Game.raw_sounds, function(media_or_arr, key){
-          
-          if (_.isArray(media_or_arr)) {
-            _.each(media_or_arr, function(media, index){
-              var new_k = [key, index].join("");
-              Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
-            });
-          } else {
-            Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
-          }
-          
+      _.each(Game.car_types, function(car){
+        _.each(_.flatten(car.assets),function(fc){
+          var img = new PxLoaderImage(Game.images_dir + fc);
+          Game.loader.add(img);
         });
-
       });
-    }
 
-    loader_percentage.text("0%");
+      _.each(Game.neighborhood, function(n){
+        var img = new PxLoaderImage(Game.images_dir + n);
+          Game.loader.add(img);
+      });
 
-    Game.loader.addProgressListener(function(e) { 
-      var percentage = Math.round((e.completedCount/e.totalCount)*100);
-      loader_percentage.text( percentage + "%" );
-    });
-    
-    if (Game.enable_preloading){
+      _.each(FRUSTRATIONS, function(f){
+        var img = new PxLoaderImage(Game.images_dir + f[0]);
+          Game.loader.add(img);
+      });
+
+      _.each(OTHERS, function(o){
+        var img = new PxLoaderImage(Game.images_dir + o);
+        Game.loader.add(img);
+      }); 
+
+      loader_percentage.text("0%");
+
+      Game.loader.addProgressListener(function(e) { 
+        var percentage = Math.round((e.completedCount/e.totalCount)*100);
+        loader_percentage.text( percentage + "%" );
+      });
+
+      if (Game.with_sm2_sound) {
       
+        soundManager.waitForWindowLoad = true;
+
+        soundManager.onready(function() {
+
+          _.each(Game.raw_sounds, function(media_or_arr, key){
+            
+            if (_.isArray(media_or_arr)) {
+              _.each(media_or_arr, function(media, index){
+                var new_k = [key, index].join("");
+                Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
+              });
+            } else {
+              Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
+            }
+            
+          });
+
+        });
+      }
+
       TraffixLoader.initialize();
       
       Game.loader.addCompletionListener(function(){
-        // console.log('completed');
         TraffixLoader.stop();
         Game.play_sound('horns_short1');
         Game.initialize(auto_start);
       });
-      
+
+      _.delay(function(){
+        Game.loader.start();  
+      }, 1000);
+
     } else {
       
       Game.initialize(auto_start);
-      
-    }
 
-    _.delay(function(){
-      Game.loader.start();  
-    }, 1000);
-    
+    }
 
   },
 
@@ -465,18 +461,6 @@ Game = {
 
         });
 
-      } else if (Game.with_jukebox_sound) {
-        
-        if (!Game.jukebox || Game.is_iOS) {
-          var settings = { 
-            resources : [ SOUNDS_DIR + SOUND_SPRITE ],
-            autoplay  : 'theme',
-            spritemap : SOUND_SPRITE_MAP
-          };
-
-          Game.jukebox = new Jukebox(settings); 
-        }
-
       }
     }
   },
@@ -679,6 +663,8 @@ Game = {
 
     Game.score   = 0;
     Game.score_cont.text("0");
+
+    Game.high_score_cont.text( Game.high_score );
 
     Game.critical_cars = new Array;
     
@@ -1288,11 +1274,11 @@ var Car = function(car_hash){
 
       if (this.animate) {
 
+        // we store the current Game.frame number that this Car is created on, 
+        // then wait until (this.last_game_frame+this.step) before switching to the next frame
         this.current_frame = 0;
         this.step = this.animation.step;
         this.last_game_frame = Game.frames; 
-        // we store the current Game.frame number that this Car is created on, 
-        // then wait until (this.last_game_frame+this.step) before switching to the next frame
 
       }
 
