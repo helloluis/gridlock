@@ -71,13 +71,13 @@ var BARRIERS = [
   ['baker_right_barrier2',  535, 637, 15, 25, 'horizontal', 'baker dexter',  false, "#aaa" ],
   ['baker_left_barrier1',   510, 347, 15, 25, 'horizontal', 'baker chang',   false, "#999" ],
   ['baker_left_barrier2',   510, 747, 15, 25, 'horizontal', 'baker dexter',  false, "#888" ],
-  ['chang_right_barrier1',  305, 310, 50, 15, 'horizontal', 'amber chang',   true,  "#999" ],
-  ['chang_right_barrier2',  555, 310, 50, 15, 'horizontal', 'baker chang',   true,  "#aaa" ],
-  ['chang_left_barrier1',   200, 253, 50, 15, 'horizontal', 'amber chang',   true,  "#bbb" ],
+  ['chang_right_barrier1',  308, 310, 50, 15, 'horizontal', 'amber chang',   true,  "#999" ],
+  ['chang_right_barrier2',  558, 310, 50, 15, 'horizontal', 'baker chang',   true,  "#aaa" ],
+  ['chang_left_barrier1',   195, 253, 50, 15, 'horizontal', 'amber chang',   true,  "#bbb" ],
   ['chang_left_barrier2',   497, 253, 50, 15, 'horizontal', 'baker chang',   true,  "#ccc" ],
-  ['dexter_right_barrier1', 305, 710, 50, 15, 'horizontal', 'amber dexter',  true,  "#ddd" ],
-  ['dexter_right_barrier2', 555, 710, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ],
-  ['dexter_left_barrier1',  200, 655, 50, 15, 'horizontal', 'amber dexter',  true,  "#fff" ],
+  ['dexter_right_barrier1', 308, 710, 50, 15, 'horizontal', 'amber dexter',  true,  "#ddd" ],
+  ['dexter_right_barrier2', 558, 710, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ],
+  ['dexter_left_barrier1',  195, 655, 50, 15, 'horizontal', 'amber dexter',  true,  "#fff" ],
   ['dexter_left_barrier2',  497, 655, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ]
 ];
 
@@ -110,7 +110,7 @@ var MAX_CARS_PER_STREET = 14;
 // the maximum number of pixels a car moves forward per frame
 var MAX_SPEED = 8; 
 
-var MAKER_FREQUENCY = 5000;
+var MAKER_FREQUENCY = 4000;
 
 var IMAGES_DIR = "images/";
 
@@ -247,4 +247,4 @@ var SUCCESS_MESSAGES = [
   "You Don't Suck After All!"
 ];
 
-var OTHERS = ["bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_again.png"];
+var OTHERS = [ "bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_again.png", "explosion.png", "bg_help.jpg" ];

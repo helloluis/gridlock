@@ -17,6 +17,8 @@ Game = {
   seconds              : 0,    // global timer, in seconds, so only increments once every 1000 millisec
 
   difficulty_increases : true, // if set to false, we don't make the game harder as time goes on
+  smart_intersections  : true, // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
+  double_buffering     : true, // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
 
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
@@ -74,15 +76,6 @@ Game = {
   // until all of the cars have been rendered, e.g., the frustration indicators
   deferred_renders     : [], 
 
-  // Doesn't currently work because having small slivers of canvases means each car has a 
-  // different coordinate system, so we need to rethink how we compute for collisions.
-  // Essentially, each car would need to compensate for its parent street's position on the map
-  // before comparing its own position with any other cars'. Is this as simple as just adding the
-  // top and left coordinates of the street to the car's? Srsly?
-  multiple_canvases    : false,  
-  canvases             : {},
-  contexts             : {},
-
   db_name              : "traffix",
   high_score_key       : "high_score",
 
@@ -131,8 +124,8 @@ Game = {
       if (Game.with_sm2_sound) {
       
         soundManager.waitForWindowLoad = true;
-        soundManager.debugMode = true;
-        soundManager.consoleOnly = true;
+        //soundManager.debugMode = true;
+        //soundManager.consoleOnly = true;
 
         soundManager.onready(function() {
 
@@ -239,24 +232,19 @@ Game = {
 
   initialize_canvas : function(){
     
-    if (Game.multiple_canvases) {
-      var orig_canvas = $("#cars"),
-          orig_width  = Game.width,
-          orig_height = Game.height;
-
-      _.each(STREETS, function(street){
-        $("<canvas id='" + street[0] + "' width='" + street[4] + "' height='" + street[5] + "' class='street_canvas'></canvas>").
-          css({ top : street[2], left : street[3] }).
-          insertAfter(orig_canvas);
-        Game.canvases[street[0]] = document.getElementById(street[0]);
-        Game.contexts[street[0]] = Game.canvases[street[0]].getContext('2d');
-      });
-
-      $("#cars").remove();
-
+    if (Game.double_buffering) {
+      Game.car_canvas  = document.getElementById('cars');
+      Game.real_car_context = Game.car_canvas.getContext('2d');
+      
+      Game.virtual_car_canvas = document.createElement('canvas');
+      Game.virtual_car_canvas.width = Game.width;
+      Game.virtual_car_canvas.height = Game.height;
+      Game.car_context = Game.virtual_car_canvas.getContext('2d');
+    
     } else {
       Game.car_canvas  = document.getElementById('cars');
       Game.car_context = Game.car_canvas.getContext('2d');  
+      
     }
     
     Game.frustration_canvas = document.getElementById('frustrations');
@@ -349,6 +337,10 @@ Game = {
         });
       });
 
+      if (Game.double_buffering) {
+        Game.real_car_context.drawImage(Game.virtual_car_canvas, 0, 0);
+      }
+
       _.each(Game.deferred_renders, function(arr) {
         if (_.isFunction(arr[0])) {
           var func = arr[0];
@@ -367,16 +359,16 @@ Game = {
 
   clear_canvases : function(){
     
-    if (Game.multiple_canvases) {
-      _.each(Game.contexts, function(context, key){
-        context.clearRect(0,0,Game.width,Game.height);  
-      });
+    if (Game.double_buffering) {
+      Game.real_car_context.clearRect(0, 0, Game.width, Game.height);    
+      Game.car_context.clearRect(0, 0, Game.width, Game.height);    
 
     } else {
-      Game.car_context.clearRect(0,0,Game.width, Game.height);  
+      Game.car_context.clearRect(0, 0, Game.width, Game.height);    
+
     }
       
-    Game.frustration_context.clearRect(0,0,Game.width, Game.height);
+    Game.frustration_context.clearRect(0, 0, Game.width, Game.height);
 
     Game.deferred_renders = new Array;
 
@@ -528,7 +520,8 @@ Game = {
 
     _.each( STREETS, function(street_data){
       var street  = new Street(),
-          context = Game.multiple_canvases ? Game.contexts[street_data[0]] : Game.car_context;
+          context = Game.car_context;
+
       street.initialize( Game, street_data, context );
       Game.streets.push( street );
     });
@@ -1156,8 +1149,8 @@ var Street = function(){
       
     this.lefthand      = this.name.indexOf('left')!==-1;
     this.orientation   = street[1];
-    this.top           = Game.multiple_canvases && this.orientation=='horizontal' ? 0 : street[2];
-    this.left          = Game.multiple_canvases && this.orientation=='vertical'   ? 0 : street[3];
+    this.top           = street[2];
+    this.left          = street[3];
     this.width         = street[4];
     this.height        = street[5];
     
@@ -1555,11 +1548,6 @@ var Car = function(car_hash){
   this.change_speed = function(faster) {
     if (faster) {
       this.speed = Game.max_speed;
-      // if (Math.ceil(this.speed)+1 < Game.max_speed) {
-      //   this.speed += 2;
-      // } else {
-      //   this.speed = Game.max_speed;
-      // }
     } else if (!faster && Math.ceil(this.speed) > 2) {
       this.speed -= 1;
     }
@@ -1580,30 +1568,31 @@ var Car = function(car_hash){
   // streets may overlap with the current car's path. this is a game-ending situation in all cases.
   this.is_colliding = function(){
     
-    var current_left = Game.multiple_canvases ? (this.current_pos.left + this.street.left) : this.current_pos.left,
-        current_top  = Game.multiple_canvases ? (this.current_pos.top + this.street.top) : this.current_pos.top;
+    var current_left = this.current_pos.left,
+        current_top  = this.current_pos.top;
 
     var self1 = [current_left, current_left + this.width],
         self2 = [current_top,  current_top + this.height];
     
+    var collision_type = false;
+
     // is it at an intersection?
     if (intersection = this.is_at_intersection(self1, self2)) {
       if (other_car = this.is_colliding_at_intersection(intersection, self1, self2)){
-        return other_car;
+        collision_type = other_car;
       }
-    }
 
     // is it at an active barrier?
-    if (this.is_at_barrier(self1, self2)) {
-      return 'barrier';
-    } 
+    } else if (this.is_at_barrier(self1, self2)) {
+      collision_type = 'barrier'; 
 
-    // is it a following a lead car?
-    if (leader = this.is_following(self1, self2)) {
-      return leader;
+    // is it following a lead car?
+    } else if (leader = this.is_following(self1, self2)) {
+      collision_type = leader;
+
     }
 
-    return false;
+    return collision_type;
 
   };
 
@@ -1613,8 +1602,8 @@ var Car = function(car_hash){
         for (var i=index-1; i >= 0; i--) {
           
           var leader = this.street.cars[i],
-              cur_l  = Game.multiple_canvases ? (leader.current_pos.left + this.street.left) : leader.current_pos.left,
-              cur_t  = Game.multiple_canvases ? (leader.current_pos.top  + this.street.top) :  leader.current_pos.top,
+              cur_l  = leader.current_pos.left,
+              cur_t  = leader.current_pos.top,
               p1     = [cur_l, cur_l + this.leader.width],
               p2     = [cur_t, cur_t + this.leader.height];
           
@@ -1712,8 +1701,8 @@ var Car = function(car_hash){
     if (intersection.cars[other].length) {
       for (var i=0; i < intersection.cars[other].length; i++) {
         var c      = intersection.cars[other][i],
-            cur_l  = Game.multiple_canvases ? (c.current_pos.left + c.street.left) : c.current_pos.left,
-            cur_t  = Game.multiple_canvases ? (c.current_pos.top  + c.street.top) :  c.current_pos.top,
+            cur_l  = c.current_pos.left,
+            cur_t  = c.current_pos.top,
             c1     = [ cur_l, cur_l + c.width ],
             c2     = [ cur_t, cur_t + c.height ];
         
