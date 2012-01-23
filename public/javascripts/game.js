@@ -875,6 +875,8 @@ Game = {
   },
 
   stop_sound : function(sound) {
+    
+    console.log('stopping sound', sound);
 
     if (Game.with_phonegap_sound) {
       // Game.sounds[sound].stop();
