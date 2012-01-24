@@ -255,6 +255,7 @@ Game = {
 
     if (Game.debug==true) {
       $(".neighborhood").css({'background':"#121212"});
+      $(".buildings").css({'background':"transparent"});
     }
     
   },
