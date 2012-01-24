@@ -19,6 +19,7 @@ Game = {
   difficulty_increases : true, // if set to false, we don't make the game harder as time goes on
   smart_intersections  : true, // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
   double_buffering     : true, // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
+  with_bosses          : true, // enable level bosses
 
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
@@ -183,6 +184,8 @@ Game = {
 
     Game.initialize_buttons();
 
+    Game.initialize_bosses();
+
     Game.initialize_sounds();
 
     Game.initialize_intersections();
@@ -314,6 +317,34 @@ Game = {
       $(".help_acceleration_text").hide();
 
     }
+  },
+
+  initialize_bosses : function(){
+    
+    if (Game.with_bosses) {
+      
+      Game.bosses = BOSSES;
+      Game.boss_countdown = 0;
+      Game.boss_timings = _.map(Game.bosses, function(boss){ return boss.time; });
+
+      Game.boss_timer = setInterval(1000, function(){
+        
+        Game.boss_countdown+=1;
+
+        // get boss hash
+        if (boss = _.detect(Game.bosses, function(boss){ return boss.time==Game.boss_countdown; })) {
+          
+          // pick a random Street's Maker to usurp
+          var boss_street = Game.streets[Math.floor(Math.random()*Game.streets.length)];
+
+          // generate the boss
+          boss_street.maker.build_car(boss);
+
+          
+        }
+      });
+    }
+
   },
 
   // this is the main animation function,
@@ -1888,10 +1919,17 @@ var Maker = function(){
 
   };
 
-  this.build_car = function(i){
+  this.build_car = function(i, car_hash_override){
     var self     = this;
     
-    if (car_hash = self.generate()) {
+    console.log(car_hash_override);
+    if (car_hash_override!==undefined) {
+      var car_hash = car_hash_override;
+    } else {
+      var car_hash = self.generate();
+    }
+
+    if (car_hash) {
       
       var car_name = [self.street.name, self.iterations, i].join("-"),
           car      = new Car(car_hash);
