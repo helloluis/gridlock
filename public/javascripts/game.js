@@ -449,9 +449,10 @@ Game = {
     })
   },
 
-  //TODO
   initialize_parameters : function(){
-    document.location.hash.indexOf('nofrustration');
+    if (document.location.hash.indexOf('reset_high_score')!==-1){
+      Game.store_high_score(0);
+    }
   },
 
   initialize_containers : function(){
@@ -1149,7 +1150,6 @@ Game = {
 
         }
 
-        
         Game.reset();  
       },1000/Game.fps);
     }
