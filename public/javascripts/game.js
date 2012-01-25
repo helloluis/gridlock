@@ -597,6 +597,7 @@ Game = {
     $(".bttn.post_to_facebook").live(function(){
       Game.post_to_facebook();
     });
+
   },
 
   initialize_streets : function(){
@@ -1182,7 +1183,7 @@ Game = {
 
     return $("<div class='new_high_score'></div>").
       append("<h1>" + Game.score + "</h1><h2>New high score!</h2>").
-      append("<div class='post_to_facebook'><span class='icon facebook'></span>Congratulations, controller. Post your score on Facebook.</div>");
+      append("<div class='bttn post_to_facebook'><span class='icon facebook'></span>Congratulations, controller. Post your score on Facebook.</div>");
 
   },
 
