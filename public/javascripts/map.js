@@ -104,8 +104,8 @@ var INTERSECTIONS = [
 var FPS = 24;
 
 // once a Maker hits MAX_CARS_PER_STREET, it stops generating new cars until the user
-// has managed to remove some more. 8 is a purely arbitrary number.
-var MAX_CARS_PER_STREET = 14;
+// has managed to remove some more. 15 is a purely arbitrary number.
+var MAX_CARS_PER_STREET = 15;
 
 // the maximum number of pixels a car moves forward per frame
 var MAX_SPEED = 8; 
@@ -252,10 +252,21 @@ var OTHERS = [ "bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_aga
 var BOSSES = [
   { time : 45,  score : 10, speed : 4, width : 20, height : 80,  assets : [ "boss_01_r.png", "boss_01_l.png", "boss_01_d.png", "boss_01_u.png" ] },
   { time : 75,  score : 15, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
-  { time : 105, score : 20, speed : 3, width : 20, height : 120, assets : [ "boss_03_r.png", "boss_03_l.png", "boss_03_d.png", "boss_03_u.png" ] },
-  { time : 135, score : 25, speed : 3, width : 20, height : 150, assets : [ "boss_04_r.png", "boss_04_l.png", "boss_04_d.png", "boss_04_u.png" ] },
-  { time : 165, score : 30, speed : 3, width : 20, height : 180, assets : [ "boss_05_r.png", "boss_05_l.png", "boss_05_d.png", "boss_05_u.png" ] },
-  { time : 195, score : 30, speed : 3, width : 20, height : 180, assets : [ "boss_05_r.png", "boss_05_l.png", "boss_05_d.png", "boss_05_u.png" ] },
-  { time : 225, score : 30, speed : 3, width : 20, height : 180, assets : [ "boss_05_r.png", "boss_05_l.png", "boss_05_d.png", "boss_05_u.png" ] },
-  { time : 255, score : 30, speed : 3, width : 20, height : 180, assets : [ "boss_05_r.png", "boss_05_l.png", "boss_05_d.png", "boss_05_u.png" ] }
+  { time : 105, score : 20, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
+  { time : 135, score : 20, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
+  { time : 165, score : 25, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
+  { time : 195, score : 25, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
+  { time : 225, score : 30, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
+  { time : 255, score : 30, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] }
 ];
+
+// var BOSSES = [
+//   { time : 45,  score : 10, speed : 4, width : 20, height : 80,  assets : [ "boss_01_r.png", "boss_01_l.png", "boss_01_d.png", "boss_01_u.png" ] },
+//   { time : 75,  score : 15, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
+//   { time : 105, score : 20, speed : 3, width : 20, height : 120, assets : [ "boss_03_r.png", "boss_03_l.png", "boss_03_d.png", "boss_03_u.png" ] },
+//   { time : 135, score : 25, speed : 3, width : 20, height : 150, assets : [ "boss_04_r.png", "boss_04_l.png", "boss_04_d.png", "boss_04_u.png" ] },
+//   { time : 165, score : 30, speed : 3, width : 20, height : 180, assets : [ "boss_05_r.png", "boss_05_l.png", "boss_05_d.png", "boss_05_u.png" ] },
+//   { time : 195, score : 30, speed : 3, width : 20, height : 180, assets : [ "boss_05_r.png", "boss_05_l.png", "boss_05_d.png", "boss_05_u.png" ] },
+//   { time : 225, score : 30, speed : 3, width : 20, height : 180, assets : [ "boss_05_r.png", "boss_05_l.png", "boss_05_d.png", "boss_05_u.png" ] },
+//   { time : 255, score : 30, speed : 3, width : 20, height : 180, assets : [ "boss_05_r.png", "boss_05_l.png", "boss_05_d.png", "boss_05_u.png" ] }
+// ];

@@ -120,6 +120,13 @@ Game = {
         Game.loader.add(img);
       }); 
 
+      _.each(BOSSES, function(b){
+        _.each(b.assets,function(ba){
+          var img = new PxLoaderImage(Game.images_dir + ba);
+          Game.loader.add(img);
+        });
+      })
+
       loader_percentage.text("0%");
 
       Game.loader.addProgressListener(function(e) { 
@@ -744,6 +751,10 @@ Game = {
     Game.timer   = 0;
     Game.boss_countdown = 0;
 
+    if (Game.difficulty_increases) {
+      Game.global_car_odds = 0.3;
+    }
+
     Game.loading_screen.hide();
     Game.intro.hide();
     Game.credits.hide();
@@ -1059,7 +1070,6 @@ Game = {
       if (Game.global_car_odds!=1.0) {
         if (arr = _.detect(Game.car_odd_levels, function(level){ return Game.score >= level[0]; })) {
           Game.global_car_odds = arr[1];
-          // console.log('new car odds', Game.global_car_odds);
           return Game.global_car_odds;  
         }  
       }
@@ -1121,13 +1131,15 @@ Game = {
 
   end_with_frustration : function(){
     if (!Game.ended) {
-      Game.started = false;
-      Game.ended = true;
-      Game.store_high_score(Game.score);
-      Game.play_sound('frustration',false,50);
-      var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
-      Game.show_message( "<h2>" + message + "</h2>" );
-      Game.reset();  
+      _.delay(function(){
+        Game.started = false;
+        Game.ended = true;
+        Game.store_high_score(Game.score);
+        Game.play_sound('frustration',false,50);
+        var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
+        Game.show_message( "<h2>" + message + "</h2>" );
+        Game.reset();  
+      },1000/Game.fps);
     }
   },
 
