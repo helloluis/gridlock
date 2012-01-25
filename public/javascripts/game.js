@@ -25,7 +25,10 @@ Game = {
   height               : MAP_HEIGHT,
    
   fps                  : FPS,
- 
+  timer                : 0,
+  
+  show_timer           : true,
+
   started              : false,
   paused               : true,
   ended                : false,
@@ -125,7 +128,7 @@ Game = {
       if (Game.with_sm2_sound) {
       
         soundManager.waitForWindowLoad = true;
-        //soundManager.debugMode = true;
+        soundManager.debugMode = false;
         //soundManager.consoleOnly = true;
 
         soundManager.onready(function() {
@@ -200,6 +203,8 @@ Game = {
 
     Game.initialize_speed_changer();
 
+    Game.initialize_timer();
+
     Game.global_car_odds = Game.difficulty_increases ? Game.car_odd_levels[Game.car_odd_levels.length-1][1] : 1;
 
     if (Game.enable_frustration) {
@@ -230,6 +235,19 @@ Game = {
         window.setTimeout(callback, 1000 / Game.fps); 
       };
     })();
+
+  },
+
+  initialize_timer : function() {
+    
+    if (Game.show_timer) {
+      $("<div id='timer'></div>").
+        everyTime(1000, function(){
+          Game.timer+=1;
+          $(this).text(Game.timer);  
+        }).
+        appendTo('#game');
+    }
 
   },
 
@@ -324,25 +342,36 @@ Game = {
     if (Game.with_bosses) {
       
       Game.bosses = BOSSES;
+
       Game.boss_countdown = 0;
-      Game.boss_timings = _.map(Game.bosses, function(boss){ return boss.time; });
 
-      Game.boss_timer = setInterval(1000, function(){
+      Game.boss_timer = window.setInterval(function(){
         
-        Game.boss_countdown+=1;
-
-        // get boss hash
-        if (boss = _.detect(Game.bosses, function(boss){ return boss.time==Game.boss_countdown; })) {
+        
+        if (Game.started && !Game.paused && !Game.ended) {
           
-          // pick a random Street's Maker to usurp
-          var boss_street = Game.streets[Math.floor(Math.random()*Game.streets.length)];
-
-          // generate the boss
-          boss_street.maker.build_car(boss);
-
+          Game.boss_countdown+=1;
           
+          // get boss hash
+          if (boss = _.detect(Game.bosses, function(boss){ return boss.time==Game.boss_countdown; })) {
+            
+            console.log(boss.time, Game.boss_countdown);
+            
+            // pick a random Street's Maker to usurp
+            var boss_street = Game.streets[Math.floor(Math.random()*Game.streets.length)];
+
+            console.log("BOSS", boss, boss_street);
+
+            // generate the boss
+            boss_street.maker.build_car(boss);
+
+          }    
         }
-      });
+        
+      }, 1000);
+
+      console.log(Game.boss_timer);
+
     }
 
   },
@@ -1611,6 +1640,11 @@ var Car = function(car_hash){
     if (intersection = this.is_at_intersection(self1, self2)) {
       if (other_car = this.is_colliding_at_intersection(intersection, self1, self2)){
         collision_type = other_car;
+
+      // even if it's at an intersection, it will still check 
+      // for a collision with a lead car, to prevent overlapping
+      } else if (leader = this.is_following(self1, self2)) {
+        collision_type = leader;
       }
 
     // is it at an active barrier?
@@ -1620,7 +1654,6 @@ var Car = function(car_hash){
     // is it following a lead car?
     } else if (leader = this.is_following(self1, self2)) {
       collision_type = leader;
-
     }
 
     return collision_type;
@@ -1913,16 +1946,19 @@ var Maker = function(){
     
     if (Game.paused!==true) {
       if (self.street.cars.length < Game.max_cars_per_street) {
-        self.build_car(0);
+        self.build_car();
       }  
     }
 
   };
 
-  this.build_car = function(i, car_hash_override){
+  this.build_car = function(car_hash_override){
     var self     = this;
     
-    console.log(car_hash_override);
+    if (car_hash_override) {
+      console.log("OVERRIDE", car_hash_override);  
+    }
+
     if (car_hash_override!==undefined) {
       var car_hash = car_hash_override;
     } else {
@@ -1931,7 +1967,7 @@ var Maker = function(){
 
     if (car_hash) {
       
-      var car_name = [self.street.name, self.iterations, i].join("-"),
+      var car_name = [self.street.name, self.iterations, 0].join("-"),
           car      = new Car(car_hash);
     
       self.street.cars.push( car ); 
