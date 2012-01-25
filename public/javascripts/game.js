@@ -1162,10 +1162,18 @@ Game = {
         Game.started = false;
         Game.ended = true;
         Game.generate_explosion( exploding_car );
-        Game.store_high_score(Game.score);
-        var message = Game.collision_messages[Math.floor(Math.random()*Game.collision_messages.length)];
-        Game.show_message( "<h2>" + message + "</h2>" );
         $(".stoplight").css('opacity',0);
+
+        if (Game.score>Game.high_score) {
+          // Game.play_sound('new_high_score');
+          Game.store_high_score(Game.score);
+          Game.show_message( Game.show_new_high_score(Game.score) );
+
+        } else {
+          var message = Game.collision_messages[Math.floor(Math.random()*Game.collision_messages.length)];
+          Game.show_message( "<h2>" + message + "</h2>" );
+
+        }
         Game.reset();    
       },1000/Game.fps);
 
@@ -1264,7 +1272,6 @@ Game = {
       link: APP_URL,
       picture: APP_URL + "/images/apple-touch-icon-h.png",
       name: "New Traffix High Score! " + Game.high_score + "!",
-      caption : "Crazy",
       description: "Traffix is a traffic control game that's completely free to play!"
     }, 
     callback = function(response) {
