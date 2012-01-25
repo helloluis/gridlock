@@ -594,10 +594,6 @@ Game = {
       }
     });
 
-    $(".bttn.post_to_facebook").live(function(){
-      Game.post_to_facebook();
-    });
-
   },
 
   initialize_streets : function(){
@@ -1181,9 +1177,12 @@ Game = {
 
   show_new_high_score : function(score) {
 
+    var fb_bttn = $("<div class='bttn post_to_facebook'><span class='icon facebook'></span>Congratulations, controller. Post your score on Facebook.</div>").
+      click(function(){ Game.post_to_facebook(); });
+
     return $("<div class='new_high_score'></div>").
       append("<h1>" + Game.score + "</h1><h2>New high score!</h2>").
-      append("<div class='bttn post_to_facebook'><span class='icon facebook'></span>Congratulations, controller. Post your score on Facebook.</div>");
+      append(fb_bttn);
 
   },
 
