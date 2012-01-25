@@ -379,7 +379,7 @@ Game = {
         
       }, 1000);
 
-      console.log(Game.boss_timer);
+      //console.log(Game.boss_timer);
 
     }
 
@@ -1134,10 +1134,21 @@ Game = {
       _.delay(function(){
         Game.started = false;
         Game.ended = true;
-        Game.store_high_score(Game.score);
-        Game.play_sound('frustration',false,50);
-        var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
-        Game.show_message( "<h2>" + message + "</h2>" );
+        $(".stoplight").css('opacity',0);
+        
+        if (new_score>Game.high_score) {
+          // Game.play_sound('new_high_score');
+          Game.store_high_score(Game.score);
+          Game.show_message( Game.show_new_high_score(Game.score) );
+
+        } else {
+          Game.play_sound('frustration',false,50);
+          var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
+          Game.show_message( "<h2>" + message + "</h2>" );
+
+        }
+
+        
         Game.reset();  
       },1000/Game.fps);
     }
@@ -1153,6 +1164,7 @@ Game = {
         Game.store_high_score(Game.score);
         var message = Game.collision_messages[Math.floor(Math.random()*Game.collision_messages.length)];
         Game.show_message( "<h2>" + message + "</h2>" );
+        $(".stoplight").css('opacity',0);
         Game.reset();    
       },1000/Game.fps);
 
@@ -1160,6 +1172,14 @@ Game = {
       // to draw the rest of the cars,
       // otherwise some of them disappear.
     }
+  },
+
+  show_new_high_score : function(score) {
+
+    return $("<div class='new_high_score'></div>").
+      append("<h1>" + Game.score + "</h1><h2>New high score!</h2>").
+      append("<div class='post_to_facebook'></div>");
+
   },
 
   generate_explosion : function( exploding_car ) {
@@ -1905,10 +1925,10 @@ var Car = function(car_hash){
     }
 
     if (Game.show_arrived_score) {
-      var cur_top  = this.orientation=='horizontal' ? ( this.lefthand ? this.street.top-20 : this.street.top+20 ) : ( this.lefthand ? this.street.height : this.street.top),
-          cur_left = this.orientation=='horizontal' ? ( this.lefthand ? this.street.left : this.street.width ) : ( this.lefthand ? this.street.left - 20 : this.street.left + 20),
-          end_top  = this.orientation=='horizontal' ? ( this.lefthand ?  "-=50" : "-=50" ) : ( this.lefthand ?  "-=50" : "+=50" ),
-          end_left = this.orientation=='horizontal' ? ( this.lefthand ?  "+=50" : "-=50" ) : ( this.lefthand ?  "-=50" : "+=50" );
+      var cur_top  = this.orientation=='horizontal' ? ( this.lefthand ? this.street.top-20 : this.street.top+10 ) : ( this.lefthand ? this.street.height-30 : this.street.top),
+          cur_left = this.orientation=='horizontal' ? ( this.lefthand ? this.street.left : this.street.width-30 ) : ( this.lefthand ? this.street.left-20 : this.street.left + 20),
+          end_top  = this.orientation=='horizontal' ? ( this.lefthand ?  "-=50" : "+=50" ) : ( this.lefthand ?  "-=60" : "+=50" ),
+          end_left = this.orientation=='horizontal' ? ( this.lefthand ?  "+=50" : "-=60" ) : ( this.lefthand ?  "-=50" : "+=50" );
 
       $("<div class='car_score'></div>").
         text("+" + this.score).
