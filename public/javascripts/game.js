@@ -1137,7 +1137,7 @@ Game = {
         Game.ended = true;
         $(".stoplight").css('opacity',0);
         
-        if (new_score>Game.high_score) {
+        if (Game.score>Game.high_score) {
           // Game.play_sound('new_high_score');
           Game.store_high_score(Game.score);
           Game.show_message( Game.show_new_high_score(Game.score) );
