@@ -1237,12 +1237,34 @@ Game = {
 
   },
 
+  login_to_facebook : function(){
+    
+    FB.login(function(response) {
+      if (response.authResponse) {
+        console.log('Welcome!  Fetching your information.... ');
+        FB.api('/me', function(response) {
+          console.log('Good to see you, ' + response.name + '.');
+          FB.logout(function(response) {
+            console.log('Logged out.');
+          });
+        });
+      } else {
+        console.log('User cancelled login or did not fully authorize.');
+      }
+    }, {scope: 'publish_stream'});
+      
+  },
+
   post_to_facebook : function(){
+    
+    FB.init({appId: APP_ID, status: true, cookie: true});
+
     var obj = {
       method: 'feed',
       link: APP_URL,
       picture: APP_URL + "/images/apple-touch-icon-h.png",
-      name: 'New Traffix High Score: ' + Game.high_score,
+      name: "New Traffix High Score! " + Game.high_score + "!",
+      caption : "Crazy",
       description: "Traffix is a traffic control game that's completely free to play!"
     }, 
     callback = function(response) {
