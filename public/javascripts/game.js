@@ -593,6 +593,10 @@ Game = {
         $(this).text("Faster");
       }
     });
+
+    $(".bttn.post_to_facebook").live(function(){
+      Game.post_to_facebook();
+    });
   },
 
   initialize_streets : function(){
@@ -1178,7 +1182,7 @@ Game = {
 
     return $("<div class='new_high_score'></div>").
       append("<h1>" + Game.score + "</h1><h2>New high score!</h2>").
-      append("<div class='post_to_facebook'></div>");
+      append("<div class='post_to_facebook'><span class='icon facebook'></span>Congratulations, controller. Post your score on Facebook.</div>");
 
   },
 
@@ -1231,6 +1235,25 @@ Game = {
       Game.car_context.stroke();
     });
 
+  },
+
+  post_to_facebook : function(){
+    var obj = {
+      method: 'feed',
+      link: APP_URL,
+      picture: APP_URL + "/images/apple-touch-icon-h.png",
+      name: 'New Traffix High Score: ' + Game.high_score,
+      description: "Traffix is a traffic control game that's completely free to play!"
+    }, 
+    callback = function(response) {
+      if (response && response.post_id) {
+        console.log('hi');
+      } else {
+        console.log('error');
+      }
+    }
+
+    FB.ui(obj, callback);
   }
 
 };

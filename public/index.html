@@ -23,6 +23,9 @@
   <script src="javascripts/underscore.js"></script>
   <script src="javascripts/map.js"></script>
   <script src="javascripts/loader.js"></script>
+  <script>
+    APP_URL = "http://traffix.infinite.ly";
+  </script>
 
   <style>
   @font-face {
@@ -52,6 +55,15 @@
   js.src = "http://connect.facebook.net/en_US/all.js#xfbml=1&appId=192448444187818";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
+
+<script>
+FB.init(
+{
+    appId: "192448444187818",
+    status: true,
+    cookie: true
+});
+</script>
 
 <div id="debugger"></div>
 
