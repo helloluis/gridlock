@@ -23,6 +23,10 @@
   <script src="javascripts/underscore.js"></script>
   <script src="javascripts/map.js"></script>
   <script src="javascripts/loader.js"></script>
+  <script>
+    APP_URL = "http://traffix.infinite.ly";
+    APP_ID  = "192448444187818";
+  </script>
 
   <style>
   @font-face {
@@ -44,6 +48,8 @@
 </head>
 
 <body>
+<div id="fb-root"></div>
+<script src='http://connect.facebook.net/en_US/all.js'></script>
 
 <div id="debugger"></div>
 
@@ -86,6 +92,7 @@
       <label>High Score</label> 
       <h3 class="high_score">0</h3>
     </div>
+    <div class="fb-login-button" data-show-faces="true" data-width="200" data-max-rows="1"></div>
   </div>
 </div>
 
@@ -111,6 +118,7 @@
   <div class="bttn pause">Pause</div>
   <div class="bttn quit">Quit</div>
   <div class="bttn restart">Try Again</div>
+  <div class="bttn speed">Faster</div>
 
   <div id="messages"></div>
 
