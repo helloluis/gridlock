@@ -29,6 +29,8 @@ Game = {
   
   show_timer           : true,
 
+  speed                : 1,     // the global speed of the Game can be modified by the user so all events occur faster
+
   started              : false,
   paused               : true,
   ended                : false,
@@ -574,6 +576,16 @@ Game = {
         Game.show_intro();  
       }
     });
+
+    $(".bttn.speed").click(function(){
+      if (Game.speed===1) {
+        Game.speed=1.5;
+        $(this).text("Slower");
+      } else {
+        Game.speed=1;
+        $(this).text("Faster");
+      }
+    });
   },
 
   initialize_streets : function(){
@@ -729,6 +741,9 @@ Game = {
     Game.paused  = true;
     Game.ended   = false;
     
+    Game.timer   = 0;
+    Game.boss_countdown = 0;
+
     Game.loading_screen.hide();
     Game.intro.hide();
     Game.credits.hide();
@@ -1118,13 +1133,20 @@ Game = {
 
   end_with_collision : function( exploding_car ){
     if (!Game.ended) {
-      Game.started = false;
-      Game.ended = true;
-      Game.generate_explosion( exploding_car );
-      Game.store_high_score(Game.score);
-      var message = Game.collision_messages[Math.floor(Math.random()*Game.collision_messages.length)];
-      Game.show_message( "<h2>" + message + "</h2>" );
-      Game.reset();  
+      
+      _.delay(function(){
+        Game.started = false;
+        Game.ended = true;
+        Game.generate_explosion( exploding_car );
+        Game.store_high_score(Game.score);
+        var message = Game.collision_messages[Math.floor(Math.random()*Game.collision_messages.length)];
+        Game.show_message( "<h2>" + message + "</h2>" );
+        Game.reset();    
+      },1000/Game.fps);
+
+      // we delay the game end slightly so that the canvas has time 
+      // to draw the rest of the cars,
+      // otherwise some of them disappear.
     }
   },
 
@@ -1452,18 +1474,21 @@ var Car = function(car_hash){
     var self = this;
     
     self.actual_travel_time += 1;
+
+    var travel = Math.round(self.actual_travel_time/Game.speed);
     
-    if (self.actual_travel_time == self.frustration_thresholds[0]) {
+    if (travel == self.frustration_thresholds[0]) {
       
       var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
       Game.play_sound(horn_name);
 
-    } else if (self.actual_travel_time > self.frustration_thresholds[0] && self.actual_travel_time < self.frustration_thresholds[1]) {
+    } else if (travel > self.frustration_thresholds[0] && travel < self.frustration_thresholds[1]) {
+
       if (self.moving===false) {
         return Game.frustration_assets[0];
       }
 
-    } else if (self.actual_travel_time == self.frustration_thresholds[1]) {
+    } else if (travel == self.frustration_thresholds[1]) {
       
 
       var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
@@ -1473,13 +1498,13 @@ var Car = function(car_hash){
         return Game.frustration_assets[0];
       }
     
-    } else if (self.actual_travel_time > self.frustration_thresholds[1] && self.actual_travel_time < self.frustration_thresholds[2]) {
+    } else if (travel > self.frustration_thresholds[1] && travel < self.frustration_thresholds[2]) {
       
       if (self.moving===false) {
         return Game.frustration_assets[1];  
       }
 
-    } else if (self.actual_travel_time == self.frustration_thresholds[2]) {
+    } else if (travel == self.frustration_thresholds[2]) {
       
       // add to critical cars array
       Game.critical_cars.push(self);
@@ -1491,13 +1516,13 @@ var Car = function(car_hash){
         return Game.frustration_assets[1];
       }
 
-    } else if (self.actual_travel_time > self.frustration_thresholds[2] && self.actual_travel_time < self.frustration_thresholds[3]) {
+    } else if (travel > self.frustration_thresholds[2] && travel < self.frustration_thresholds[3]) {
       
       if (self.moving===false) {
         return Game.frustration_assets[2];  
       }
     
-    } else if (self.actual_travel_time === self.frustration_thresholds[3]) {
+    } else if (travel === self.frustration_thresholds[3]) {
            
       var horn_name = 'horns_long' + (Math.floor(Math.random()*Game.raw_sounds.horns_long.length));
       Game.play_sound(horn_name);
@@ -1506,13 +1531,13 @@ var Car = function(car_hash){
         return Game.frustration_assets[2];  
       }
     
-    } else if (self.actual_travel_time > self.frustration_thresholds[3] && self.actual_travel_time < self.ideal_travel_time) {
+    } else if (travel > self.frustration_thresholds[3] && travel < self.ideal_travel_time) {
 
       if (self.moving===false) {
         return Game.frustration_assets[3];  
       }
       
-    } else if (self.actual_travel_time === self.ideal_travel_time) {
+    } else if (travel === self.ideal_travel_time) {
       
       Game.end_with_frustration();
 
@@ -1588,15 +1613,6 @@ var Car = function(car_hash){
     
     this.drive();
     this.render(); 
-
-  };
-
-  this.go = function(){
-    
-    var self = this,
-       speed = self.calculate_speed();
-
-    self.moving = true;
 
   };
 
@@ -1814,15 +1830,15 @@ var Car = function(car_hash){
       
       if (self.orientation=='horizontal') {
         if (self.lefthand) {
-          self.current_pos.left-=self.speed;  
+          self.current_pos.left-=self.speed*Game.speed;  
         } else {
-          self.current_pos.left+=self.speed;    
+          self.current_pos.left+=self.speed*Game.speed;    
         }
       } else {
         if (self.lefthand) {
-          self.current_pos.top+=self.speed;  
+          self.current_pos.top+=self.speed*Game.speed;  
         } else {
-          self.current_pos.top-=self.speed;    
+          self.current_pos.top-=self.speed*Game.speed;    
         }
       }
   

@@ -89,6 +89,7 @@ a, #intro p strong { color:#fc0; }
 .bttn.quit { left: 100px; }
 .bttn.mute { bottom:20px; left:20px; color:#fff; }
 .bttn.disabled { opacity:0.5; }
+.bttn.speed { bottom:30px; right:20px; color:#fff; }
 
 .barrier { position:absolute; background:#fff; width:20px; height:50%; display:block; visibility:hidden; }
 .barrier.vertical { width:50%; height:20px; }
