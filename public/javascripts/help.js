@@ -77,6 +77,27 @@ Help = {
 
   },
 
+  animate_out : function(callback) {
+    
+    var self = this;
+        dom  = $("#intro").animate({ opacity:0  },1000);
+    
+    $("h1", dom).animate({ top : 20, left : -700 },500),
+    $(".help p", dom).hide(),
+    $(".help_illustration_intersection", dom).animate({ top : -450, right : -400 },500),
+    $(".help_illustration_frustration", dom).animate({ top : 450, right : -600 },500),
+    $(".help_illustration_acceleration", dom).animate({ top : 900, right : -400 },500),
+    $(".high_score_cont", dom).hide(),
+    $(".start_game", dom).hide(),
+    $(".credits", dom).hide(),
+    $(".leaderboards", dom).hide();
+
+    if (callback!==undefined) {
+      _.delay(callback, 1500);  
+    }
+
+  },
+
   initialize_controls : function(){
     this.diagrams.click(function(){
       $(this).

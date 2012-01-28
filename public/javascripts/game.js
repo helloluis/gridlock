@@ -777,6 +777,7 @@ Game = {
   show_intro : function() {
     Game.intro.show();
     Game.credits.hide();
+    Game.loading_screen.hide();
     Game.leaderboards.hide();
     Game.main.hide();
   },
@@ -784,6 +785,7 @@ Game = {
   show_credits : function() {
     Game.intro.hide();
     Game.credits.show();
+    Game.loading_screen.hide();
     Game.leaderboards.hide();
     Game.main.hide();
   },
@@ -791,11 +793,12 @@ Game = {
   show_leaderboards : function(){
     Game.intro.hide();
     Game.credits.hide();
+    Game.loading_screen.hide();
     Game.leaderboards.show();
     Game.main.hide();
   },
 
-  start : function(){
+  start : function(from_intro){
 
     Game.log("starting countdown now");
 
@@ -820,17 +823,22 @@ Game = {
     }
 
     Game.loading_screen.hide();
-    Game.intro.hide();
     Game.credits.hide();
     Game.leaderboards.hide();
-    Game.hide_message();    
+    Game.hide_message();
     
     Game.main.show();
-    Game.credits.hide();
 
-    Game.stop_sound_theme();
-    Game.start_countdown();
+    Game.exit_intro(function(){
+      Game.intro.hide();
+      Game.stop_sound_theme();
+      Game.start_countdown();
+    });
+    
+  },
 
+  exit_intro : function(callback){
+    Help.animate_out(callback);
   },
 
   start_streets : function(){
