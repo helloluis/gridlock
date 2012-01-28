@@ -2,7 +2,7 @@ Game = {
 
   debug                : false,  // set to TRUE to visualize barriers and intersections
   debug_cont           : false,
-  debug_visually       : true,
+  debug_visually       : false,
    
   loader               : false,
   
@@ -94,6 +94,8 @@ Game = {
     Game.dom = $("#game");
     
     Game.debug_cont = $("#debugger");
+
+    if (!Game.debug_visually) { Game.debug_cont.hide(); }
 
     Game.loader = new PxLoader();
 
@@ -189,6 +191,8 @@ Game = {
     
     jQuery.fx.interval = 50;
 
+    Game.initialize_parameters();
+
     Game.initialize_animation_frame();
 
     Game.initialize_menus();
@@ -220,6 +224,7 @@ Game = {
     Game.initialize_speed_changer();
 
     Game.initialize_timer();
+
 
     Game.global_car_odds = Game.difficulty_increases ? Game.car_odd_levels[Game.car_odd_levels.length-1][1] : 1;
 
@@ -267,8 +272,10 @@ Game = {
     if (Game.show_timer) {
       $("<div id='timer'></div>").
         everyTime(1000, function(){
-          Game.timer+=1;
-          $(this).text(Game.timer);  
+          if (Game.started && !Game.paused && !Game.ended) {
+            Game.timer+=1;
+            $(this).text(Game.timer);    
+          }
         }).
         appendTo('#game');
     }
@@ -762,10 +769,9 @@ Game = {
   },
 
   store_high_score : function(new_score) {
-    if (new_score>Game.high_score) {
-      Game.high_score = new_score;
-      $.jStorage.set( Game.high_score_key_full, new_score );
-    }
+    console.log('storing high score', Game.high_score, new_score);
+    Game.high_score = new_score;
+    $.jStorage.set( Game.high_score_key_full, new_score );
   },
 
   show_intro : function() {
@@ -1059,7 +1065,7 @@ Game = {
   start_countdown : function() {
     
     var int = 3;
-    Game.messages.css({ display : 'block', opacity : '1' });
+    Game.messages.css({ display : 'block', opacity : '1' }).html("<h1 class='countdown'>Starting ...</h1>");
     
     Game.clear_canvases();
 
@@ -1194,9 +1200,14 @@ Game = {
     });
   },
 
-  end_with_frustration : function(){
-    if (!Game.ended) {
-      _.delay(function(){
+  end_with_frustration : function(){    
+
+    // we delay the game end slightly so that the canvas has time 
+    // to draw the rest of the cars,
+    // otherwise some of them disappear.
+
+    _.delay(function(){
+      if (!Game.ended) {
         Game.started = false;
         Game.ended = true;
         $(".stoplight").css('opacity',0);
@@ -1209,24 +1220,30 @@ Game = {
         } else {
           Game.play_sound('frustration',false,50);
           var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
-          Game.show_message( "<h2>" + message + "</h2>" );
+          Game.show_message( "<h2 class='quip'>" + message + "</h2>" );
 
         }
 
         Game.reset();  
-      },1000/Game.fps);
-    }
+      }
+    },1000/Game.fps);
+
   },
 
   end_with_collision : function( exploding_car ){
-    if (!Game.ended) {
-      
-      _.delay(function(){
+    
+    // we delay the game end slightly so that the canvas has time 
+    // to draw the rest of the cars,
+    // otherwise some of them disappear.
+
+    _.delay(function(){
+      if (!Game.ended) {
         Game.started = false;
         Game.ended = true;
         Game.generate_explosion( exploding_car );
         $(".stoplight").css('opacity',0);
 
+        console.log(Game.score, Game.high_score);
         if (Game.score>Game.high_score) {
           // Game.play_sound('new_high_score');
           Game.store_high_score(Game.score);
@@ -1234,21 +1251,20 @@ Game = {
 
         } else {
           var message = Game.collision_messages[Math.floor(Math.random()*Game.collision_messages.length)];
-          Game.show_message( "<h2>" + message + "</h2>" );
+          Game.show_message( "<h2 class='quip'>" + message + "</h2>" );
 
         }
-        Game.reset();    
-      },1000/Game.fps);
 
-      // we delay the game end slightly so that the canvas has time 
-      // to draw the rest of the cars,
-      // otherwise some of them disappear.
-    }
+        Game.reset();      
+      }
+      
+    },1000/Game.fps);
+    
   },
 
   show_new_high_score : function(score) {
 
-    var fb_bttn = $("<div class='bttn post_to_facebook'><span class='icon facebook'></span>Congratulations, controller. Post your score on Facebook.</div>").
+    var fb_bttn = $("<p class='bttn post_to_facebook'><span class='icon facebook'></span>Congratulations, controller. Post your score on Facebook.</p>").
       click(function(){ Game.post_to_facebook(); });
 
     return $("<div class='new_high_score'></div>").
