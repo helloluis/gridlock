@@ -1,7 +1,9 @@
 Game = {
 
   debug                : false,  // set to TRUE to visualize barriers and intersections
- 
+  debug_cont           : false,
+  debug_visually       : true,
+   
   loader               : false,
   
   enable_preloading    : true,
@@ -90,13 +92,17 @@ Game = {
   preload : function(auto_start){
 
     Game.dom = $("#game");
+    
+    Game.debug_cont = $("#debugger");
 
     Game.loader = new PxLoader();
 
-    if (Game.enable_preloading) {
-
-      Game.loading_screen = $("#loader"),
+    Game.loading_screen = $("#loader"),
         loader_percentage = $(".loading_percentage", Game.loading_screen);
+
+    Game.log("enable_preloading?", Game.enable_preloading);
+
+    if (Game.enable_preloading) {
 
       _.each(Game.car_types, function(car){
         _.each(_.flatten(car.assets),function(fc){
@@ -216,6 +222,8 @@ Game = {
 
     Game.global_car_odds = Game.difficulty_increases ? Game.car_odd_levels[Game.car_odd_levels.length-1][1] : 1;
 
+    Game.log("global car odds", Game.global_car_odds);
+
     if (Game.enable_frustration) {
       Game.initialize_frustration();  
     }
@@ -228,12 +236,16 @@ Game = {
 
   initialize_menus : function(){
 
+    Game.log("initializing help menus");
+
     Help.initialize();
 
   },
 
   initialize_animation_frame : function(){
     
+    Game.log("initializing requestAnimFrame");
+
     window.requestAnimFrame = (function(callback){
       // return window.requestAnimationFrame ||
       // window.webkitRequestAnimationFrame ||
@@ -249,6 +261,8 @@ Game = {
 
   initialize_timer : function() {
     
+    Game.log("initializing timer");
+
     if (Game.show_timer) {
       $("<div id='timer'></div>").
         everyTime(1000, function(){
@@ -262,6 +276,8 @@ Game = {
 
   initialize_canvas : function(){
     
+    Game.log("double buffering?", Game.double_buffering);
+
     if (Game.double_buffering) {
       Game.car_canvas  = document.getElementById('cars');
       Game.real_car_context = Game.car_canvas.getContext('2d');
@@ -288,6 +304,9 @@ Game = {
   },
 
   initialize_speed_changer : function(){
+    
+    Game.log("speed is changeable?", Game.can_adjust_speed);
+
     if (this.can_adjust_speed) {
 
       var click = function(e, obj){ 
@@ -347,8 +366,20 @@ Game = {
     }
   },
 
+  log : function() {
+    if (Game.debug_visually && arguments.length) {
+      var str = "";
+      for (var i=0; i<arguments.length;i++) {
+        str+= arguments[i] + " ";
+      }
+      Game.debug_cont.append("<p>"+str+"</p>");
+    }
+  },
+
   initialize_bosses : function(){
     
+    Game.log("initializing boss timers", BOSSES.length);
+
     if (Game.with_bosses) {
       
       Game.bosses = BOSSES;
@@ -457,6 +488,9 @@ Game = {
   },
 
   initialize_containers : function(){
+    
+    Game.log("initializing containers");
+
     Game.intro           = $("#intro");
     Game.leaderboards    = $("#leaderboards");
     Game.main            = $("#game");
@@ -473,6 +507,8 @@ Game = {
 
   initialize_behaviours : function() {
     
+    Game.log("initializing behaviours");
+
     Game.intro.show();
     Game.main.hide();
     Game.credits.hide();
@@ -489,6 +525,9 @@ Game = {
   },
 
   initialize_sounds : function() {
+
+    Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_sm2_sound);
+
     if (Game.with_sound){
       if (Game.with_phonegap_sound) {
 
@@ -532,14 +571,14 @@ Game = {
 
   initialize_buttons : function(){
     
+    Game.log("initializing buttons");
+
     $(".start_game").click(function(){
       Game.start();
     });
 
     $(".restart").click(function(){
       Game.restart();
-      // document.location.hash="autostart";
-      // document.location.reload();
     });
     
     $(".pause").click(function(){
@@ -600,6 +639,8 @@ Game = {
 
   initialize_streets : function(){
 
+    Game.log("initializing streets", STREETS.length);
+
     _.each( STREETS, function(street_data){
       var street  = new Street(),
           context = Game.car_context;
@@ -612,6 +653,8 @@ Game = {
 
   initialize_barriers : function(){
     
+    Game.log("initializing barriers", BARRIERS.length);
+
     var self  = this;
 
     _.each(BARRIERS, function(b){
@@ -635,6 +678,9 @@ Game = {
   },
 
   initialize_intersections : function(){
+    
+    Game.log("initializing intersections", INTERSECTIONS.length);
+
     _.each(INTERSECTIONS, function(intersection){
       Game.intersections.push({
         name   : intersection[0],
@@ -649,6 +695,8 @@ Game = {
 
   initialize_controls : function(){
     
+    Game.log("initializing controls", $(".stoplight").length);
+
     var self = this;
     self.stoplights = STOPLIGHTS;
 
@@ -692,7 +740,8 @@ Game = {
       elem.removeClass('vertical').addClass('horizontal');
 
       if (Game.touch_device) {
-        new MBP.fastButton(el, click);
+        elem.tappable(click);
+        // new MBP.fastButton(el, click);
       } else {
         elem.unbind('click').click(click);
       }
@@ -702,6 +751,9 @@ Game = {
   },
 
   initialize_high_score : function(){
+
+    Game.log("initializing high score", $.jStorage.storageAvailable(), Game.high_score);
+
     if ($.jStorage.storageAvailable()) {
       Game.high_score = $.jStorage.get(Game.high_score_key_full, 0);
       Game.high_score_cont.text( Game.high_score );
@@ -737,6 +789,8 @@ Game = {
   },
 
   start : function(){
+
+    Game.log("starting countdown now");
 
     Game.score   = 0;
     Game.score_cont.text("0");
@@ -1021,6 +1075,9 @@ Game = {
       }
 
       if (int==-1) {
+        
+        Game.log("starting game now");
+
         $(this).stopTime('countdown');
         Game.started = true;
         Game.paused = false;
@@ -1028,6 +1085,7 @@ Game = {
         Game.start_counters();
         Game.start_controls();
         Game.start_streets();
+
         $(".pause, .quit, .mute").removeClass('disabled');
       } 
 
@@ -1080,6 +1138,9 @@ Game = {
   },
 
   initialize_frustration : function(){
+    
+    Game.log("initializing frustration assets", FRUSTRATIONS.length);
+
     Game.frustration = 0;
 
     Game.frustration_assets = _.map(FRUSTRATIONS, function(f){ 

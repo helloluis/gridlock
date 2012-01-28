@@ -171,10 +171,11 @@ var CAR_ODDS = { 'car' : [1,40], 'hatch' : [41,60], 'van' : [61,75], 'jeepney' :
 // in other words, a car is only half as likely to be spawned
 // as "normal".
 var CAR_ODD_LEVELS = [
-  [ 0,   0.3  ],
-  [ 30,  0.5  ],
-  [ 60,  0.7  ],
-  [ 100, 1.0  ]
+  [ 0,   0.3   ],
+  [ 30,  0.5   ],
+  [ 60,  0.7   ],
+  [ 100, 0.85  ],
+  [ 150, 1.0   ]
 ];
 
 var SOUNDS_DIR = "sounds/";
@@ -242,7 +243,7 @@ var SUCCESS_MESSAGES = [
   "Awesome!",
   "Cool!",
   "Crazy!",
-  "Ikaw na!",
+  "Ikaw na! Ikaw na ang MMDA!",
   "Fantastic!",
   "You Don't Suck After All!"
 ];
