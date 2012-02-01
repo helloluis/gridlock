@@ -251,8 +251,8 @@ var SUCCESS_MESSAGES = [
 var OTHERS = [ "bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_again.png", "explosion.png", "bg_help.jpg" ];
 
 var BOSSES = [
-  { time : 45,  score : 10, speed : 4, width : 20, height : 80,  assets : [ "truck_01_r.png", "truck_01_l.png", "truck_01_d.png", "truck_01_u.png" ] },
-  { time : 75,  score : 15, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
+  { time : 45,  score : 10, speed : 4, width : 20, height : 80,  assets : [ "truck_r.png", "truck_l.png", "truck_d.png", "truck_u.png" ] },
+  { time : 75,  score : 10, speed : 3, width : 20, height : 80,  assets : [ "truck_r.png", "truck_l.png", "truck_d.png", "truck_u.png" ] },
   { time : 105, score : 20, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
   { time : 135, score : 20, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
   { time : 165, score : 25, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },
