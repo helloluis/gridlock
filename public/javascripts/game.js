@@ -1469,7 +1469,7 @@ var Car = function(car_hash){
   this.speed                 = car_hash && car_hash.speed ? car_hash.speed : (Math.random()*4)+4; // pixels per frame 
   
   this.intersecting          = {};
-  this.on_street             = false;
+  
   this.orientation           = 'horizontal';
   this.lefthand              = false;
   this.origins               = {}; // top, left
