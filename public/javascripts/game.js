@@ -147,7 +147,6 @@ Game = {
       
         soundManager.waitForWindowLoad = true;
         soundManager.debugMode = false;
-        //soundManager.consoleOnly = true;
 
         soundManager.onready(function() {
 
@@ -404,12 +403,8 @@ Game = {
           // get boss hash
           if (boss = _.detect(Game.bosses, function(boss){ return boss.time==Game.boss_countdown; })) {
             
-            console.log(boss.time, Game.boss_countdown);
-            
             // pick a random Street's Maker to usurp
             var boss_street = Game.streets[Math.floor(Math.random()*Game.streets.length)];
-
-            console.log("BOSS", boss, boss_street);
 
             // generate the boss
             boss_street.maker.build_car(boss);
@@ -709,7 +704,6 @@ Game = {
 
     // prevent gray overlay when tapping in iOS?
     $('body').live('touchstart', function(e){
-      console.log(e.target);
       if(e.target.localName != 'select' && e.target.localName != 'h2'){
         e.preventDefault(); 
       }
@@ -769,7 +763,7 @@ Game = {
   },
 
   store_high_score : function(new_score) {
-    console.log('storing high score', Game.high_score, new_score);
+    Game.log('storing high score', Game.high_score, new_score);
     Game.high_score = new_score;
     $.jStorage.set( Game.high_score_key_full, new_score );
   },
@@ -1027,7 +1021,7 @@ Game = {
 
   stop_sound : function(sound) {
     
-    console.log('stopping sound', sound);
+    Game.log('stopping sound', sound);
 
     if (Game.with_phonegap_sound) {
       // Game.sounds[sound].stop();
@@ -1251,7 +1245,7 @@ Game = {
         Game.generate_explosion( exploding_car );
         $(".stoplight").css('opacity',0);
 
-        console.log(Game.score, Game.high_score);
+        Game.log(Game.score, Game.high_score);
         if (Game.score>Game.high_score) {
           // Game.play_sound('new_high_score');
           Game.store_high_score(Game.score);
@@ -1336,15 +1330,15 @@ Game = {
     
     FB.login(function(response) {
       if (response.authResponse) {
-        console.log('Welcome!  Fetching your information.... ');
+        Game.log('Welcome!  Fetching your information.... ');
         FB.api('/me', function(response) {
-          console.log('Good to see you, ' + response.name + '.');
+          Game.log('Good to see you, ' + response.name + '.');
           FB.logout(function(response) {
-            console.log('Logged out.');
+            Game.log('Logged out.');
           });
         });
       } else {
-        console.log('User cancelled login or did not fully authorize.');
+        Game.log('User cancelled login or did not fully authorize.');
       }
     }, {scope: 'publish_stream'});
       
@@ -1363,9 +1357,9 @@ Game = {
     }, 
     callback = function(response) {
       if (response && response.post_id) {
-        console.log('hi');
+        Game.log('hi', response);
       } else {
-        console.log('error');
+        Game.log('error');
       }
     }
 
@@ -1475,7 +1469,7 @@ var Car = function(car_hash){
   this.speed                 = car_hash && car_hash.speed ? car_hash.speed : (Math.random()*4)+4; // pixels per frame 
   
   this.intersecting          = {};
-  this.on_street             = false;
+  
   this.orientation           = 'horizontal';
   this.lefthand              = false;
   this.origins               = {}; // top, left
@@ -1850,20 +1844,33 @@ var Car = function(car_hash){
   this.is_following = function(self1, self2) {
     if (this.street.cars.length > 1) {
       if (index = this.street.cars.indexOf(this)) {
-        for (var i=index-1; i >= 0; i--) {
-          
-          var leader = this.street.cars[i],
+        if (index > 0) {
+          var leader = this.street.cars[index-1],
               cur_l  = leader.current_pos.left,
               cur_t  = leader.current_pos.top,
               p1     = [cur_l, cur_l + this.leader.width],
-              p2     = [cur_t, cur_t + this.leader.height];
-          
-          var horiz_match = this.compare_positions( self1, p1 ),
+              p2     = [cur_t, cur_t + this.leader.height],
+              horiz_match = this.compare_positions( self1, p1 ),
               vert_match  = this.compare_positions( self2, p2 );
-      
-          if (horiz_match && vert_match) { return leader; }  
           
-        }    
+          if (horiz_match && vert_match) { return leader; } 
+
+        }
+
+        // for (var i=index-1; i >= 0; i--) {
+          
+        //   var leader = this.street.cars[i],
+        //       cur_l  = leader.current_pos.left,
+        //       cur_t  = leader.current_pos.top,
+        //       p1     = [cur_l, cur_l + this.leader.width],
+        //       p2     = [cur_t, cur_t + this.leader.height];
+          
+        //   var horiz_match = this.compare_positions( self1, p1 ),
+        //       vert_match  = this.compare_positions( self2, p2 );
+      
+        //   if (horiz_match && vert_match) { return leader; }  
+          
+        // }    
       }
     }
     return false;
@@ -1984,16 +1991,20 @@ var Car = function(car_hash){
 
     if (leader_or_collision_or_barrier) {
       
+      // perpendicular collision at intersection
       if (leader_or_collision_or_barrier.orientation!==undefined && 
           leader_or_collision_or_barrier.orientation !== self.orientation) {
         self.moving = false;
         Game.end_with_collision( self );
 
+      // collision with barrier
       } else if (leader_or_collision_or_barrier==='barrier') {
         self.moving = false;
 
+      // collision with leader
       } else if (typeof leader_or_collision_or_barrier==='object') {
         self.moving = false;
+        self.speed  = leader.speed; // we copy the speed of the lead car
         
       }
 
@@ -2141,10 +2152,6 @@ var Maker = function(){
 
   this.build_car = function(car_hash_override){
     var self     = this;
-    
-    if (car_hash_override) {
-      console.log("OVERRIDE", car_hash_override);  
-    }
 
     if (car_hash_override!==undefined) {
       var car_hash = car_hash_override;
