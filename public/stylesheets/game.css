@@ -30,6 +30,8 @@ blockquote:before, blockquote:after,
 q:before, q:after { content: ''; content: none; }
 table { border-collapse: collapse; border-spacing: 0; }
 
+body { width:1024px; height:768px; }
+
 h1, h2, p { color:#333; margin-bottom:0.5em;}
 h1 { font-size:64px; font-family: 'Fugaz One', Helvetica, sans-serif; letter-spacing:-2px; text-shadow:0 3px 8px #333; }
 h1.countdown { font-size:100px; }

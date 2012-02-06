@@ -60,10 +60,6 @@ Help = {
     }, 1250);
 
     _.delay(function(){
-      text.show();
-    }, 1750);
-
-    _.delay(function(){
       score.show();
     }, 2000);
 

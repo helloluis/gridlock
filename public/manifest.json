@@ -1,0 +1,9 @@
+{
+   "name": "Traffix!",
+   "version": "1.0",
+   "icon-19x19": "images/icon_19x19.png",
+   "icon-29x29": "images/icon_29x29.png",
+   "icon-42x42": "images/icon_42x42.png",
+   "description": "A traffic control game set in the busy streets of Manila",
+   "popup": "index.html"
+}
