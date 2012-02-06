@@ -75,8 +75,8 @@ Game = {
    
   with_sound           : true,
   with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
-  with_sm2_sound       : true,    // SoundManager2 is what we use for regular web presentation
-  with_html5_audio     : true,
+  with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
+  with_soundjs         : true,    // SoundJS, for Pokki build
 
   sound_format         : "." + SOUND_FORMATS[(navigator.platform.indexOf("iPad") != -1) ? 'ios' : 'web'],
  
