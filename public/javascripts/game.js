@@ -149,9 +149,10 @@ Game = {
       if (Game.with_sm2_sound) {
       
         soundManager.waitForWindowLoad = true;
-        soundManager.debugMode = false;
+        soundManager.debugMode = true;
         
         if (Game.with_html5_audio===true) {
+          soundManager.debugFlash = false;
           soundManager.useHTML5Audio = true;
         }
 
