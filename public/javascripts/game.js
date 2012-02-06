@@ -50,20 +50,20 @@ Game = {
   max_frustration      : 100,
   enable_frustration   : true,
    
-  maker_freq           : MAKER_FREQUENCY,        // how often does a Maker add a new car to the road
-  max_cars_per_street  : MAX_CARS_PER_STREET,    
-  car_types            : CARS,                   // library of car settings and assets
-  car_odds             : CAR_ODDS,               // the likelihood that a particular car will be added
+  maker_freq           : MAKER_FREQUENCY,                  // how often does a Maker add a new car to the road
+  max_cars_per_street  : MAX_CARS_PER_STREET,              
+  car_types            : CARS,                             // library of car settings and assets
+  car_odds             : CAR_ODDS,                         // the likelihood that a particular car will be added
   car_odd_levels       : CAR_ODD_LEVELS.reverse(),         // modifiers for our car-creation randomness, basically making fewer cars spawn early on in the game
-  neighborhood         : NEIGHBORHOOD,           // graphics used for the neighborhood layers
-
-  images_dir           : IMAGES_DIR,             // path to images
-  sounds_dir           : SOUNDS_DIR,             // path to sounds
-
-  is_critical          : false,                  // if traffic condition is critical, we overlay the scary red borders on the screen
-  critical_cars        : [],                     // cars that are about to end the game
-
-  show_arrived_score   : true,                   // show a little floating +score for every arrived car
+  neighborhood         : NEIGHBORHOOD,                     // graphics used for the neighborhood layers
+          
+  images_dir           : IMAGES_DIR,                       // path to images
+  sounds_dir           : SOUNDS_DIR,                       // path to sounds
+          
+  is_critical          : false,                            // if traffic condition is critical, we overlay the scary red borders on the screen
+  critical_cars        : [],                               // cars that are about to end the game
+          
+  show_arrived_score   : true,                             // show a little floating +score for every arrived car
 
   // cache of the images representing various levels of vehicular frustration
   frustration_assets   : [],
@@ -73,7 +73,7 @@ Game = {
 
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
-  with_sound           : true,
+  with_sound           : true,    // globally disable all sound
   with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
   with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
   with_soundjs         : true,    // SoundJS, for Pokki build
@@ -172,6 +172,25 @@ Game = {
           });
 
         });
+
+      } else if (Game.with_soundjs) {
+        
+        _.each(Game.raw_sounds, function(media_or_arr, key){
+          if (_.isArray(media_or_arr)) {
+            _.each(media_or_arr, function(media, index){
+              var new_k = [key, index].join(""),
+                  src = Game.sounds_dir + media + Game.sound_format;
+              Game.sounds[new_k] = src
+              SoundJS.addBatch([{ name : new_k, src : src, instance : 2 }]);
+            });
+          } else {
+            var src = Game.sounds_dir + media_or_arr + Game.sound_format;
+            Game.sounds[key] = src;
+            SoundJS.addBatch([{ name : key, src : src, instance : key=='theme' ? 1 : 2 }]);
+          }
+        });
+
+        //SoundJS.onLoadQueueComplete = function(){ SoundJS.play('horns_short0') };
       }
 
       TraffixLoader.initialize();
@@ -1009,6 +1028,14 @@ Game = {
           Game.loop_sound(sound,volume);
         } else {
           Game.sounds[sound].play({ volume : volume });  
+        }
+
+      } else if (Game.with_soundjs) {
+        if (loop) {
+          // TODO
+        } else {
+          console.log('playing sound', sound);
+          SoundJS.play( sound );
         }
       }
     }
