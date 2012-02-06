@@ -23,11 +23,13 @@ Help = {
     
     var self    = this,
         dom     = $("#intro").css({ top : 1024 }),
-        logo    = $("h1", dom).css({ top : 20, left : -700 }),
-        text    = $(".help p", dom).hide(),
-        help1   = $(".help_illustration_intersection", dom).css({ top : -450, right : -400 }),
-        help2   = $(".help_illustration_frustration", dom).css({ top : 450, right : -600 }),
-        help3   = $(".help_illustration_acceleration", dom).css({ top : 900, right : -400 }),
+        logo    = $("h1", dom).css({ top : 400, left : -700 }),
+        cap1    = $(".caption_intersection", dom).css({ top : 850, left : -200 }),
+        cap2    = $(".caption_frustration", dom).css({ top : 850, left : 400 }),
+        cap3    = $(".caption_reward", dom).css({ top : 850, left : 1200 }),
+        help1   = $(".help_illustration_intersection", dom).css({ top : 250, left : -500 }),
+        help2   = $(".help_illustration_frustration", dom).css({ top : 850, left : 400 }),
+        help3   = $(".help_illustration_reward", dom).css({ top : 900, left : 1200 }),
         score   = $(".high_score_cont", dom).hide(),
         play    = $(".start_game", dom).hide(),
         credits = $(".credits", dom).hide(),
@@ -36,21 +38,24 @@ Help = {
     dom.animate({ top : 0 });
 
     _.delay(function(){
-      logo.animate({ top : -50, left : -60 });  
+      logo.animate({ top : -50, left : 110 });  
     }, 500);
     
     _.delay(function(){
-      help1.animate({ top : -60, right : -60});
+      help1.animate({ top : 160, left : -80});
+      cap1.animate({ top : 430, left : -40});
       self.initialize_intersection();
     }, 750);
     
     _.delay(function(){
-      help2.animate({ top : 150, right : 120}); 
+      help2.animate({ top : 130, left : 240}); 
+      cap2.animate({ top : 430, left : 275},800); 
       self.initialize_frustration();  
     }, 1000);
 
     _.delay(function(){
-      help3.animate({ top : 350, right : -70});
+      help3.animate({ top : 140, left : 560});
+      cap3.animate({ top : 420, left : 578},800);
       self.initialize_acceleration();  
     }, 1250);
 
@@ -82,11 +87,13 @@ Help = {
     var self = this;
         dom  = $("#intro").animate({ opacity:0  },1000);
     
-    $("h1", dom).animate({ top : 20, left : -700 },500),
-    $(".help p", dom).hide(),
-    $(".help_illustration_intersection", dom).animate({ top : -450, right : -400 },500),
-    $(".help_illustration_frustration", dom).animate({ top : 450, right : -600 },500),
-    $(".help_illustration_acceleration", dom).animate({ top : 900, right : -400 },500),
+    $("h1", dom).animate({ top : -400, left : 200 },500),
+    $(".help_illustration_intersection", dom).animate({ top : 300, left : -500 },500),
+    $(".help_illustration_frustration", dom).animate({ top : 1200, left : 400 },500),
+    $(".help_illustration_reward", dom).animate({ top : 300, left : 1200 },500),
+    $(".caption_intersection",dom).animate({ top: 800, left:-300 }),
+    $(".caption_frustration",dom).animate({ top: 800, left:400 }),
+    $(".caption_reward",dom).animate({ top: 800, left:800 }),
     $(".high_score_cont", dom).hide(),
     $(".start_game", dom).hide(),
     $(".credits", dom).hide(),
@@ -232,7 +239,7 @@ Help = {
         _.delay(function(){
           obj.animate_h = false;
           next();
-        }, 8000);
+        }, 4000);
 
       }).
       queue('intersection', function(next){
@@ -276,7 +283,7 @@ Help = {
         loop_yellow(yellow[1], 1, yellow[1].position().left, yellow[1].position().top, 400, 3500);
         loop_yellow(yellow[2], 2, yellow[2].position().left, yellow[2].position().top, 400, 4000);
 
-        _.delay(next, 8000);
+        _.delay(next, 4000);
 
       }).
       queue('intersection', function(next){

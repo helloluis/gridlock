@@ -261,6 +261,12 @@ var BOSSES = [
   { time : 255, score : 30, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] }
 ];
 
+var TUTORIAL = [
+  { time : 1, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 1 },
+  { time : 3, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 7 },
+  { time : 5, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 2 }
+];
+
 // var BOSSES = [
 //   { time : 45,  score : 10, speed : 4, width : 20, height : 80,  assets : [ "boss_01_r.png", "boss_01_l.png", "boss_01_d.png", "boss_01_u.png" ] },
 //   { time : 75,  score : 15, speed : 3, width : 20, height : 100, assets : [ "boss_02_r.png", "boss_02_l.png", "boss_02_d.png", "boss_02_u.png" ] },

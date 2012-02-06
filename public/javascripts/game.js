@@ -25,6 +25,8 @@ Game = {
 
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
+
+  enable_tutorial      : true,
    
   fps                  : FPS,
   timer                : 0,
@@ -224,6 +226,7 @@ Game = {
 
     Game.initialize_timer();
 
+    Game.initialize_tutorial();
 
     Game.global_car_odds = Game.difficulty_increases ? Game.car_odd_levels[Game.car_odd_levels.length-1][1] : 1;
 
@@ -261,6 +264,13 @@ Game = {
         window.setTimeout(callback, 1000 / Game.fps); 
       };
     })();
+
+  },
+
+  initialize_tutorial : function() {
+    
+    // if the game has been played more than once, we don't run the tutorial mode anymore
+
 
   },
 
@@ -485,8 +495,11 @@ Game = {
   },
 
   initialize_parameters : function(){
-    if (document.location.hash.indexOf('reset_high_score')!==-1){
+    var hash = document.location.hash;
+    if (hash.indexOf('reset_high_score')!==-1){
       Game.store_high_score(0);
+    } else if (hash.indexOf('force_tutorial')!==-1) {
+      Game.force_tutorial();
     }
   },
 

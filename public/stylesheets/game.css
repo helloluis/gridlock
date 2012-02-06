@@ -48,11 +48,11 @@ em { font-style:italic; }
 #loading_container { width:0; height:0; display:block; overflow:hidden; visibility:hidden; }
 
 #intro { display:block; background:url(../images/loader.jpg) no-repeat; z-index:2; }
-#intro h1 { position:absolute; text-indent:-2000px; background:url(../images/traffix_logo.png) no-repeat; width:600px; height:250px; top: -50px; left: -60px; }
+#intro h1 { position:absolute; text-indent:-2000px; background:url(../images/traffix_logo.png) no-repeat; width:600px; height:250px; top: -50px; left: -60px; z-index:6; }
 a, #intro p strong { color:#fc0; }
 #intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; position:absolute; }
 #intro blockquote { font-size:18px; padding:10px 20px; }
-#intro h3 { padding:10px 0px 0px 0px; margin-bottom:0px; font-size:24px; }
+#intro h3 { padding:10px 0px 0px 0px; margin-bottom:0px; font-size:24px; color:#fff; }
 #intro .high_score_cont { position:absolute; top:380px; left:20px; color:#ff9; text-shadow:2px 2px 3px #000; }
 #intro .high_score_cont h3 { font-size:32px; }
 #intro .examples { display:block; clear:both; overflow:hidden; margin-bottom:10px; margin-left:200px; }
@@ -63,19 +63,21 @@ a, #intro p strong { color:#fc0; }
 #game { z-index:1; }
 
 /* HELP */
-.help p { position:absolute; font-size:24px; line-height:1.3; width:350px; text-shadow:2px 2px 3px #000; color:#fff; top:200px; left:20px; }
-.help_illustration { position:absolute; right:-60px; top:-60px; width:350px; height:350px; -webkit-transform:rotate(10deg); background:#000; color:#fff; background:url(../images/bg_polaroid.png); z-index:5; cursor:pointer; }
+.help { width:100%; height:100%; }
+.help p { position:absolute; font-size:18px; line-height:1.3; width:350px; color:#411; top:200px; left:20px; }
+.help_caption, .help_illustration { position:absolute; right:-60px; top:-60px; width:350px; height:350px; -webkit-transform:rotate(-5deg); background:url(../images/bg_polaroid.png); z-index:5; }
+.help p.help_caption { background-image: url(../images/bg_caption_01.png); z-index:6; padding:30px 25px 30px 55px; -webkit-transform:rotate(-6deg); width:220px; height:40px; }
+.help p.help_caption.caption_frustration { -webkit-transform:rotate(-2deg); background-image: url(../images/bg_caption_02.png); height:20px; }
+.help p.help_caption.caption_reward { -webkit-transform:rotate(3deg); background-image: url(../images/bg_caption_03.png);}
 .help_illustration_intersection .stoplight, .help_illustration_frustration .stoplight { top:133px; left:163px; width:50px; height:50px; display:block; z-index:2; }
 .help_illustration .help_background { width: 270px; height:275px; position:absolute; background:url(../images/bg_help.jpg); top:39px; left:41px; z-index:1; overflow:hidden; }
-.help_illustration .overlay { z-index:5; opacity:0.4; background:#000; position:absolute; width:270px; height:275px; top:39px; left:41px; }
-.help_illustration.selected .overlay { opacity:0; }
 .help_illustration canvas { position:absolute; top:39px; left:41px; z-index:2; }
-.help_illustration_frustration { top:150px; right:120px; -webkit-transform:rotate(-5deg); z-index:4; }
+.help_illustration_frustration { top:150px; right:120px; -webkit-transform:rotate(-2deg); z-index:4; }
 .help_illustration_frustration .frustration { position:absolute; width:40px; height:40px; background:url(../images/frustration_01.png); visibility:hidden; z-index:3; }
 .help_illustration_frustration .frustration.frustration02 { background:url(../images/frustration_02.png); }
 .help_illustration_frustration .frustration.frustration03 { background:url(../images/frustration_03.png); }
-.help_illustration_acceleration { top:350px; right:-80px; -webkit-transform:rotate(2deg); z-index:3; }
-.help_illustration_acceleration .help_background { background-image:url(../images/bg_help_acceleration.jpg); }
+.help_illustration_reward { top:350px; right:-80px; -webkit-transform:rotate(4deg); z-index:3; }
+.help_illustration_reward .help_background { background-image:url(../images/bg_help_acceleration.jpg); }
 .finger { background:url(../images/finger.png); width:40px; height:100px; position:absolute; z-index:3; visibility: hidden; display:block; }
 /*.finger.tapped { border:1px solid #ff0; }*/
 
@@ -86,12 +88,12 @@ a, #intro p strong { color:#fc0; }
 #timer { position:absolute; z-index:15; font-size:20px; color:#fff; top: 70px; left : 50px; }
 
 .bttn.start_game, .bttn.restart { position:absolute; height:35px; padding:10px; margin-top:10px; margin:0 auto; text-align:center; color:#fff; text-indent:-2000px; height:90px; font-size:30px; cursor:pointer; }
-.bttn.start_game { bottom:30px; left:10px; width:200px; background:url(../images/bttn_play.png) no-repeat 0 0; -webkit-transform:rotate(-1deg); }
+.bttn.start_game { bottom:-10px; left:360px; width:200px; background:url(../images/bttn_play.png) no-repeat 0 0; -webkit-transform:rotate(-1deg); }
 .bttn.restart { background:url(../images/bttn_again.png) no-repeat 0 0; text-indent:-2000px; width:120px; height:140px; display:none; top:230px; left:800px; -webkit-transform:rotate(2deg); z-index:21; }
 .bttn.credits, .bttn.leaderboards { font-size:16px; }
-.bttn.credits { bottom:0px; left:20px; }
-.bttn.leaderboards { bottom:0px; left:180px; }
-.bttn.pause, .bttn.quit { top:20px; left :20px; color:#fff; }
+.bttn.credits { bottom:20px; left:30px; text-shadow: 0 0 7px #000; }
+.bttn.leaderboards { bottom:20px; right:30px; text-shadow: 0 0 7px #000; }
+.bttn.pause, .bttn.quit { top:20px; left:20px; color:#fff; }
 .bttn.quit { left: 100px; }
 .bttn.mute { bottom:20px; left:20px; color:#fff; }
 .bttn.disabled { opacity:0.5; }
