@@ -175,20 +175,31 @@ Game = {
 
       } else if (Game.with_soundjs) {
         
+        var sounds_to_load = [];
+
         _.each(Game.raw_sounds, function(media_or_arr, key){
           if (_.isArray(media_or_arr)) {
+
             _.each(media_or_arr, function(media, index){
+              
               var new_k = [key, index].join(""),
                   src = Game.sounds_dir + media + Game.sound_format;
-              Game.sounds[new_k] = src
-              SoundJS.addBatch([{ name : new_k, src : src, instance : 2 }]);
+
+              Game.sounds[new_k] = src;
+              sounds_to_load.push({ name : new_k, src : src, instance : 2 });
+              
             });
+
           } else {
+
             var src = Game.sounds_dir + media_or_arr + Game.sound_format;
             Game.sounds[key] = src;
-            SoundJS.addBatch([{ name : key, src : src, instance : key=='theme' ? 1 : 2 }]);
+            sounds_to_load.push({ name : key, src : src, instance : key=='theme' ? 1 : 2 });
+
           }
         });
+
+        SoundJS.addBatch(sounds_to_load);
 
         //SoundJS.onLoadQueueComplete = function(){ SoundJS.play('horns_short0') };
       }
@@ -448,8 +459,6 @@ Game = {
         }
         
       }, 1000);
-
-      //console.log(Game.boss_timer);
 
     }
 
@@ -1032,10 +1041,11 @@ Game = {
 
       } else if (Game.with_soundjs) {
         if (loop) {
-          // TODO
+          SoundJS.play( sound, null, 0.5, true );
+
         } else {
           console.log('playing sound', sound);
-          SoundJS.play( sound );
+          SoundJS.play( sound, SoundJS.INTERUPT_LATE );
         }
       }
     }

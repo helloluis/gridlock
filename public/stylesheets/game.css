@@ -194,4 +194,5 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 .car.yellow.vertical { background:url(../images/taxi_d.png); }
 .car.yellow.vertical.right { background:url(../images/taxi_u.png); }
 
-.car_score { font-size:25px; color:#fff; position:absolute; z-index:20; opacity : 1; color:#ff0; }
+.car_score { font-size:25px; position:absolute; z-index:20; opacity : 1; color:#ff0; }
+#help_reward .car_score { font-size:18px; }
