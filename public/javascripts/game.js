@@ -1572,6 +1572,8 @@ var Car = function(car_hash){
         (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
         (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );      
 
+      // console.log(this.image.src);
+
       if (this.animate) {
 
         // we store the current Game.frame number that this Car is created on, 
@@ -1805,6 +1807,7 @@ var Car = function(car_hash){
 
         var sx = 0 + (this.width*this.current_frame);
 
+        // console.log(self.image);
         ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height); 
 
       } else {
@@ -2060,7 +2063,9 @@ var Car = function(car_hash){
       // collision with leader
       } else if (typeof leader_or_collision_or_barrier==='object') {
         self.moving = false;
-        self.speed  = leader.speed; // we copy the speed of the lead car
+        if (leader.speed < self.speed) {
+          self.speed  = leader.speed; // we copy the speed of the lead car  
+        }
         
       }
 
