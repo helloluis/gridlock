@@ -292,6 +292,9 @@ Game = {
           $(this).html('&#10065;');
         }
       }).click();
+      $("#minimize").bind('click', function(){
+        pokki.closePopup();
+      });
     }
   },
 
