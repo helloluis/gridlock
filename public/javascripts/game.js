@@ -6,10 +6,12 @@ Game = {
    
   loader               : false,
   
-  enable_preloading    : true,
+  enable_preloading    : PLATFORM=='web' || PLATFORM=='pokki',
 
-  is_iOS               : false, // we want to switch turn off enable_preloading and turn on is_iOS when deploying to PhoneGap
-  
+  is_iOS               : PLATFORM=='ios', 
+  is_pokki             : PLATFORM=='pokki',
+  is_web               : PLATFORM=='web',
+
   score                : 0,
   frustration          : 0,
   high_score           : 0,
@@ -78,7 +80,7 @@ Game = {
   with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
   with_soundjs         : true,    // SoundJS, for Pokki build
 
-  sound_format         : "." + SOUND_FORMATS[(navigator.platform.indexOf("iPad") != -1) ? 'ios' : 'web'],
+  sound_format         : "." + SOUND_FORMATS[PLATFORM],
  
   raw_sounds           : SOUNDS,  // our library of sounds
   sounds               : {},
@@ -178,7 +180,7 @@ Game = {
                   src = Game.sounds_dir + media + Game.sound_format;
 
               Game.sounds[new_k] = src;
-              sounds_to_load.push({ name : new_k, src : src, instance : 2 });
+              sounds_to_load.push({ name : new_k, src : src, instances : 3 });
               
             });
 
@@ -186,7 +188,7 @@ Game = {
 
             var src = Game.sounds_dir + media_or_arr + Game.sound_format;
             Game.sounds[key] = src;
-            sounds_to_load.push({ name : key, src : src, instance : key=='theme' ? 1 : 2 });
+            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 4 : 1 });
 
           }
         });
@@ -221,6 +223,8 @@ Game = {
   initialize : function(auto_start){
     
     jQuery.fx.interval = 50;
+
+    Game.initialize_fullscreen();
 
     Game.initialize_parameters();
 
@@ -270,6 +274,21 @@ Game = {
       Game.start();
     }
 
+  },
+
+  initialize_fullscreen : function(){
+    if (Game.is_pokki) {
+      // var fullscreen = document.getElementById('fullscreen-go');
+      // fullscreen.addEventListener('click', function() {
+      //   var wrapper = document.body;
+      //   wrapper.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+      // });
+      // To exit full-screen, we call the document method from the Exit Full-Screen Button click event:
+      // var fullscreenexit = document.getElementById('fullscreen-exit');
+      // fullscreenexit.addEventListener('click', function() {
+      //   document.webkitCancelFullScreen();
+      // });
+    }
   },
 
   initialize_menus : function(){
