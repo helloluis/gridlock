@@ -6,10 +6,12 @@ Game = {
    
   loader               : false,
   
-  enable_preloading    : true,
+  enable_preloading    : PLATFORM=='web' || PLATFORM=='pokki',
 
-  is_iOS               : false, // we want to switch turn off enable_preloading and turn on is_iOS when deploying to PhoneGap
-  
+  is_iOS               : PLATFORM=='ios', 
+  is_pokki             : PLATFORM=='pokki',
+  is_web               : PLATFORM=='web',
+
   score                : 0,
   frustration          : 0,
   high_score           : 0,
@@ -78,7 +80,7 @@ Game = {
   with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
   with_soundjs         : true,    // SoundJS, for Pokki build
 
-  sound_format         : "." + SOUND_FORMATS[(navigator.platform.indexOf("iPad") != -1) ? 'ios' : 'web'],
+  sound_format         : "." + SOUND_FORMATS[PLATFORM],
  
   raw_sounds           : SOUNDS,  // our library of sounds
   sounds               : {},
