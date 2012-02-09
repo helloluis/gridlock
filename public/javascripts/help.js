@@ -3,6 +3,7 @@ Help = {
   intersection : { dom : false, cars : {}, coordinates : {} },
   frustration  : { dom : false, cars : {}, coordinates : {} },
   acceleration : { dom : false, cars : {}, coordinates : {} },
+  reward       : { dom : false, cars : {}, coordinates : {} },
   diagrams     : false,
 
   initialize : function(){
@@ -14,7 +15,8 @@ Help = {
       self.initialize_controls();
       self.initialize_intersection();
       self.initialize_frustration();
-      self.initialize_acceleration();
+      // self.initialize_acceleration();
+      self.initialize_reward();
     });
 
   },
@@ -56,7 +58,7 @@ Help = {
     _.delay(function(){
       help3.animate({ top : 140, left : 560});
       cap3.animate({ top : 420, left : 578},800);
-      self.initialize_acceleration();  
+      self.initialize_reward();  
     }, 1250);
 
     _.delay(function(){
@@ -73,7 +75,8 @@ Help = {
       callback.call();
       self.start_intersection();
       self.start_frustration();
-      self.start_acceleration();
+      // self.start_acceleration();
+      self.start_reward();
     }, 3000);
 
   },
@@ -146,13 +149,20 @@ Help = {
         stoplight = $(".stoplight", this.acceleration.dom).show();
   },
 
-  build_cars : function(object, num_blue, num_yellow) {
+  initialize_reward : function() {
+    
+    this.reward.dom = $("#help_reward");
+    this.reward.cont = $(".help_background", this.reward.dom);
+
+  },
+
+  build_cars : function(object, num_blue, num_yellow, left) {
     object.cars.blue = [];
     object.cars.yellow = [];
 
     for (var i=0; i < num_blue; i++) {
       object.cars.blue.push(
-        $("<div class='car horizontal right blue'></div>").
+        $("<div class='car horizontal " + (left ? "left" : "right") + " blue'></div>").
           css({ position : "absolute", 
                 top : 90, 
                 left : 400 }).
@@ -161,7 +171,7 @@ Help = {
 
     for (var i=0; i < num_yellow; i++) {
       object.cars.yellow.push(
-        $("<div class='car vertical yellow'></div>").
+        $("<div class='car vertical " + (left ? "left" : "right") + " yellow'></div>").
           css({ position : "absolute", 
                 top : -150, 
                 left : 100 }).
@@ -411,6 +421,60 @@ Help = {
 
   },
 
+  animate_reward : function(){
+    
+    var self = this,
+        obj  = this.reward,
+        loop = function(car, x1, x2, y, duration) {
+          car.
+            css({ top : y, left : x1 }).
+            stop(false,false).
+            animate({ left : x2 }, 
+              { duration : duration,
+                easing   : 'linear', 
+                complete : function(){
+                  loop(car, x1, x2, y, duration);
+                  score(x2, y);
+                } 
+            });
+          },
+        score = function(left, top) {
+          $("<div class='car_score'>+1</div>").
+            css({ top : top-20, left : left-50, opacity : 1 }).
+            animate({ top : "-=100", left : "-=150", opacity : 0 }, 
+              { duration : 2000, 
+                complete : function(){
+                  $(this).remove();  
+              }
+            }).
+            appendTo(self.reward.cont);
+        };
+
+    self.build_cars(obj, 3, 0, true);
+
+    self.reward.dom.
+      queue('reward', function(next){
+        
+        loop(obj.cars.blue[0], -40, 300, 120, 2000);
+        loop(obj.cars.blue[1], -40, 300, 140, 3000);
+        _.delay(function(){
+          loop(obj.cars.blue[2], -40, 300, 120, 2000);
+        },1000);
+
+      });
+
+    self.reward.dom.dequeue('reward');
+
+  },
+
+  start_reward : function(){
+    
+    var self = this;
+    self.reward.animating = true;
+    self.animate_reward();
+
+  },
+
   animate_acceleration : function(){
     
     var self = this,
@@ -469,15 +533,18 @@ Help = {
     
     this.intersection.dom.stop(false,false).stopTime();
     this.frustration.dom.stop(false,false).stopTime();
-    this.acceleration.dom.stop(false,false).stopTime();
+    // this.acceleration.dom.stop(false,false).stopTime();
+    this.reward.dom.stop(false,false).stopTime();
 
     this.intersection.cont.empty();
     this.frustration.cont.empty();
-    this.acceleration.cont.empty();
+    // this.acceleration.cont.empty();
+    this.reward.cont.empty();
 
     this.intersection.animating = false;
-    this.acceleration.animating = false;
     this.frustration.animating  = false;
+    // this.acceleration.animating = false;
+    this.reward.animating  = false;
 
   }
   
