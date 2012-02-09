@@ -111,7 +111,7 @@ a, #intro p strong { color:#fc0; }
 
 
 div#messages { position:absolute; top:250px; left:0px; text-align:center; width:900px; height:auto; z-index:20; opacity : 1; display:none; font-size:48px; background:rgba(0,0,0,0.7); padding:20px 62px; margin:0px; border-width:5px 0px 5px 0px !important; border-color: #dd3; box-shadow: 0 0 20px #fff; }
-#messages .quip { width:600px; margin-left:140px; text-align:center; }
+#messages .quip { width:600px; margin-left:140px; text-align:center; font-size:50px; }
 #messages h1, #messages h2, #messages h3, #messages .countdown { color:#fff; text-shadow:3px 3px 6px #000; margin-bottom:5px; }
 #messages h2 { font-size:60px; }
 #messages .new_high_score { overflow:hidden; }

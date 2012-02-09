@@ -1006,11 +1006,7 @@ Game = {
     Game.with_sound = true;
     Game.muted = false;
     if (Game.started) {
-      if (Game.with_soundjs) {
-        Game.setMute(false);  
-      } else {
-        Game.play_sound_theme();  
-      }
+      Game.play_sound_theme();  
     }
   },
 
@@ -1113,7 +1109,8 @@ Game = {
     } else if (Game.with_sm2_sound) {
       soundManager.stopAll();
     } else if (Game.with_soundjs) {
-      soundJS.setMute();
+      SoundJS.setMute(true);
+      SoundJS.stop('theme');
     }
   },
 
