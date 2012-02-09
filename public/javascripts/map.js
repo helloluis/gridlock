@@ -241,11 +241,10 @@ var FRUSTRATION_MESSAGES = [
   "Too hard for you?",
   "Fruit Ninja might be a better game for you",
   "Too much time playing PvZ?",
-
   "\"When everything's coming your way, you're in the wrong lane.\" ~ Unknown",
   "\"A car is not the only thing that can be recalled by its maker.\" ~ Unknown",
   "Honking means they're getting annoyed at you",
-  "\"Natives who beat drums to drive off evil spirits are objects of scorn to smart Americans who blow horns to break up traffic jams.\"  ~ Mary Ellen Kelly"
+  "\"Natives who beat drums to drive off evil spirits are objects of scorn to smart Americans who blow horns to break up traffic jams.\"  ~ Mary Ellen Kelly",
   "\"Anywhere from 10% to more than 70% of people in urban traffic are simply looking for parking.\" ~ Tom Vanderbilt",
   "Drivers in one-third of U.S. cities spend more than 40 hours a year (an entire work week) in traffic that is not moving.",
   "The individual cost of road congestion in the US exceeded $900 per driver in 1997, resulting in more than $72 billion in lost wages and wasted fuel.",
