@@ -299,7 +299,7 @@ Game = {
           Game.is_fullscreen = false;
           $(this).html('&#10065;');
         }
-      });
+      }).click();
     }
   },
 
