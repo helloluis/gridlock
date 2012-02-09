@@ -188,7 +188,7 @@ Game = {
                   src = Game.sounds_dir + media + Game.sound_format;
 
               Game.sounds[new_k] = src;
-              sounds_to_load.push({ name : new_k, src : src, instance : 2 });
+              sounds_to_load.push({ name : new_k, src : src, instances : 3 });
               
             });
 
@@ -196,7 +196,7 @@ Game = {
 
             var src = Game.sounds_dir + media_or_arr + Game.sound_format;
             Game.sounds[key] = src;
-            sounds_to_load.push({ name : key, src : src, instance : key=='theme' ? 1 : 2 });
+            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 4 : 1 });
 
           }
         });
@@ -231,6 +231,8 @@ Game = {
   initialize : function(auto_start){
     
     jQuery.fx.interval = 50;
+
+    Game.initialize_fullscreen();
 
     Game.initialize_parameters();
 
@@ -280,6 +282,21 @@ Game = {
       Game.start();
     }
 
+  },
+
+  initialize_fullscreen : function(){
+    if (Game.is_pokki) {
+      // var fullscreen = document.getElementById('fullscreen-go');
+      // fullscreen.addEventListener('click', function() {
+      //   var wrapper = document.body;
+      //   wrapper.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+      // });
+      // To exit full-screen, we call the document method from the Exit Full-Screen Button click event:
+      // var fullscreenexit = document.getElementById('fullscreen-exit');
+      // fullscreenexit.addEventListener('click', function() {
+      //   document.webkitCancelFullScreen();
+      // });
+    }
   },
 
   initialize_menus : function(){
