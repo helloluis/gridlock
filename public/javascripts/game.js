@@ -193,14 +193,16 @@ Game = {
 
         SoundJS.addBatch(sounds_to_load);
 
-        //SoundJS.onLoadQueueComplete = function(){ SoundJS.play('horns_short0') };
+        SoundJS.onLoadQueueComplete = function(){
+          setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);
+        };
+          
       }
 
       TraffixLoader.initialize();
       
       Game.loader.addCompletionListener(function(){
         TraffixLoader.stop();
-        Game.play_sound('horns_short1');
         Game.initialize(auto_start);
       });
 
@@ -996,7 +998,7 @@ Game = {
     Game.with_sound = true;
     Game.muted = false;
     if (Game.started) {
-      Game.play_sound_theme();
+      Game.play_sound_theme();  
     }
   },
 
@@ -1008,7 +1010,7 @@ Game = {
     Game.stop_sound('theme');
   },
 
-  play_sound : function(sound, loop, volume) {
+  play_sound : function(sound, loop, volume, interrupt_all) {
     
     if (_.isUndefined(Game.sounds[sound])) { return false; }
 
@@ -1017,12 +1019,10 @@ Game = {
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
         if (loop) {
-          // console.log('looping ' + sound);
           Game.loop_sound(sound, volume);
         } else {
           PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
         }
-        // console.log(Game.sounds[sound]);
         
       } else if (Game.with_sm2_sound) {
         if (loop) {
@@ -1036,8 +1036,11 @@ Game = {
           SoundJS.play( sound, null, 0.5, true );
 
         } else {
-          console.log('playing sound', sound);
-          SoundJS.play( sound, SoundJS.INTERUPT_LATE );
+          if (interrupt_all) {
+            SoundJS.play( sound, SoundJS.INTERUPT_ANY );
+          } else {
+            SoundJS.play( sound, SoundJS.INTERUPT_LATE );  
+          }
         }
       }
     }
@@ -1055,7 +1058,7 @@ Game = {
           // console.log('looping theme'); 
         }, 23980);
       
-    } else {
+    } else if (Game.with_sm2_sound) {
       
       Game.sounds[sound].
           play({ 
@@ -1064,6 +1067,11 @@ Game = {
             Game.loop_sound(sound, volume);
           }
         }); 
+
+    } else if (Game.with_soundjs) {
+      
+      SoundJS.play(sound, SoundJS.INTERRUPT_NONE, 50, true);
+
     }
   },
 
@@ -1072,13 +1080,14 @@ Game = {
     Game.log('stopping sound', sound);
 
     if (Game.with_phonegap_sound) {
-      // Game.sounds[sound].stop();
-      // PhoneGap.exec("SoundPlug.stop");
       clearInterval(Game.theme_timer);
       Game.sounds[sound].stop()
 
     } else if (Game.with_sm2_sound) {
       Game.sounds[sound].stop();
+
+    } else if (Game.with_soundjs) {
+      SoundJS.stop(sound);
 
     }
     
@@ -1091,8 +1100,9 @@ Game = {
       });
     } else if (Game.with_sm2_sound) {
       soundManager.stopAll();
-    } else if (Game.with_jukebox_sound) {
-      Game.jukebox.stop();
+    } else if (Game.with_soundjs) {
+      SoundJS.setMute(true);
+      SoundJS.stop('theme');
     }
   },
 
@@ -1268,7 +1278,8 @@ Game = {
           Game.show_message( Game.show_new_high_score(Game.score) );
 
         } else {
-          Game.play_sound('frustration',false,50);
+          Game.stop_sound('theme');
+          Game.play_sound('frustration',false,50,true);
           var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
           Game.show_message( "<h2 class='quip'>" + message + "</h2>" );
 
@@ -1293,7 +1304,6 @@ Game = {
         Game.generate_explosion( exploding_car );
         $(".stoplight").css('opacity',0);
 
-        Game.log(Game.score, Game.high_score);
         if (Game.score>Game.high_score) {
           // Game.play_sound('new_high_score');
           Game.store_high_score(Game.score);
@@ -1336,7 +1346,7 @@ Game = {
       $(this).animate({ opacity : 0 });  
     });
 
-    Game.play_sound('explosion');
+    Game.play_sound('explosion',false,100,true);
     
   },
 
