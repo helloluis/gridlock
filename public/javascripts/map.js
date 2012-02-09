@@ -224,7 +224,13 @@ var COLLISION_MESSAGES = [
   "BOOM!",
   "KA-BOOOOM!",
   "You like making things explode, huh?",
-  "Asleep at the wheel?"
+  "\"Never drive faster than your guardian angel can fly.\"  ~ Unknown",
+  "\"My driving abilities from Mexico have helped me get through Hollywood.\" ~ Salma Hayek",
+  "\"Living with a conscience is like driving a car with the brakes on.\" ~ Budd Schulberg",
+  "\"Until you've learned to drive, you've never really learned how to swear.\" ~ Robert Paul",
+  "\"Baseball is like driving, it's the one who gets home safely that counts.\" ~ Tommy Lasorda",
+  "\"It takes 8,460 bolts to assemble an automobile, and one nut to scatter it all over the road.\" ~ Unknown",
+  "\"Driving is a spectacular form of amnesia. Everything is to be discovered, everything to be obliterated.\" ~ Jean Baudrillard" 
 ];
 
 var FRUSTRATION_MESSAGES = [
@@ -235,8 +241,15 @@ var FRUSTRATION_MESSAGES = [
   "Too hard for you?",
   "Fruit Ninja might be a better game for you",
   "Too much time playing PvZ?",
-  "They honk because they care.",
-  "Honking means they're getting annoyed at you"
+
+  "\"When everything's coming your way, you're in the wrong lane.\" ~ Unknown",
+  "\"A car is not the only thing that can be recalled by its maker.\" ~ Unknown",
+  "Honking means they're getting annoyed at you",
+  "\"Natives who beat drums to drive off evil spirits are objects of scorn to smart Americans who blow horns to break up traffic jams.\"  ~ Mary Ellen Kelly"
+  "\"Anywhere from 10% to more than 70% of people in urban traffic are simply looking for parking.\" ~ Tom Vanderbilt",
+  "Drivers in one-third of U.S. cities spend more than 40 hours a year (an entire work week) in traffic that is not moving.",
+  "The individual cost of road congestion in the US exceeded $900 per driver in 1997, resulting in more than $72 billion in lost wages and wasted fuel.",
+  "\"Have you ever noticed that anybody driving slower than you is an idiot, and anyone going faster than you is a maniac?\" ~ George Carlin"
 ];
 
 var SUCCESS_MESSAGES = [
