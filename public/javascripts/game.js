@@ -73,6 +73,8 @@ Game = {
   collision_messages   : COLLISION_MESSAGES,
   frustration_messages : FRUSTRATION_MESSAGES,
 
+  is_fullscreen        : false, // only works with pokki platform
+
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
   with_sound           : true,    // globally disable all sound
@@ -278,16 +280,18 @@ Game = {
 
   initialize_fullscreen : function(){
     if (Game.is_pokki) {
-      // var fullscreen = document.getElementById('fullscreen-go');
-      // fullscreen.addEventListener('click', function() {
-      //   var wrapper = document.body;
-      //   wrapper.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-      // });
-      // To exit full-screen, we call the document method from the Exit Full-Screen Button click event:
-      // var fullscreenexit = document.getElementById('fullscreen-exit');
-      // fullscreenexit.addEventListener('click', function() {
-      //   document.webkitCancelFullScreen();
-      // });
+      $('#toggle_fullscreen').bind('click', function() {
+        if (Game.is_fullscreen===false) {
+          var wrapper = document.body;
+          wrapper.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+          Game.is_fullscreen = true;
+          $(this).html('x');
+        } else {
+          document.webkitCancelFullScreen();  
+          Game.is_fullscreen = false;
+          $(this).html('&#10065;');
+        }
+      }).click();
     }
   },
 
