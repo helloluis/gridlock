@@ -78,9 +78,10 @@ Game = {
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
   with_sound           : true,    // globally disable all sound
-  with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
+  with_phonegap_sound  : true,    // we use the Phonegap sound library for iOS
   with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
-  with_soundjs         : true,    // SoundJS, for Pokki build
+  with_soundjs         : true,    // SoundJS, for Pokki build. If both SoundJS and PhoneGap Sound are enabled, 
+                                  // we use SoundJS to manage the theme music, and PGSound for everything else
 
   sound_format         : "." + SOUND_FORMATS[PLATFORM],
  
@@ -1022,11 +1023,19 @@ Game = {
   },
 
   play_sound_theme : function(){
-    Game.play_sound('theme', true, 50);
+    if (Game.with_soundjs && Game.with_phonegap_sound) {
+      SoundJS.play('theme', null, 0.5, true); 
+    } else {
+      Game.play_sound('theme', true, 50);  
+    }
   },
 
   stop_sound_theme : function(){
-    Game.stop_sound('theme');
+    if (Game.with_soundjs && Game.with_phonegap_sound) {
+      SoundJS.stop('theme'); 
+    } else {
+      Game.stop_sound('theme');  
+    }
   },
 
   play_sound : function(sound, loop, volume, interrupt_all) {
