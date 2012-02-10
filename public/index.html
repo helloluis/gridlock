@@ -24,6 +24,7 @@
   <script src="javascripts/map.js"></script>
   <script src="javascripts/sound.js"></script>
   <script src="javascripts/loader.js"></script>
+  <script src="javascripts/pokkiBrowser.js"></script>
   <script>
     PLATFORM = 'pokki';
     APP_URL  = "http://traffix.infinite.ly";
@@ -51,8 +52,6 @@
 
 <div id="all">
 
-  <a id="minimize" href="#">&mdash;</a>
-  <a id="toggle_fullscreen">&#10065;</a>
 
   <div id="fb-root"></div>
   <script src='http://connect.facebook.net/en_US/all.js'></script>
@@ -177,6 +176,9 @@
 <script src="javascripts/help.js"></script>
 
 <script>
+  window.pauseFromPokki  = function(){ Game.pause(); console.log('pausing game'); };
+  window.resumeFromPokki = function(){ Game.resume(); console.log('resuming game'); };
+
   $(function(){
     $("body").addClass(PLATFORM);
     var auto_start = document.location.hash.indexOf("autostart")!==-1;

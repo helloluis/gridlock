@@ -190,7 +190,7 @@ Game = {
 
             var src = Game.sounds_dir + media_or_arr + Game.sound_format;
             Game.sounds[key] = src;
-            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 4 : 1 });
+            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 1 });
 
           }
         });
@@ -226,7 +226,7 @@ Game = {
     
     jQuery.fx.interval = 50;
 
-    Game.initialize_fullscreen();
+    Game.initialize_pokki();
 
     Game.initialize_parameters();
 
@@ -278,22 +278,10 @@ Game = {
 
   },
 
-  initialize_fullscreen : function(){
+  initialize_pokki : function(){
     if (Game.is_pokki) {
-      $('#toggle_fullscreen').bind('click', function() {
-        if (Game.is_fullscreen===false) {
-          var wrapper = document.body;
-          wrapper.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-          Game.is_fullscreen = true;
-          $(this).html('x');
-        } else {
-          document.webkitCancelFullScreen();  
-          Game.is_fullscreen = false;
-          $(this).html('&#10065;');
-        }
-      });
-      $("#minimize").bind('click', function(){
-        pokki.closePopup();
+      pokki.addEventListener('popup_hidden', function() {
+        Game.pause();
       });
     }
   },
@@ -970,14 +958,15 @@ Game = {
   },
 
   resume : function() {
-    Game.paused = false;
+    if (Game.started===true && Game.paused===true) {
+      Game.paused = false;
     
-    $("#overlay").hide();
-    
-    Game.animate();
+      $("#overlay").hide();
+      
+      Game.animate();
 
-    Game.play_sound_theme();
-    
+      Game.play_sound_theme();
+    }
   },
 
   quit : function() {
@@ -1023,6 +1012,7 @@ Game = {
     $(".bttn.mute").removeClass('muted').text('Mute');
     Game.with_sound = true;
     Game.muted = false;
+    SoundJS.setMute(false);
     if (Game.started) {
       Game.play_sound_theme();  
     }
@@ -1152,6 +1142,8 @@ Game = {
     
     var int = 3;
     Game.messages.css({ display : 'block', opacity : '1' }).html("<h1 class='countdown'>Starting ...</h1>");
+    
+    $("#overlay").hide();    
     
     Game.clear_canvases();
 

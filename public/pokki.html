@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name = "viewport" content = "width = device-width, initial-scale = 1, user-scalable = no">
+
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/apple-touch-icon-h.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/apple-touch-icon-m.png" />
+  <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon-l.png" />
+  <link rel="shortcut icon" href="images/apple-touch-icon-l.png" />
+
+  <title>Traffix!</title>
+  
+  <script src="javascripts/jquery-1.7.1.min.js"></script>
+  <script src="javascripts/pokkiBrowser.js"></script>
+
+  <script>
+    
+    // Add listener for when the popup is first loaded
+    // Perform popup page initiation and configuration
+    // NOTE: DOMContentLoaded is the ideal event to listen for as it doesn't
+    // wait for external resources (like images) to be loaded
+    function load() {
+        console.log('Popup page is loaded.');
+    }
+    window.addEventListener('DOMContentLoaded', load, false);
+
+    // Add listener for when the page is unloaded by the platform 
+    // This occurs due to inactivity or memory usage
+    // You have 4 seconds from this event to save/store any data
+    function unload() {
+        console.log('Popup page is being unloaded.');
+        
+    }
+    pokki.addEventListener('popup_unload', unload);
+
+    // Add listener for when the popup window is showing
+    function showing() {
+        console.log('Popup window is almost visible.');
+    }
+    pokki.addEventListener('popup_showing', showing);
+
+    // Add listener for when the popup window is shown
+    function shown() {
+      console.log('Popup window is visible.');
+      //document.getElementById("iframe").contentWindow.resumeFromPokki();
+    }
+    pokki.addEventListener('popup_shown', shown);
+
+    // Add listener for when the popup window is hidden
+    function hidden() {
+      console.log('Popup window was hidden.');
+      document.getElementById("iframe").contentWindow.pauseFromPokki(); 
+    }
+    pokki.addEventListener('popup_hidden', hidden);
+
+  </script>
+
+  <style>
+  body { background:#000; margin:0; padding:0; display:block; }
+  .container { margin:0 auto; overflow:hidden; display:block; position:relative; }
+  iframe { margin:0 auto; overflow:hidden; border:0px; display:block; }
+#minimize, #toggle_fullscreen { position:absolute; z-index:100; top :10px; right:10px; width:12px; height:12px; font-size:14px; line-height:1; color:#fff; cursor: pointer; font-family: Helvetica, sans-serif; }
+#minimize { right : 30px; border:1px solid #ccc; padding:2px; font-size:10px; width:10px; height:8px; line-height:0.8; text-decoration:none; font-weight:bold; }
+body.fullscreen #minimize { display:none; }
+  </style>
+
+</head>
+<body>
+<!-- POKKI CONTAINER -->
+<div class="container">
+  <a id="minimize" href="#">&mdash;</a>
+  <a id="toggle_fullscreen">&#10065;</a>
+  <iframe name="game" id="iframe" src="index.html" width="1024" height="768"></iframe>
+</div>
+
+<script>
+$(function(){
+  var is_fullscreen = false;
+  $('#toggle_fullscreen')
+    .bind('click', function() {
+      if (is_fullscreen===false) {
+        var wrapper = document.body;
+        wrapper.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        is_fullscreen = true;
+        $(this).html('x');
+        $('body').addClass('fullscreen');
+      } else {
+        document.webkitCancelFullScreen();  
+        is_fullscreen = false;
+        $(this).html('&#10065;');
+        $('body').removeClass('fullscreen');
+      }
+    });
+
+  $("#minimize").bind('click', function(){
+    pokki.closePopup();
+  });
+});
+</script>
+</body>
+</html>
