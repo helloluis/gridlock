@@ -5,5 +5,5 @@
    "icon-29x29": "images/icon_29x29.png",
    "icon-42x42": "images/icon_42x42.png",
    "description": "A traffic control game set in the busy streets of Manila",
-   "popup": "index.html"
+   "popup": "pokki.html"
 }
