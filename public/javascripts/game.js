@@ -42,8 +42,9 @@ Game = {
   ended                : false,
   muted                : false,
  
-  can_adjust_speed     : false,  // clicking or swiping on a car will increase its speed (UNDER CONSTRUCTION)
+  can_adjust_speed     : false,  // clicking or swiping on a car will increase its speed
  
+  factory              : false,
   streets              : [],     // array of Street objects
   barriers             : {},     // hash of barrier hitboxes
   intersections        : [],     // array of intersection hitboxes
@@ -78,10 +79,9 @@ Game = {
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
   with_sound           : true,    // globally disable all sound
-  with_phonegap_sound  : true,    // we use the Phonegap sound library for iOS
-  with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
-  with_soundjs         : true,    // SoundJS, for Pokki build. If both SoundJS and PhoneGap Sound are enabled, 
-                                  // we use SoundJS to manage the theme music, and PGSound for everything else
+  with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
+  with_soundjs         : true,   // SoundJS, for Web & Pokki build
+  with_sm2_sound       : false,    // SoundManager2 is what we used to use for web
 
   sound_format         : "." + SOUND_FORMATS[PLATFORM],
  
@@ -168,7 +168,7 @@ Game = {
             
           });
 
-        });
+        });      
 
       } else if (Game.with_soundjs) {
         
@@ -202,6 +202,11 @@ Game = {
           setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);
         };
           
+      } else if (Game.with_phonegap_sound) {
+        
+        // using the Media API for theme music
+        Game.sounds['theme'] = new Media( Game.sounds_dir + SOUNDS.theme + Game.sound_format );
+
       }
 
       TraffixLoader.initialize();
@@ -253,6 +258,8 @@ Game = {
 
     Game.initialize_barriers();
 
+    Game.initialize_factory();
+
     Game.initialize_streets();
     
     Game.initialize_controls();
@@ -281,6 +288,9 @@ Game = {
 
   initialize_pokki : function(){
     if (Game.is_pokki) {
+      
+      Game.log("initializing pokki");
+
       pokki.addEventListener('popup_hidden', function() {
         Game.pause();
       });
@@ -670,8 +680,9 @@ Game = {
     });
 
     $(".bttn.credits").click(function(){
+      console.log('disabled?');
       if (!$(this).hasClass('disabled')) {
-        Game.show_credits();  
+        Game.show_credits();
       }
     });
 
@@ -696,6 +707,13 @@ Game = {
         $(this).text("Faster");
       }
     });
+
+  },
+
+  initialize_factory : function(){
+    
+    Game.factory = new Factory();
+    Game.factory.initialize(CARS, BOSSES);
 
   },
 
@@ -1023,23 +1041,19 @@ Game = {
   },
 
   play_sound_theme : function(){
-    if (Game.with_soundjs && Game.with_phonegap_sound) {
-      SoundJS.play('theme', null, 0.5, true); 
-    } else {
-      Game.play_sound('theme', true, 50);  
-    }
+    Game.log('playing sound theme');
+    Game.play_sound('theme', true, 50);
   },
 
   stop_sound_theme : function(){
-    if (Game.with_soundjs && Game.with_phonegap_sound) {
-      SoundJS.stop('theme'); 
-    } else {
-      Game.stop_sound('theme');  
-    }
+    Game.log('stopping sound theme');
+    Game.stop_sound('theme');  
   },
 
   play_sound : function(sound, loop, volume, interrupt_all) {
     
+    console.log('playing sound', sound, loop);
+
     if (_.isUndefined(Game.sounds[sound])) { return false; }
 
     if (volume===undefined) { volume = 100; }
@@ -1062,7 +1076,6 @@ Game = {
       } else if (Game.with_soundjs) {
         if (loop) {
           SoundJS.play( sound, null, 0.5, true );
-
         } else {
           if (interrupt_all) {
             SoundJS.play( sound, SoundJS.INTERUPT_ANY );
@@ -1077,14 +1090,11 @@ Game = {
   loop_sound : function(sound, volume) {
     if (Game.with_phonegap_sound) {
       
-      // console.log('playing ' + sound);
-      
       Game.sounds[sound].play();
 
       Game.theme_timer = setInterval(function(){ 
           Game.sounds[sound].play(); 
-          // console.log('looping theme'); 
-        }, 23980);
+        }, 72002);
       
     } else if (Game.with_sm2_sound) {
       
@@ -1108,7 +1118,11 @@ Game = {
     Game.log('stopping sound', sound);
 
     if (Game.with_phonegap_sound) {
-      clearInterval(Game.theme_timer);
+      
+      if (sound=='theme') {
+        clearInterval(Game.theme_timer);  
+      }
+      
       Game.sounds[sound].stop()
 
     } else if (Game.with_sm2_sound) {
@@ -1159,7 +1173,10 @@ Game = {
     
     Game.clear_canvases();
 
+    Game.log('clearing canvas before countdown');
+
     _.delay(function(){
+      Game.log('playing countdown sound');
       Game.play_sound('countdown');
     },1000);
 
@@ -1536,7 +1553,8 @@ var Car = function(car_hash){
   this.height                = car_hash && car_hash.height  ? car_hash.height    : 35;
   this.color                 = car_hash && car_hash.colors  ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
   this.type                  = car_hash && car_hash.type    ? car_hash.type      : 'car';
-  this.image_assets          = car_hash && car_hash.assets  ? car_hash.assets    : false;
+  this.assets                = car_hash && car_hash.assets  ? car_hash.assets    : false;
+  this.image_assets          = car_hash && car_hash.image_assets  ? car_hash.image_assets    : false;
   this.sounds                = car_hash && car_hash.sounds  ? car_hash.sounds    : false;
   this.score                 = car_hash && car_hash.score   ? car_hash.score     : 1;
   this.animate               = car_hash && car_hash.animate ? true               : false;
@@ -1598,13 +1616,24 @@ var Car = function(car_hash){
 
     } else {
   
-      this.image = new Image();
+      if (this.image_assets) {
 
-      this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
-        (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
-        (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );      
+        this.image = (this.orientation=='horizontal' ? 
+          (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
+          (this.lefthand ? this.image_assets[2] : this.image_assets[3]) ); 
 
-      // console.log(this.image.src);
+        console.log(this.image);
+
+      } else {
+        
+        this.image = new Image();
+
+        this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
+          (this.lefthand ? this.assets[0] : this.assets[1]) : 
+          (this.lefthand ? this.assets[2] : this.assets[3]) );        
+      }
+
+      
 
       if (this.animate) {
 
@@ -2186,6 +2215,59 @@ var Car = function(car_hash){
 
 };
 
+var Factory = function(){
+  
+  this.cars = {};
+  this.bosses = [];
+
+  this.initialize = function(cars, bosses) {
+
+    var self = this;
+    
+    _.each(cars, function(car, type){
+
+      console.log(car);
+
+      var car_assets = new Array;
+
+      _.each(car.assets,function(asset, j){
+        if (_.isArray(asset)) {
+          _.each(asset, function(a){
+            var img = new Image();
+            img.src = Game.images_dir + a;
+            car_assets.push( img );
+          });
+           
+        } else {
+          var img = new Image();
+          img.src = Game.images_dir + asset;
+          car_assets.push( img );  
+        }
+      });
+      
+      self.cars[type] = car_assets;
+      console.log(type, car_assets);
+
+    });
+
+    _.each(bosses, function(boss, i){
+
+      var boss_assets = new Array;
+
+      _.each(boss.assets,function(asset, j){
+        var img = new Image();
+        img.src = Game.images_dir + asset;
+        boss_assets.push( img );
+      });
+      
+      self.bosses.push(boss_assets);
+      
+    });
+
+  };
+
+};
+
 var Maker = function(){
   
   this.initialize    = function(street) {
@@ -2223,10 +2305,9 @@ var Maker = function(){
 
     if (car && _.isArray(car.assets[0])) {
       var selected_assets = car.assets[ Math.floor(Math.random()*car.assets.length) ];
-      return _.extend( _.clone(car), { assets : selected_assets });
+      return _.extend( _.clone(car), { assets : selected_assets, image_assets : Game.factory.cars[car.type] });
     } else {
-      // if (!car) { console.log('no car'); }
-      return car;  
+      return _.extend( _.clone(car), { image_assets : Game.factory.cars[car.type] });  
     }
     
   };
