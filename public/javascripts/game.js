@@ -6,7 +6,7 @@ Game = {
    
   loader               : false,
   
-  enable_preloading    : PLATFORM=='web' || PLATFORM=='pokki',
+  enable_preloading    : true,
 
   is_iOS               : PLATFORM=='ios', 
   is_pokki             : PLATFORM=='pokki',
@@ -152,14 +152,6 @@ Game = {
 
       if (Game.with_sm2_sound) {
       
-        soundManager.waitForWindowLoad = true;
-        soundManager.debugMode = true;
-        
-        if (Game.with_html5_audio===true) {
-          soundManager.debugFlash = false;
-          soundManager.useHTML5Audio = true;
-        }
-
         soundManager.onready(function() {
 
           _.each(Game.raw_sounds, function(media_or_arr, key){
@@ -198,13 +190,13 @@ Game = {
 
             var src = Game.sounds_dir + media_or_arr + Game.sound_format;
             Game.sounds[key] = src;
-            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 4 : 1 });
+            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 1 });
 
           }
         });
 
         SoundJS.addBatch(sounds_to_load);
-
+        console.log(sounds_to_load);
         SoundJS.onLoadQueueComplete = function(){
           setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);
         };
@@ -234,7 +226,7 @@ Game = {
     
     jQuery.fx.interval = 50;
 
-    Game.initialize_fullscreen();
+    Game.initialize_pokki();
 
     Game.initialize_parameters();
 
@@ -286,22 +278,13 @@ Game = {
 
   },
 
-  initialize_fullscreen : function(){
+  initialize_pokki : function(){
     if (Game.is_pokki) {
-      $('#toggle_fullscreen').bind('click', function() {
-        if (Game.is_fullscreen===false) {
-          var wrapper = document.body;
-          wrapper.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-          Game.is_fullscreen = true;
-          $(this).html('x');
-        } else {
-          document.webkitCancelFullScreen();  
-          Game.is_fullscreen = false;
-          $(this).html('&#10065;');
-        }
-      }).click();
-      $("#minimize").bind('click', function(){
-        pokki.closePopup();
+      pokki.addEventListener('popup_hidden', function() {
+        Game.pause();
+      });
+      $("#credits a.external").click(function(){
+        pokki.openURLInDefaultBrowser($(this).attr('href'));
       });
     }
   },
@@ -978,14 +961,15 @@ Game = {
   },
 
   resume : function() {
-    Game.paused = false;
+    if (Game.started===true && Game.paused===true) {
+      Game.paused = false;
     
-    $("#overlay").hide();
-    
-    Game.animate();
+      $("#overlay").hide();
+      
+      Game.animate();
 
-    Game.play_sound_theme();
-    
+      Game.play_sound_theme();
+    }
   },
 
   quit : function() {
@@ -1031,6 +1015,7 @@ Game = {
     $(".bttn.mute").removeClass('muted').text('Mute');
     Game.with_sound = true;
     Game.muted = false;
+    SoundJS.setMute(false);
     if (Game.started) {
       Game.play_sound_theme();  
     }
@@ -1160,6 +1145,8 @@ Game = {
     
     var int = 3;
     Game.messages.css({ display : 'block', opacity : '1' }).html("<h1 class='countdown'>Starting ...</h1>");
+    
+    $("#overlay").hide();    
     
     Game.clear_canvases();
 

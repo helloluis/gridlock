@@ -30,10 +30,12 @@ blockquote:before, blockquote:after,
 q:before, q:after { content: ''; content: none; }
 table { border-collapse: collapse; border-spacing: 0; }
 
-body { width:1024px; height:768px; }
+body { 
+  -webkit-user-select: none;
+  user-select: none;
+}
 
-#minimize, #toggle_fullscreen { position:absolute; z-index:100; top :10px; right:10px; width:12px; height:12px; font-size:14px; line-height:1; color:#fff; cursor: pointer; font-family: Helvetica, sans-serif; }
-#minimize { right : 30px; border:1px solid #666; padding:2px; font-size:10px; width:10px; height:8px; line-height:0.8; text-decoration:none; font-weight:bold; }
+#all { width:1024px; height:768px; margin:0 auto; display:block; }
 
 h1, h2, p { color:#333; margin-bottom:0.5em;}
 h1 { font-size:64px; font-family: 'Fugaz One', Helvetica, sans-serif; letter-spacing:-2px; text-shadow:0 3px 8px #333; }
@@ -42,7 +44,7 @@ h2, h3, label, .bttn, #score, #high_score, #timer { font-size:24px; font-family:
 p, .car_score { line-height:1.5; font-family: 'Boogaloo', Times, sans-serif; }
 em { font-style:italic; }
 
-.screen { position:absolute; top:0; left:0; width:1024px; height:768px; display:none; overflow:hidden; }
+.screen { position:absolute; top:0; left:0; width:1024px; height:768px; display:none; overflow:hidden; margin:0 auto; background-image:url(../images/loader.jpg); }
 .screen_inner { position:absolute; top:10%; bottom:10%; left:10%; right:10%; width:80%; height:80%; }
 
 #loader.screen { background:#000; display:block; }
@@ -199,3 +201,16 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 
 .car_score { font-size:25px; position:absolute; z-index:20; opacity : 1; color:#ff0; }
 #help_reward .car_score { font-size:18px; }
+
+#credits .screen_inner { padding:100px; width:600px; text-align:center; }
+#credits h1 { color:#900; text-shadow:0 0 5px #FFF; }
+#credits h2 { position:static; text-align:center; }
+#credits .screen_inner p { font-size:24px; color:#fff; text-shadow:0 0 7px #000; }
+#credits .screen_inner p a { color:#ff0; }
+#credits .bttn.intro { padding-top:20px; color:#ff0; text-shadow:0 0 7px #000; }
+
+body.pokki #minimize { display:block; }
+body.pokki #toggle_fullscreen { display:block; }
+body.pokki p a:hover {color:#fff;}
+body.pokki #score { top:30px; }
+body.pokki #high_score { top:70px; }
