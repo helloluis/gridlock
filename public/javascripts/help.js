@@ -125,7 +125,7 @@ Help = {
     this.intersection.dom       = $("#help_intersection");
     this.intersection.cont      = $(".help_background", this.intersection.dom);
 
-    this.build_cars(this.intersection, 3, 3);
+    this.build_cars(this.intersection, 3, 3, false, true);
 
   },
 
@@ -156,13 +156,13 @@ Help = {
 
   },
 
-  build_cars : function(object, num_blue, num_yellow, left) {
+  build_cars : function(object, num_blue, num_yellow, blue_left, yellow_left) {
     object.cars.blue = [];
     object.cars.yellow = [];
 
     for (var i=0; i < num_blue; i++) {
       object.cars.blue.push(
-        $("<div class='car horizontal " + (left ? "left" : "right") + " blue'></div>").
+        $("<div class='car horizontal " + (blue_left ? "left" : "right") + " blue'></div>").
           css({ position : "absolute", 
                 top : 90, 
                 left : 400 }).
@@ -171,7 +171,7 @@ Help = {
 
     for (var i=0; i < num_yellow; i++) {
       object.cars.yellow.push(
-        $("<div class='car vertical " + (left ? "left" : "right") + " yellow'></div>").
+        $("<div class='car vertical " + (yellow_left ? "left" : "right") + " yellow'></div>").
           css({ position : "absolute", 
                 top : -150, 
                 left : 100 }).

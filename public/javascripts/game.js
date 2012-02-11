@@ -2204,6 +2204,7 @@ var Car = function(car_hash){
 
       $("<div class='car_score'></div>").
         text("+" + this.score).
+        addClass(this.score > 5 ? 'big' : 'normal').
         css({ top : cur_top, left : cur_left }).
         animate({ top : end_top, left : end_left, opacity : 0 },{ duration : 2000, complete : function(){ $(this).remove(); } }).
         appendTo(Game.dom);
