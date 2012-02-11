@@ -151,26 +151,7 @@ Game = {
         loader_percentage.text( percentage + "%" );
       });
 
-      if (Game.with_sm2_sound) {
-      
-        soundManager.onready(function() {
-
-          _.each(Game.raw_sounds, function(media_or_arr, key){
-            
-            if (_.isArray(media_or_arr)) {
-              _.each(media_or_arr, function(media, index){
-                var new_k = [key, index].join("");
-                Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
-              });
-            } else {
-              Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
-            }
-            
-          });
-
-        });      
-
-      } else if (Game.with_soundjs) {
+      if (Game.with_soundjs) {
         
         var sounds_to_load = [];
 
@@ -196,8 +177,17 @@ Game = {
           }
         });
 
+        // TODO: No boss sounds yet
+        Game.sounds.bosses = new Array;
+        _.each(Game.bosses, function(boss, idx){
+          var src = Game.sounds_dir + boss.sound + Game.sound_format; 
+          Game.sounds.bosses.push( src );
+        });
+
         SoundJS.addBatch(sounds_to_load);
-        console.log(sounds_to_load);
+        
+        // console.log(sounds_to_load);
+
         SoundJS.onLoadQueueComplete = function(){
           setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);
         };
@@ -598,7 +588,7 @@ Game = {
 
   initialize_sounds : function() {
 
-    Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_sm2_sound);
+    Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_soundjs);
 
     if (Game.with_sound){
       if (Game.with_phonegap_sound) {
@@ -618,25 +608,6 @@ Game = {
           }          
         });
         
-      } else if (Game.with_sm2_sound && Game.enable_preloading===false) {
-        
-        soundManager.onready(function() {
-
-          _.each(Game.raw_sounds, function(media_or_arr, key){
-            
-            if (_.isArray(media_or_arr)) {
-              _.each(media_or_arr, function(media, index){
-                var new_k = [key, index].join("");
-                Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
-              });
-            } else {
-              Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
-            }
-            
-          });
-
-        });
-
       }
     }
   },
@@ -1052,7 +1023,7 @@ Game = {
 
   play_sound : function(sound, loop, volume, interrupt_all) {
     
-    console.log('playing sound', sound, loop);
+    // console.log('playing sound', sound, loop);
 
     if (_.isUndefined(Game.sounds[sound])) { return false; }
 
@@ -1064,13 +1035,6 @@ Game = {
           Game.loop_sound(sound, volume);
         } else {
           PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
-        }
-        
-      } else if (Game.with_sm2_sound) {
-        if (loop) {
-          Game.loop_sound(sound,volume);
-        } else {
-          Game.sounds[sound].play({ volume : volume });  
         }
 
       } else if (Game.with_soundjs) {
@@ -1096,16 +1060,6 @@ Game = {
           Game.sounds[sound].play(); 
         }, 72002);
       
-    } else if (Game.with_sm2_sound) {
-      
-      Game.sounds[sound].
-          play({ 
-            volume   : volume,
-            onfinish : function(){
-            Game.loop_sound(sound, volume);
-          }
-        }); 
-
     } else if (Game.with_soundjs) {
       
       SoundJS.play(sound, SoundJS.INTERRUPT_NONE, 50, true);
@@ -1125,9 +1079,6 @@ Game = {
       
       Game.sounds[sound].stop()
 
-    } else if (Game.with_sm2_sound) {
-      Game.sounds[sound].stop();
-
     } else if (Game.with_soundjs) {
       SoundJS.stop(sound);
 
@@ -1140,8 +1091,6 @@ Game = {
       _.each(Game.sounds,function(media, key) {
         Game.stop_sound(key);
       });
-    } else if (Game.with_sm2_sound) {
-      soundManager.stopAll();
     } else if (Game.with_soundjs) {
       SoundJS.setMute(true);
       SoundJS.stop('theme');
@@ -1622,8 +1571,6 @@ var Car = function(car_hash){
           (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
           (this.lefthand ? this.image_assets[2] : this.image_assets[3]) ); 
 
-        console.log(this.image);
-
       } else {
         
         this.image = new Image();
@@ -1683,11 +1630,7 @@ var Car = function(car_hash){
   // TODO!
   this.play_sound_loop = function(){
     if (Game.with_sound) {
-      if (Game.with_phonegap_sound) {
-        
-      } else if (Game.with_sm2_sound) {
-        
-      }
+      Game.play_sound(this.sounds);
     }
   };
 
@@ -2227,27 +2170,29 @@ var Factory = function(){
     
     _.each(cars, function(car, type){
 
-      console.log(car);
-
       var car_assets = new Array;
 
       _.each(car.assets,function(asset, j){
         if (_.isArray(asset)) {
+          
+          car_assets.push([]);
+
           _.each(asset, function(a){
             var img = new Image();
             img.src = Game.images_dir + a;
-            car_assets.push( img );
+            car_assets[j].push( img );
           });
            
         } else {
+
           var img = new Image();
           img.src = Game.images_dir + asset;
-          car_assets.push( img );  
+          car_assets.push( img );
+
         }
       });
       
       self.cars[type] = car_assets;
-      console.log(type, car_assets);
 
     });
 
@@ -2264,6 +2209,8 @@ var Factory = function(){
       self.bosses.push(boss_assets);
       
     });
+
+    // console.log(self.cars);
 
   };
 
@@ -2304,11 +2251,18 @@ var Maker = function(){
         }
     });
 
-    if (car && _.isArray(car.assets[0])) {
-      var selected_assets = car.assets[ Math.floor(Math.random()*car.assets.length) ];
-      return _.extend( _.clone(car), { assets : selected_assets, image_assets : Game.factory.cars[car.type] });
+    if (car && _.isArray(car.assets[0]) && car.assets.length>1) {
+      
+      var rand2  = Math.floor(Math.random()*car.assets.length),
+          assets = car.assets[ rand2 ],
+          images = Game.factory.cars[ car.type ][ rand2 ];
+
+      return _.extend( _.clone(car), { assets : assets, image_assets : images });
+
     } else {
+
       return _.extend( _.clone(car), { image_assets : Game.factory.cars[car.type] });  
+
     }
     
   };
