@@ -125,6 +125,17 @@ Help = {
     this.intersection.dom       = $("#help_intersection");
     this.intersection.cont      = $(".help_background", this.intersection.dom);
 
+    this.build_cars(this.intersection, 3, 3, false, true);
+
+  },
+
+  // only the intersection screen needs this convenience method,
+  // the other two just spawn their cars as needed by their animate() methods
+  restart_intersection : function(){
+    
+    this.build_cars(this.intersection, 3, 3, false, true);
+    this.start_intersection();
+
   },
 
   initialize_frustration : function(){
@@ -176,8 +187,6 @@ Help = {
   },
 
   animate_intersection : function(){
-
-    this.build_cars(this.intersection, 3, 3, false, true);
 
     var self   = this,
         obj    = this.intersection,

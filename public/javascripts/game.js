@@ -285,7 +285,7 @@ Game = {
       pokki.addEventListener('popup_hidden', function() {
         Game.pause();
       });
-      
+
       $("#credits a.external").click(function(){
         pokki.openURLInDefaultBrowser($(this).attr('href'));
       });
@@ -977,7 +977,7 @@ Game = {
     if (Game.menus_paused===true) {
       Game.menus_paused = false;
       console.log('starting menus ...');  
-      Help.start_intersection();
+      Help.restart_intersection();
       Help.start_frustration();
       Help.start_reward();
     }
