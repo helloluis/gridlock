@@ -973,10 +973,10 @@ Game = {
   },
 
   resume_menus : function(){
-    console.log(Game.menus_paused, Game.paused);
+    //console.log(Game.menus_paused, Game.paused);
     if (Game.menus_paused===true) {
       Game.menus_paused = false;
-      console.log('starting menus ...');  
+      //console.log('starting menus ...');  
       Help.restart_intersection();
       Help.start_frustration();
       Help.start_reward();
@@ -1093,11 +1093,6 @@ Game = {
     Game.log('stopping sound', sound);
 
     if (Game.with_phonegap_sound) {
-      
-      if (sound=='theme') {
-        clearInterval(Game.theme_timer);  
-      }
-      
       Game.sounds[sound].stop()
 
     } else if (Game.with_soundjs) {
@@ -1524,7 +1519,7 @@ var Street = function(){
 
 var Car = function(car_hash){
   
-  console.log(car_hash);
+  //console.log(car_hash);
 
   this.width                 = car_hash && car_hash.width                 ? car_hash.width           : 20;
   this.height                = car_hash && car_hash.height                ? car_hash.height          : 35;
@@ -1662,7 +1657,7 @@ var Car = function(car_hash){
   // TODO!
   this.play_sound_loop = function(){
     if (Game.with_sound) {
-      console.log(this.sounds);
+      //console.log(this.sounds);
       Game.play_sound(this.sounds);
       if (this.interrupt_all_sounds===true) {
         Game.stop_sound_theme();
@@ -2179,6 +2174,7 @@ var Car = function(car_hash){
     }
 
     if (this.interrupt_all_sounds===true) {
+      console.log('resuming theme from boss interruption');
       Game.play_sound_theme();
     }
   };

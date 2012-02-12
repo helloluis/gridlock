@@ -134,7 +134,6 @@ Help = {
   restart_intersection : function(){
     
     this.build_cars(this.intersection, 3, 3, false, true);
-    console.log(this.intersection.cars);
     this.start_intersection();
 
   },
@@ -225,7 +224,8 @@ Help = {
             });
       };
 
-    if (!(obj.cars.blue.length && obj.cars.yellow.length)) { return false; }
+    console.log(obj.cars);
+    if (typeof obj.cars.blue=='undefined' || typeof obj.cars.yellow=='undefined') { return false; }
 
     obj.cars.blue[0].css('top', coords.blue.y[0]);
     obj.cars.blue[1].css('top', coords.blue.y[1]);
@@ -546,34 +546,41 @@ Help = {
 
   stop_intersection : function(){
 
-    $(".car", this.intersection.dom).stop(false,false);
-    $(".finger", this.intersection.dom).stop(false,false);
-    this.intersection.dom.stop(false,false).stopTime();
+    if (this.intersection.dom) {
+      $(".car", this.intersection.dom).stop(false,false);
+      $(".finger", this.intersection.dom).stop(false,false);
+      this.intersection.dom.stop(false,false).stopTime();
     
-    this.intersection.cont.empty();
-    this.intersection.animating = false;
-    this.intersection.cars = {};
-
+      this.intersection.cars = { blue : [], yellow : [] };
+      this.intersection.cont.empty();
+      this.intersection.animating = false;
+      this.intersection.cars = {};  
+    }
+    
   },
 
   stop_frustration : function(){
 
-    $(".car", this.frustration.dom).stop(false,false);
-    this.frustration.dom.stop(false,false).stopTime();
-    this.frustration.cont.empty();
-    this.frustration.animating  = false;
-    this.frustration.cars = {};
-
+    if (this.frustration.dom) {
+      $(".car", this.frustration.dom).stop(false,false);
+      this.frustration.dom.stop(false,false).stopTime();
+      this.frustration.cont.empty();
+      this.frustration.animating  = false;
+      this.frustration.cars = {};  
+    }
+    
   },
 
   stop_reward : function(){
 
-    this.reward.dom.stop(false,false).stopTime();
-    $(".car", this.reward.cont).stop(false,false);
-    this.reward.cont.empty();
-    this.reward.animating  = false;
-    this.reward.cars = {};
-
+    if (this.reward.dom) {
+      this.reward.dom.stop(false,false).stopTime();
+      $(".car", this.reward.cont).stop(false,false);
+      this.reward.cont.empty();
+      this.reward.animating  = false;
+      this.reward.cars = {};
+    }
+    
   },
 
   stop_all : function(){
