@@ -1103,14 +1103,16 @@ Game = {
     
   },
 
-  stop_all_sounds : function() {
+  stop_all_sounds : function(dont_mute) {
     if (Game.with_phonegap_sound) {
       _.each(Game.sounds,function(media, key) {
         Game.stop_sound(key);
       });
     } else if (Game.with_soundjs) {
-      SoundJS.setMute(true);
-      SoundJS.stop('theme');
+      SoundJS.stop();
+      if (dont_mute!==true) {
+        SoundJS.setMute(true);  
+      }
     }
   },
 
@@ -1360,8 +1362,8 @@ Game = {
       $(this).animate({ opacity : 0 });  
     });
 
-    Game.stop_theme();
-    Game.stop_all_sounds();
+    Game.stop_all_sounds(true);
+    
     Game.play_sound('explosion',false,100,true);
     
   },
