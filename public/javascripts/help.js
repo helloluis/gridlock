@@ -225,7 +225,7 @@ Help = {
             });
       };
 
-    if (!(obj.cars.blue.length && obj.cars.yellow.length)) { return false; }
+    if (obj.cars.blue.length==0 || obj.cars.yellow.length==0) { return false; }
 
     obj.cars.blue[0].css('top', coords.blue.y[0]);
     obj.cars.blue[1].css('top', coords.blue.y[1]);
