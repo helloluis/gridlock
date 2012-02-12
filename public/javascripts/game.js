@@ -23,6 +23,7 @@ Game = {
   difficulty_increases : true, // if set to false, we don't make the game harder as time goes on
   smart_intersections  : true, // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
   double_buffering     : true, // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
+  multiple_canvases    : false, // if set to true, we use one canvas per street
   with_bosses          : true, // enable level bosses
 
   width                : MAP_WIDTH,
@@ -1274,7 +1275,8 @@ Game = {
           Game.show_message( Game.show_new_high_score(Game.score) );
 
         } else {
-          Game.stop_sound('theme');
+          Game.stop_theme();
+          Game.stop_all_sounds();
           Game.play_sound('frustration',false,50,true);
           var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
           Game.show_message( "<h2 class='quip'>" + message + "</h2>" );
@@ -1342,6 +1344,8 @@ Game = {
       $(this).animate({ opacity : 0 });  
     });
 
+    Game.stop_theme();
+    Game.stop_all_sounds();
     Game.play_sound('explosion',false,100,true);
     
   },
@@ -1529,6 +1533,7 @@ var Car = function(car_hash){
   this.lefthand              = false;
   this.origins               = {}; // top, left
   this.current_pos           = {}; // top, left
+  this.canvas_pos            = {}; // top, left
   this.destinations          = {}; // top, left
   
   this.ideal_travel_time     = 0; 
