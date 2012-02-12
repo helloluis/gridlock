@@ -66,17 +66,22 @@
   body { background:#000; margin:0; padding:0; display:block; }
   .container { margin:0 auto; overflow:hidden; display:block; position:relative; }
   iframe { margin:0 auto; overflow:hidden; border:0px; display:block; }
-#minimize, #toggle_fullscreen { position:absolute; z-index:100; top :10px; right:10px; width:12px; height:12px; font-size:14px; line-height:1; color:#fff; cursor: pointer; font-family: Helvetica, sans-serif; }
-#minimize { right : 30px; border:1px solid #ccc; padding:2px; font-size:10px; width:10px; height:8px; line-height:0.8; text-decoration:none; font-weight:bold; }
+  .sprite { background:url(images/pokki_window_sprite.png); width:18px; height:18px; position:absolute; z-index:100;top:10px; right:10px; line-height:1; cursor:pointer; }
+  #minimize { background-position:-36px 0px; }
+  #toggle_fullscreen { background-position:0px 0px; }
+  #toggle_fullscreen.cancel_fullscreen { background-position:-18px 0px; }
+  #minimize { right : 30px; }
 body.fullscreen #minimize { display:none; }
   </style>
 
 </head>
 <body>
+
+<a id="minimize" class="sprite" href="#">&mdash;</a>
+<a id="toggle_fullscreen" class="sprite" >&#10065;</a>
+
 <!-- POKKI CONTAINER -->
 <div class="container">
-  <a id="minimize" href="#">&mdash;</a>
-  <a id="toggle_fullscreen">&#10065;</a>
   <iframe name="game" id="iframe" src="index.html" width="1024" height="768"></iframe>
 </div>
 
@@ -89,12 +94,12 @@ $(function(){
         var wrapper = document.body;
         wrapper.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
         is_fullscreen = true;
-        $(this).html('x');
+        $(this).addClass('cancel_fullscreen');
         $('body').addClass('fullscreen');
       } else {
         document.webkitCancelFullScreen();  
         is_fullscreen = false;
-        $(this).html('&#10065;');
+        $(this).removeClass('cancel_fullscreen');
         $('body').removeClass('fullscreen');
       }
     });

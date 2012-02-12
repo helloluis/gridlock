@@ -875,6 +875,7 @@ Game = {
     Game.exit_intro(function(){
       Game.intro.hide();
       Game.stop_sound_theme();
+      Game.pause_menus();
       Game.start_countdown();
     });
     
@@ -943,16 +944,16 @@ Game = {
 
   pause : function(){
     
-    Game.paused = true;
-    
-    $("#overlay").show();
-    
-    Game.stop_sound_theme();
+    if (Game.started===true) {
+      Game.paused = true;
+      $("#overlay").show();
+      Game.stop_sound_theme();
+    }
     
   },
 
   pause_menus : function(){
-    if (Game.started!==true && Game.menus_paused!==true) {
+    if (Game.menus_paused!==true) {
       Game.menus_paused = true;  
       Help.stop_all();
     }
@@ -971,7 +972,7 @@ Game = {
   },
 
   resume_menus : function(){
-    if (Game.started!==true && Game.menus_paused===true) {
+    if (Game.menus_paused===true) {
       Game.menus_paused = false;  
       Help.start_intersection();
       Help.start_frustration();
@@ -1291,7 +1292,7 @@ Game = {
           Game.show_message( Game.show_new_high_score(Game.score) );
 
         } else {
-          Game.stop_theme();
+          Game.stop_sound_theme();
           Game.stop_all_sounds();
           Game.play_sound('frustration',false,50,true);
           var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
@@ -1360,7 +1361,7 @@ Game = {
       $(this).animate({ opacity : 0 });  
     });
 
-    Game.stop_theme();
+    Game.stop_sound_theme();
     Game.stop_all_sounds();
     Game.play_sound('explosion',false,100,true);
     
