@@ -17,7 +17,6 @@ Help = {
       self.initialize_controls();
       self.initialize_intersection();
       self.initialize_frustration();
-      // self.initialize_acceleration();
       self.initialize_reward();
     });
 
@@ -126,8 +125,6 @@ Help = {
     this.intersection.dom       = $("#help_intersection");
     this.intersection.cont      = $(".help_background", this.intersection.dom);
 
-    this.build_cars(this.intersection, 3, 3, false, true);
-
   },
 
   initialize_frustration : function(){
@@ -137,8 +134,6 @@ Help = {
 
     var obj = this.frustration,
         stoplight = $(".stoplight", this.frustration.dom).show();
-
-    this.build_cars(this.frustration, 3, 3);
 
   },
 
@@ -182,6 +177,8 @@ Help = {
 
   animate_intersection : function(){
 
+    this.build_cars(this.intersection, 3, 3, false, true);
+
     var self   = this,
         obj    = this.intersection,
         light  = $(".stoplight", obj.dom).show().addClass('horizontal').removeClass('vertical'),
@@ -189,7 +186,7 @@ Help = {
         coords = {  blue   : { x : 400, y : [ 90, 70, 90] },
                     yellow : { x : [ 100, 122, 100], y : -100 }
                  };
-    
+
     // looping functions for both blue and yellow cars
     var loop_blue = function(car, i, x1, x2, y, duration) {
         car.
@@ -333,12 +330,14 @@ Help = {
 
   animate_frustration : function(){
     
+    this.build_cars(this.frustration, 3, 3);
+
     var self   = this,
         obj    = this.frustration,
         light  = $(".stoplight", obj.dom).show().addClass('horizontal').removeClass('vertical'),
         frus   = [ 'frustration01', 'frustration02', 'frustration03' ],
         coords = {  blue   : { x : 400, y : [ 90, 70, 90] },
-                    yellow : { x : [ 152, 175, 152], y : 350 },
+                    yellow : { x : [ 152, 175, 152 ], y : 350 },
                  };
     
     this.frustration.animate_h = true;
@@ -438,6 +437,7 @@ Help = {
                   score(x2, y);
                 } 
             });
+            return car;
           },
         score = function(left, top) {
           $("<div class='car_score'>+1</div>").
@@ -453,13 +453,15 @@ Help = {
 
     self.build_cars(obj, 3, 0, true);
 
+    self.reward.loops = new Array;
+
     self.reward.dom.
       queue('reward', function(next){
         
-        loop(obj.cars.blue[0], -40, 300, 120, 2000);
-        loop(obj.cars.blue[1], -40, 300, 140, 3000);
+        self.reward.loops.push( loop(obj.cars.blue[0], -40, 300, 120, 2000) );
+        self.reward.loops.push( loop(obj.cars.blue[1], -40, 300, 140, 3000) );
         _.delay(function(){
-          loop(obj.cars.blue[2], -40, 300, 120, 2000);
+          self.reward.loops.push( loop(obj.cars.blue[2], -40, 300, 120, 2000) );
         },1000);
 
       });
@@ -530,29 +532,44 @@ Help = {
 
   },
 
+  stop_intersection : function(){
+
+    $(".car", this.intersection.dom).stop(false,false);
+    $(".finger", this.intersection.dom).stop(false,false);
+    this.intersection.dom.stop(false,false).stopTime();
+    
+    this.intersection.cont.empty();
+    this.intersection.animating = false;
+    this.intersection.cars = {};
+
+  },
+
+  stop_frustration : function(){
+
+    this.frustration.dom.stop(false,false).stopTime();
+    this.frustration.cont.empty();
+    this.frustration.animating  = false;
+    this.frustration.cars = {};
+
+  },
+
+  stop_reward : function(){
+
+    this.reward.dom.stop(false,false).stopTime();
+    $(".car", this.reward.cont).stop(false,false);
+    this.reward.cont.empty();
+    this.reward.animating  = false;
+    this.reward.cars = {};
+
+  },
+
   stop_all : function(){
     
     console.log("Stopping all menus");
-
-    this.intersection.dom.stop(false,false).stopTime();
-    this.frustration.dom.stop(false,false).stopTime();
-    this.reward.dom.stop(false,false).stopTime();
     
-    $("div", this.intersection.dom).stop(false,false);
-    $("div", this.frustration.dom).stop(false,false);
-    $("div", this.reward.dom).stop(false,false);
-
-    $("div", this.intersection.dom).stop(false,false).stopTime();
-    $("div", this.frustration.dom).stop(false,false).stopTime();
-    $("div", this.reward.dom).stop(false,false).stopTime();
-
-    this.intersection.cont.empty();
-    this.frustration.cont.empty();
-    this.reward.cont.empty();
-
-    this.intersection.animating = false;
-    this.frustration.animating  = false;
-    this.reward.animating  = false;
+    this.stop_intersection();
+    this.stop_frustration();
+    this.stop_reward();
 
   }
   

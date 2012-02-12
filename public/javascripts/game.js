@@ -285,6 +285,7 @@ Game = {
       pokki.addEventListener('popup_hidden', function() {
         Game.pause();
       });
+      
       $("#credits a.external").click(function(){
         pokki.openURLInDefaultBrowser($(this).attr('href'));
       });
