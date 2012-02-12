@@ -532,6 +532,8 @@ Help = {
 
   stop_all : function(){
     
+    console.log("Stopping all menus");
+
     this.intersection.dom.stop(false,false).stopTime();
     this.frustration.dom.stop(false,false).stopTime();
     this.reward.dom.stop(false,false).stopTime();
@@ -539,6 +541,10 @@ Help = {
     $("div", this.intersection.dom).stop(false,false);
     $("div", this.frustration.dom).stop(false,false);
     $("div", this.reward.dom).stop(false,false);
+
+    $("div", this.intersection.dom).stop(false,false).stopTime();
+    $("div", this.frustration.dom).stop(false,false).stopTime();
+    $("div", this.reward.dom).stop(false,false).stopTime();
 
     this.intersection.cont.empty();
     this.frustration.cont.empty();
