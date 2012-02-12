@@ -1034,7 +1034,7 @@ Game = {
 
   play_sound_theme : function(){
     Game.log('playing sound theme');
-    Game.play_sound('theme', true, 50);
+    Game.play_sound('theme', true, 50);  
   },
 
   stop_sound_theme : function(){
@@ -1298,7 +1298,7 @@ Game = {
 
         } else {
           Game.stop_sound_theme();
-          Game.stop_all_sounds();
+          Game.stop_all_sounds(true);
           Game.play_sound('frustration',false,50,true);
           var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
           Game.show_message( "<h2 class='quip'>" + message + "</h2>" );
@@ -1524,20 +1524,25 @@ var Street = function(){
 
 var Car = function(car_hash){
   
-  this.width                 = car_hash && car_hash.width   ? car_hash.width     : 20;
-  this.height                = car_hash && car_hash.height  ? car_hash.height    : 35;
-  this.color                 = car_hash && car_hash.colors  ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
-  this.type                  = car_hash && car_hash.type    ? car_hash.type      : 'car';
-  this.assets                = car_hash && car_hash.assets  ? car_hash.assets    : false;
-  this.image_assets          = car_hash && car_hash.image_assets  ? car_hash.image_assets    : false;
-  this.sounds                = car_hash && car_hash.sounds  ? car_hash.sounds    : false;
-  this.score                 = car_hash && car_hash.score   ? car_hash.score     : 1;
-  this.animate               = car_hash && car_hash.animate ? true               : false;
-  this.animation             = car_hash && car_hash.animate ? car_hash.animation : {};
+  console.log(car_hash);
+
+  this.width                 = car_hash && car_hash.width                 ? car_hash.width           : 20;
+  this.height                = car_hash && car_hash.height                ? car_hash.height          : 35;
+  this.color                 = car_hash && car_hash.colors                ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
+  this.type                  = car_hash && car_hash.type                  ? car_hash.type            : 'car';
+  this.assets                = car_hash && car_hash.assets                ? car_hash.assets          : false;
+  this.image_assets          = car_hash && car_hash.image_assets          ? car_hash.image_assets    : false;
+  this.sounds                = car_hash && car_hash.sounds                ? car_hash.sounds          : false;
+  this.interrupt_all_sounds  = car_hash && car_hash.interrupt_all_sounds  ? true                     : false;
+  this.score                 = car_hash && car_hash.score                 ? car_hash.score           : 1;
+  this.animate               = car_hash && car_hash.animate               ? true                     : false;
+  this.animation             = car_hash && car_hash.animation             ? car_hash.animation       : {};
+  
   this.street                = false;
   this.moving                = false;
+  
   this.frustration           = 0;
-  this.frustrates_by         = car_hash && car_hash.frustrates_by ? car_hash.frustrates_by : 1; // rate of frustration
+  this.frustrates_by         = car_hash && car_hash.frustrates_by         ? car_hash.frustrates_by   : 1; // rate of frustration
   this.frustration_checks    = 0;
   this.frustration_threshold = 3;
   this.frustration_level1    = 4;
@@ -1657,7 +1662,11 @@ var Car = function(car_hash){
   // TODO!
   this.play_sound_loop = function(){
     if (Game.with_sound) {
+      console.log(this.sounds);
       Game.play_sound(this.sounds);
+      if (this.interrupt_all_sounds===true) {
+        Game.stop_sound_theme();
+      }
     }
   };
 
@@ -1665,18 +1674,18 @@ var Car = function(car_hash){
 
     if (this.orientation == 'horizontal') {
       
-      var a1 = this.street.left - 100,
-          a2 = Game.map.width() + 100,
+      var a1 = this.street.left,
+          a2 = Game.map.width(),
           b1 = this.street.top + (Math.random() > 0.5 ? -1 : 1);
 
       if (this.lefthand) {
         this.origins.left = a2;
         this.current_pos.left = a2;
-        this.destinations.left = a1;
+        this.destinations.left = a1-this.width;
       } else {
-        this.origins.left = a1;
-        this.current_pos.left = a1;
-        this.destinations.left = a2;  
+        this.origins.left = a1-this.width;
+        this.current_pos.left = a1-this.width;
+        this.destinations.left = a2+this.width;  
       }
       
       this.origins.top = this.current_pos.top = this.destinations.top = b1;
@@ -1685,18 +1694,18 @@ var Car = function(car_hash){
 
     } else {
 
-      var a1 = this.street.top - 100,
-          a2 = Game.map.height() + 100,
+      var a1 = this.street.top,
+          a2 = Game.map.height(),
           b1 = this.street.left + (Math.random() > 0.5 ? -1 : 1);
 
       if (this.lefthand) {
-        this.origins.top = a1;
-        this.current_pos.top = a1;
-        this.destinations.top = a2;
+        this.origins.top = a1-this.height;
+        this.current_pos.top = a1-this.height;
+        this.destinations.top = a2+this.height;
       } else {
-        this.origins.top = a2;
-        this.current_pos.top = a2;
-        this.destinations.top = a1;  
+        this.origins.top = a2+this.height;
+        this.current_pos.top = a2+this.height;
+        this.destinations.top = a1-this.height;  
       }
       
       this.destinations.left = this.current_pos.left = this.origins.left = b1;
@@ -1946,21 +1955,6 @@ var Car = function(car_hash){
           if (horiz_match && vert_match) { return leader; } 
 
         }
-
-        // for (var i=index-1; i >= 0; i--) {
-          
-        //   var leader = this.street.cars[i],
-        //       cur_l  = leader.current_pos.left,
-        //       cur_t  = leader.current_pos.top,
-        //       p1     = [cur_l, cur_l + this.leader.width],
-        //       p2     = [cur_t, cur_t + this.leader.height];
-          
-        //   var horiz_match = this.compare_positions( self1, p1 ),
-        //       vert_match  = this.compare_positions( self2, p2 );
-      
-        //   if (horiz_match && vert_match) { return leader; }  
-          
-        // }    
       }
     }
     return false;
@@ -2129,9 +2123,9 @@ var Car = function(car_hash){
     var self = this;
     if (self.orientation=='horizontal') {
       if (self.lefthand){ 
-        return self.current_pos.left <= self.destinations.left + self.width;
+        return self.current_pos.left <= self.destinations.left;
       } else {
-        return self.destinations.left - self.width <= self.current_pos.left;
+        return self.current_pos.left >= self.destinations.left;
       }
     } else {
       if (self.lefthand) {
@@ -2162,10 +2156,6 @@ var Car = function(car_hash){
     // remove from street.cars array
     this.street.cars.splice(idx,1);
 
-    if (this.sound_loop) {
-      this.sound_loop.stop();
-    }
-
     if (Game.show_arrived_score) {
       var cur_top  = this.orientation=='horizontal' ? ( this.lefthand ? this.street.top-20 : this.street.top+10 ) : ( this.lefthand ? this.street.height-30 : this.street.top),
           cur_left = this.orientation=='horizontal' ? ( this.lefthand ? this.street.left : this.street.width-30 ) : ( this.lefthand ? this.street.left-20 : this.street.left + 20),
@@ -2182,6 +2172,15 @@ var Car = function(car_hash){
 
     Game.frustration -= this.frustration;
     Game.arrived( this );
+
+    if (this.sounds) {
+      console.log('stopping sound', this.sounds);
+      Game.stop_sound(this.sounds);
+    }
+
+    if (this.interrupt_all_sounds===true) {
+      Game.play_sound_theme();
+    }
   };
 
 };

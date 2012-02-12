@@ -224,6 +224,8 @@ Help = {
             });
       };
 
+    if (!(obj.cars.blue.length && obj.cars.yellow.length)) { return false; }
+
     obj.cars.blue[0].css('top', coords.blue.y[0]);
     obj.cars.blue[1].css('top', coords.blue.y[1]);
     obj.cars.blue[2].css('top', coords.blue.y[2]);
@@ -399,23 +401,23 @@ Help = {
         loop_blue(blue[1], 1, blue[1].position().left, -100, blue[1].position().top, 3500);
         loop_blue(blue[2], 2, blue[2].position().left, -100, blue[2].position().top, 4000);
 
-        _.delay(function(){
-          var i = 0; 
-          self.frustration.dom.everyTime(1000,function(){
-            
-            var pos = obj.cars.yellow[i%3].position(),
-                f   = $($(".frustration", obj.cont).get(i%3));
-            
-            f.css({ top : pos.top-30, left : pos.left-40, visibility : 'visible' }).addClass( frus[i%3] );
+      }).
+      delay(4000).
+      queue('frustration', function(next){
+        var i = 0; 
+        self.frustration.dom.everyTime(1000,function(){
+          
+          var pos = obj.cars.yellow[i%3].position(),
+              f   = $($(".frustration", obj.cont).get(i%3));
+          
+          f.css({ top : pos.top-30, left : pos.left-40, visibility : 'visible' }).addClass( frus[i%3] );
 
-            i+=1;
+          i+=1;
 
-            if (i==9) {
-              $(this).stopTime();
-            }
-          });
-        }, 4000);
-
+          if (i==9) {
+            $(this).stopTime();
+          }
+        });
       });
 
     self.frustration.dom.dequeue('frustration');
@@ -555,6 +557,7 @@ Help = {
 
   stop_frustration : function(){
 
+    $(".car", this.frustration.dom).stop(false,false);
     this.frustration.dom.stop(false,false).stopTime();
     this.frustration.cont.empty();
     this.frustration.animating  = false;
