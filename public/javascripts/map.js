@@ -123,8 +123,9 @@ var CARS = {
       frustrates_by : 6,
       score         : 1,
       assets        : [ 
+      // 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png'
         [ 'car2_r.png', 'car2_l.png', 'car2_d.png', 'car2_u.png' ], 
-        [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ], 
+        [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ]
       ]
     },
   hatch           : { type : 'hatch',     width : 20, height : 35, frustrates_by : 6, score : 1,
@@ -143,7 +144,7 @@ var CARS = {
       assets      : [ 'ambulance_r_anim.png', 'ambulance_l_anim.png', 'ambulance_d_anim.png', 'ambulance_u_anim.png' ],
       animate     : true,
       animation   : { step : 12, frames : 4 },
-      sounds      : [ 'ambulance.mp3' ] 
+      sounds      : [ 'ambulance' ] 
     }
 };
 
@@ -197,7 +198,8 @@ var SOUNDS = {
   theme         : "bg",
   explosion     : "explosion_short",
   frustration   : "frustration",
-  arrived       : "kaching"
+  arrived       : "kaching",
+  ambulance     : "ambulance"
 };
 
 var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
@@ -251,6 +253,7 @@ var FRUSTRATION_MESSAGES = [
   "\"Have you ever noticed that anybody driving slower than you is an idiot, and anyone going faster than you is a maniac?\" ~ George Carlin"
 ];
 
+
 var SUCCESS_MESSAGES = [
   "Awesome!",
   "Cool!",
@@ -260,18 +263,19 @@ var SUCCESS_MESSAGES = [
   "You Don't Suck After All!"
 ];
 
+
 var OTHERS = [ "bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_again.png", "explosion.png", "bg_help.jpg" ];
 
 
 var BOSSES = [
-  { time : 45,  score : 10, speed : 4, width : 20, height : 80,  assets : [ "towtruck_r.png", "towtruck_l.png", "towtruck_d.png", "towtruck_u.png" ] },
-  { time : 75,  score : 10, speed : 3, width : 20, height : 100, assets : [ "truck_r.png", "truck_l.png", "truck_d.png", "truck_u.png" ] },
-  { time : 105, score : 20, speed : 3, width : 20, height : 120, assets : [ "convoy_r.png", "convoy_l.png", "convoy_d.png", "convoy_u.png" ] },
-  { time : 135, score : 20, speed : 3, width : 20, height : 120, assets : [ "convoy_r.png", "convoy_l.png", "convoy_d.png", "convoy_u.png" ] },
-  { time : 165, score : 20, speed : 3, width : 20, height : 120, assets : [ "convoy_r.png", "convoy_l.png", "convoy_d.png", "convoy_u.png" ] },
-  { time : 195, score : 30, speed : 3, width : 20, height : 200, assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] },
-  { time : 225, score : 30, speed : 3, width : 20, height : 200, assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] },
-  { time : 255, score : 30, speed : 3, width : 20, height : 200, assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] }
+  { time : 45,  score : 10, speed : 4, width : 20, height : 80,  sounds : [], assets : [ "towtruck_r.png", "towtruck_l.png", "towtruck_u.png", "towtruck_d.png" ] },
+  { time : 75,  score : 10, speed : 3, width : 20, height : 100, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
+  { time : 105, score : 20, speed : 3, width : 20, height : 100, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
+  { time : 135, score : 20, speed : 3, width : 20, height : 100, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
+  { time : 165, score : 20, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+  { time : 195, score : 30, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+  { time : 225, score : 30, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+  { time : 255, score : 50, speed : 2, width : 20, height : 200, sounds : [], assets : [ "hearse_r.png", "hearse_l.png", "hearse_u.png", "hearse_d.png" ] }
 ];
 
 var TUTORIAL = [

@@ -159,8 +159,9 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #cars, .street_canvas, #frustrations { z-index:10; position:absolute; top:0px; left:0px; }
 #frustrations { z-index:13; }
 
+/*canvas { border:1px solid #fff; position:absolute; }*/
 #amber { top:210px; left:0px; }
-#baker { top:510px; left:0px; }
+#baker { top:505px; left:0px; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
@@ -200,6 +201,7 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 .car.yellow.vertical.right { background:url(../images/taxi_u.png); }
 
 .car_score { font-size:25px; position:absolute; z-index:20; opacity : 1; color:#ff0; }
+.car_score.big { font-size:36px; color:#f90; }
 #help_reward .car_score { font-size:18px; }
 
 #credits .screen_inner { padding:100px; width:600px; text-align:center; }

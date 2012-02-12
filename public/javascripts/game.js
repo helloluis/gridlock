@@ -6,7 +6,7 @@ Game = {
    
   loader               : false,
   
-  enable_preloading    : PLATFORM=='web' || PLATFORM=='pokki',
+  enable_preloading    : true,
 
   is_iOS               : PLATFORM=='ios', 
   is_pokki             : PLATFORM=='pokki',
@@ -23,6 +23,7 @@ Game = {
   difficulty_increases : true, // if set to false, we don't make the game harder as time goes on
   smart_intersections  : true, // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
   double_buffering     : true, // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
+  multiple_canvases    : false, // if set to true, we use one canvas per street
   with_bosses          : true, // enable level bosses
 
   width                : MAP_WIDTH,
@@ -42,8 +43,9 @@ Game = {
   ended                : false,
   muted                : false,
  
-  can_adjust_speed     : false,  // clicking or swiping on a car will increase its speed (UNDER CONSTRUCTION)
+  can_adjust_speed     : false,  // clicking or swiping on a car will increase its speed
  
+  factory              : false,
   streets              : [],     // array of Street objects
   barriers             : {},     // hash of barrier hitboxes
   intersections        : [],     // array of intersection hitboxes
@@ -79,8 +81,8 @@ Game = {
    
   with_sound           : true,    // globally disable all sound
   with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
-  with_sm2_sound       : false,   // SoundManager2 is what we use for regular web presentation
-  with_soundjs         : true,    // SoundJS, for Pokki build
+  with_soundjs         : true,   // SoundJS, for Web & Pokki build
+  with_sm2_sound       : false,    // SoundManager2 is what we used to use for web
 
   sound_format         : "." + SOUND_FORMATS[PLATFORM],
  
@@ -150,26 +152,7 @@ Game = {
         loader_percentage.text( percentage + "%" );
       });
 
-      if (Game.with_sm2_sound) {
-      
-        soundManager.onready(function() {
-
-          _.each(Game.raw_sounds, function(media_or_arr, key){
-            
-            if (_.isArray(media_or_arr)) {
-              _.each(media_or_arr, function(media, index){
-                var new_k = [key, index].join("");
-                Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
-              });
-            } else {
-              Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
-            }
-            
-          });
-
-        });
-
-      } else if (Game.with_soundjs) {
+      if (Game.with_soundjs) {
         
         var sounds_to_load = [];
 
@@ -195,12 +178,26 @@ Game = {
           }
         });
 
+        // TODO: No boss sounds yet
+        Game.sounds.bosses = new Array;
+        _.each(Game.bosses, function(boss, idx){
+          var src = Game.sounds_dir + boss.sound + Game.sound_format; 
+          Game.sounds.bosses.push( src );
+        });
+
         SoundJS.addBatch(sounds_to_load);
+        
+        // console.log(sounds_to_load);
 
         SoundJS.onLoadQueueComplete = function(){
           setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);
         };
           
+      } else if (Game.with_phonegap_sound) {
+        
+        // using the Media API for theme music
+        Game.sounds['theme'] = new Media( Game.sounds_dir + SOUNDS.theme + Game.sound_format );
+
       }
 
       TraffixLoader.initialize();
@@ -252,6 +249,8 @@ Game = {
 
     Game.initialize_barriers();
 
+    Game.initialize_factory();
+
     Game.initialize_streets();
     
     Game.initialize_controls();
@@ -280,6 +279,8 @@ Game = {
 
   initialize_pokki : function(){
     if (Game.is_pokki) {
+      Game.log("initializing pokki");
+
       pokki.addEventListener('popup_hidden', function() {
         Game.pause();
       });
@@ -587,7 +588,7 @@ Game = {
 
   initialize_sounds : function() {
 
-    Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_sm2_sound);
+    Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_soundjs);
 
     if (Game.with_sound){
       if (Game.with_phonegap_sound) {
@@ -607,25 +608,6 @@ Game = {
           }          
         });
         
-      } else if (Game.with_sm2_sound && Game.enable_preloading===false) {
-        
-        soundManager.onready(function() {
-
-          _.each(Game.raw_sounds, function(media_or_arr, key){
-            
-            if (_.isArray(media_or_arr)) {
-              _.each(media_or_arr, function(media, index){
-                var new_k = [key, index].join("");
-                Game.sounds[new_k] = Game.loader.addSound( new_k, Game.sounds_dir + media + Game.sound_format );
-              });
-            } else {
-              Game.sounds[key] = Game.loader.addSound( key, Game.sounds_dir + media_or_arr + Game.sound_format );
-            }
-            
-          });
-
-        });
-
       }
     }
   },
@@ -669,8 +651,9 @@ Game = {
     });
 
     $(".bttn.credits").click(function(){
+      console.log('disabled?');
       if (!$(this).hasClass('disabled')) {
-        Game.show_credits();  
+        Game.show_credits();
       }
     });
 
@@ -695,6 +678,13 @@ Game = {
         $(this).text("Faster");
       }
     });
+
+  },
+
+  initialize_factory : function(){
+    
+    Game.factory = new Factory();
+    Game.factory.initialize(CARS, BOSSES);
 
   },
 
@@ -1022,15 +1012,19 @@ Game = {
   },
 
   play_sound_theme : function(){
+    Game.log('playing sound theme');
     Game.play_sound('theme', true, 50);
   },
 
   stop_sound_theme : function(){
-    Game.stop_sound('theme');
+    Game.log('stopping sound theme');
+    Game.stop_sound('theme');  
   },
 
   play_sound : function(sound, loop, volume, interrupt_all) {
     
+    // console.log('playing sound', sound, loop);
+
     if (_.isUndefined(Game.sounds[sound])) { return false; }
 
     if (volume===undefined) { volume = 100; }
@@ -1042,18 +1036,10 @@ Game = {
         } else {
           PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
         }
-        
-      } else if (Game.with_sm2_sound) {
-        if (loop) {
-          Game.loop_sound(sound,volume);
-        } else {
-          Game.sounds[sound].play({ volume : volume });  
-        }
 
       } else if (Game.with_soundjs) {
         if (loop) {
           SoundJS.play( sound, null, 0.5, true );
-
         } else {
           if (interrupt_all) {
             SoundJS.play( sound, SoundJS.INTERUPT_ANY );
@@ -1068,25 +1054,12 @@ Game = {
   loop_sound : function(sound, volume) {
     if (Game.with_phonegap_sound) {
       
-      // console.log('playing ' + sound);
-      
       Game.sounds[sound].play();
 
       Game.theme_timer = setInterval(function(){ 
           Game.sounds[sound].play(); 
-          // console.log('looping theme'); 
-        }, 23980);
+        }, 72002);
       
-    } else if (Game.with_sm2_sound) {
-      
-      Game.sounds[sound].
-          play({ 
-            volume   : volume,
-            onfinish : function(){
-            Game.loop_sound(sound, volume);
-          }
-        }); 
-
     } else if (Game.with_soundjs) {
       
       SoundJS.play(sound, SoundJS.INTERRUPT_NONE, 50, true);
@@ -1099,11 +1072,12 @@ Game = {
     Game.log('stopping sound', sound);
 
     if (Game.with_phonegap_sound) {
-      clearInterval(Game.theme_timer);
+      
+      if (sound=='theme') {
+        clearInterval(Game.theme_timer);  
+      }
+      
       Game.sounds[sound].stop()
-
-    } else if (Game.with_sm2_sound) {
-      Game.sounds[sound].stop();
 
     } else if (Game.with_soundjs) {
       SoundJS.stop(sound);
@@ -1117,8 +1091,6 @@ Game = {
       _.each(Game.sounds,function(media, key) {
         Game.stop_sound(key);
       });
-    } else if (Game.with_sm2_sound) {
-      soundManager.stopAll();
     } else if (Game.with_soundjs) {
       SoundJS.setMute(true);
       SoundJS.stop('theme');
@@ -1150,7 +1122,10 @@ Game = {
     
     Game.clear_canvases();
 
+    Game.log('clearing canvas before countdown');
+
     _.delay(function(){
+      Game.log('playing countdown sound');
       Game.play_sound('countdown');
     },1000);
 
@@ -1299,7 +1274,8 @@ Game = {
           Game.show_message( Game.show_new_high_score(Game.score) );
 
         } else {
-          Game.stop_sound('theme');
+          Game.stop_theme();
+          Game.stop_all_sounds();
           Game.play_sound('frustration',false,50,true);
           var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
           Game.show_message( "<h2 class='quip'>" + message + "</h2>" );
@@ -1367,6 +1343,8 @@ Game = {
       $(this).animate({ opacity : 0 });  
     });
 
+    Game.stop_theme();
+    Game.stop_all_sounds();
     Game.play_sound('explosion',false,100,true);
     
   },
@@ -1527,7 +1505,8 @@ var Car = function(car_hash){
   this.height                = car_hash && car_hash.height  ? car_hash.height    : 35;
   this.color                 = car_hash && car_hash.colors  ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
   this.type                  = car_hash && car_hash.type    ? car_hash.type      : 'car';
-  this.image_assets          = car_hash && car_hash.assets  ? car_hash.assets    : false;
+  this.assets                = car_hash && car_hash.assets  ? car_hash.assets    : false;
+  this.image_assets          = car_hash && car_hash.image_assets  ? car_hash.image_assets    : false;
   this.sounds                = car_hash && car_hash.sounds  ? car_hash.sounds    : false;
   this.score                 = car_hash && car_hash.score   ? car_hash.score     : 1;
   this.animate               = car_hash && car_hash.animate ? true               : false;
@@ -1553,6 +1532,7 @@ var Car = function(car_hash){
   this.lefthand              = false;
   this.origins               = {}; // top, left
   this.current_pos           = {}; // top, left
+  this.canvas_pos            = {}; // top, left
   this.destinations          = {}; // top, left
   
   this.ideal_travel_time     = 0; 
@@ -1589,13 +1569,22 @@ var Car = function(car_hash){
 
     } else {
   
-      this.image = new Image();
+      if (this.image_assets) {
 
-      this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
-        (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
-        (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );      
+        this.image = (this.orientation=='horizontal' ? 
+          (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
+          (this.lefthand ? this.image_assets[2] : this.image_assets[3]) ); 
 
-      // console.log(this.image.src);
+      } else {
+        
+        this.image = new Image();
+
+        this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
+          (this.lefthand ? this.assets[0] : this.assets[1]) : 
+          (this.lefthand ? this.assets[2] : this.assets[3]) );        
+      }
+
+      
 
       if (this.animate) {
 
@@ -1645,11 +1634,7 @@ var Car = function(car_hash){
   // TODO!
   this.play_sound_loop = function(){
     if (Game.with_sound) {
-      if (Game.with_phonegap_sound) {
-        
-      } else if (Game.with_sm2_sound) {
-        
-      }
+      Game.play_sound(this.sounds);
     }
   };
 
@@ -2166,6 +2151,7 @@ var Car = function(car_hash){
 
       $("<div class='car_score'></div>").
         text("+" + this.score).
+        addClass(this.score > 5 ? 'big' : 'normal').
         css({ top : cur_top, left : cur_left }).
         animate({ top : end_top, left : end_left, opacity : 0 },{ duration : 2000, complete : function(){ $(this).remove(); } }).
         appendTo(Game.dom);
@@ -2173,6 +2159,63 @@ var Car = function(car_hash){
 
     Game.frustration -= this.frustration;
     Game.arrived( this );
+  };
+
+};
+
+var Factory = function(){
+  
+  this.cars = {};
+  this.bosses = [];
+
+  this.initialize = function(cars, bosses) {
+
+    var self = this;
+    
+    _.each(cars, function(car, type){
+
+      var car_assets = new Array;
+
+      _.each(car.assets,function(asset, j){
+        if (_.isArray(asset)) {
+          
+          car_assets.push([]);
+
+          _.each(asset, function(a){
+            var img = new Image();
+            img.src = Game.images_dir + a;
+            car_assets[j].push( img );
+          });
+           
+        } else {
+
+          var img = new Image();
+          img.src = Game.images_dir + asset;
+          car_assets.push( img );
+
+        }
+      });
+      
+      self.cars[type] = car_assets;
+
+    });
+
+    _.each(bosses, function(boss, i){
+
+      var boss_assets = new Array;
+
+      _.each(boss.assets,function(asset, j){
+        var img = new Image();
+        img.src = Game.images_dir + asset;
+        boss_assets.push( img );
+      });
+      
+      self.bosses.push(boss_assets);
+      
+    });
+
+    // console.log(self.cars);
+
   };
 
 };
@@ -2212,12 +2255,18 @@ var Maker = function(){
         }
     });
 
-    if (car && _.isArray(car.assets[0])) {
-      var selected_assets = car.assets[ Math.floor(Math.random()*car.assets.length) ];
-      return _.extend( _.clone(car), { assets : selected_assets });
+    if (car && _.isArray(car.assets[0]) && car.assets.length>1) {
+      
+      var rand2  = Math.floor(Math.random()*car.assets.length),
+          assets = car.assets[ rand2 ],
+          images = Game.factory.cars[ car.type ][ rand2 ];
+
+      return _.extend( _.clone(car), { assets : assets, image_assets : images });
+
     } else {
-      // if (!car) { console.log('no car'); }
-      return car;  
+
+      return _.extend( _.clone(car), { image_assets : Game.factory.cars[car.type] });  
+
     }
     
   };
