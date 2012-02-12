@@ -169,8 +169,8 @@
 <script src="javascripts/help.js"></script>
 
 <script>
-  window.pauseFromPokki  = function(){ Game.pause(); console.log('pausing game'); };
-  window.resumeFromPokki = function(){ Game.resume(); console.log('resuming game'); };
+  window.pauseFromPokki  = function(){ Game.pause(); Game.pause_menus(); console.log('pausing game'); };
+  window.resumeFromPokki = function(){ Game.resume_menus(); console.log('resuming game'); };
 
   $(function(){
     $("body").addClass(PLATFORM);

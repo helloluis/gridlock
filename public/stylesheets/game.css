@@ -216,3 +216,4 @@ body.pokki #toggle_fullscreen { display:block; }
 body.pokki p a:hover {color:#fff;}
 body.pokki #score { top:30px; }
 body.pokki #high_score { top:70px; }
+body.pokki .bttn.post_to_facebook { display:none; }

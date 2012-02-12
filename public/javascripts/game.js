@@ -972,8 +972,10 @@ Game = {
   },
 
   resume_menus : function(){
+    console.log(Game.menus_paused, Game.paused);
     if (Game.menus_paused===true) {
-      Game.menus_paused = false;  
+      Game.menus_paused = false;
+      console.log('starting menus ...');  
       Help.start_intersection();
       Help.start_frustration();
       Help.start_reward();
@@ -1104,14 +1106,16 @@ Game = {
     
   },
 
-  stop_all_sounds : function() {
+  stop_all_sounds : function(dont_mute) {
     if (Game.with_phonegap_sound) {
       _.each(Game.sounds,function(media, key) {
         Game.stop_sound(key);
       });
     } else if (Game.with_soundjs) {
-      SoundJS.setMute(true);
-      SoundJS.stop('theme');
+      SoundJS.stop();
+      if (dont_mute!==true) {
+        SoundJS.setMute(true);  
+      }
     }
   },
 
@@ -1362,7 +1366,7 @@ Game = {
     });
 
     Game.stop_sound_theme();
-    Game.stop_all_sounds();
+    Game.stop_all_sounds(true);
     Game.play_sound('explosion',false,100,true);
     
   },

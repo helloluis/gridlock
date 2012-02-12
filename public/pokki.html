@@ -49,7 +49,9 @@
     // Add listener for when the popup window is shown
     function shown() {
       console.log('Popup window is visible.');
-      //document.getElementById("iframe").contentWindow.resumeFromPokki();
+      setTimeout(function(){
+        document.getElementById("iframe").contentWindow.resumeFromPokki();  
+      },500);
     }
     pokki.addEventListener('popup_shown', shown);
 
@@ -66,7 +68,7 @@
   body { background:#000; margin:0; padding:0; display:block; }
   .container { margin:0 auto; overflow:hidden; display:block; position:relative; }
   iframe { margin:0 auto; overflow:hidden; border:0px; display:block; }
-  .sprite { background:url(images/pokki_window_sprite.png); width:18px; height:18px; position:absolute; z-index:100;top:10px; right:10px; line-height:1; cursor:pointer; }
+  .sprite { background:url(images/pokki_window_sprite.png); width:18px; height:18px; position:absolute; z-index:100;top:10px; right:10px; line-height:1; cursor:pointer; text-decoration:none; text-indent:-1000px; overflow:hidden; }
   #minimize { background-position:-36px 0px; }
   #toggle_fullscreen { background-position:0px 0px; }
   #toggle_fullscreen.cancel_fullscreen { background-position:-18px 0px; }
@@ -78,7 +80,7 @@ body.fullscreen #minimize { display:none; }
 <body>
 
 <a id="minimize" class="sprite" href="#">&mdash;</a>
-<a id="toggle_fullscreen" class="sprite" >&#10065;</a>
+<a id="toggle_fullscreen" class="sprite" href="#" >&#10065;</a>
 
 <!-- POKKI CONTAINER -->
 <div class="container">
