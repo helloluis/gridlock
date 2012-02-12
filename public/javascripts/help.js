@@ -134,6 +134,7 @@ Help = {
   restart_intersection : function(){
     
     this.build_cars(this.intersection, 3, 3, false, true);
+    console.log(this.intersection.cars);
     this.start_intersection();
 
   },

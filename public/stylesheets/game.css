@@ -217,3 +217,4 @@ body.pokki p a:hover {color:#fff;}
 body.pokki #score { top:30px; }
 body.pokki #high_score { top:70px; }
 body.pokki .bttn.post_to_facebook { display:none; }
+body.pokki .new_high_score h2 { font-size:60px; margin-top:40px;}
