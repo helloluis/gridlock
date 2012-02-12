@@ -40,6 +40,7 @@ Game = {
 
   started              : false,
   paused               : true,
+  menus_paused         : false,
   ended                : false,
   muted                : false,
  
@@ -317,8 +318,8 @@ Game = {
 
   initialize_tutorial : function() {
     
+    // TODO
     // if the game has been played more than once, we don't run the tutorial mode anymore
-
 
   },
 
@@ -950,6 +951,13 @@ Game = {
     
   },
 
+  pause_menus : function(){
+    if (Game.started!==true && Game.menus_paused!==true) {
+      Game.menus_paused = true;  
+      Help.stop_all();
+    }
+  },
+
   resume : function() {
     if (Game.started===true && Game.paused===true) {
       Game.paused = false;
@@ -959,6 +967,15 @@ Game = {
       Game.animate();
 
       Game.play_sound_theme();
+    }
+  },
+
+  resume_menus : function(){
+    if (Game.started!==true && Game.menus_paused===true) {
+      Game.menus_paused = false;  
+      Help.start_intersection();
+      Help.start_frustration();
+      Help.start_reward();
     }
   },
 

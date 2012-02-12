@@ -1,3 +1,5 @@
+/* needs jQuery.pause.js */
+
 Help = {
 
   intersection : { dom : false, cars : {}, coordinates : {} },
@@ -75,7 +77,6 @@ Help = {
       callback.call();
       self.start_intersection();
       self.start_frustration();
-      // self.start_acceleration();
       self.start_reward();
     }, 3000);
 
