@@ -534,17 +534,18 @@ Help = {
     
     this.intersection.dom.stop(false,false).stopTime();
     this.frustration.dom.stop(false,false).stopTime();
-    // this.acceleration.dom.stop(false,false).stopTime();
     this.reward.dom.stop(false,false).stopTime();
+    
+    $("div", this.intersection.dom).stop(false,false);
+    $("div", this.frustration.dom).stop(false,false);
+    $("div", this.reward.dom).stop(false,false);
 
     this.intersection.cont.empty();
     this.frustration.cont.empty();
-    // this.acceleration.cont.empty();
     this.reward.cont.empty();
 
     this.intersection.animating = false;
     this.frustration.animating  = false;
-    // this.acceleration.animating = false;
     this.reward.animating  = false;
 
   }

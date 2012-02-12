@@ -275,7 +275,7 @@ var BOSSES = [
   { time : 165, score : 20, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
   { time : 195, score : 30, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
   { time : 225, score : 30, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
-  { time : 255, score : 50, speed : 2, width : 20, height : 200, sounds : [], assets : [ "hearse_r.png", "hearse_l.png", "hearse_u.png", "hearse_d.png" ] }
+  { time : 255, score : 50, speed : 2, width : 20, height : 200, interrupt_all : true, sounds : ['hearse'], assets : [ "hearse_r.png", "hearse_l.png", "hearse_u.png", "hearse_d.png" ] }
 ];
 
 var TUTORIAL = [
