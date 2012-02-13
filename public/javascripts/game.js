@@ -134,6 +134,11 @@ Game = {
           Game.loader.add(img);
       });
 
+      _.each(EXCLAMATIONS, function(e){
+        var img = new PxLoaderImage(Game.images_dir + e[0]);
+          Game.loader.add(img);
+      });
+
       _.each(OTHERS, function(o){
         var img = new PxLoaderImage(Game.images_dir + o);
         Game.loader.add(img);
@@ -268,9 +273,9 @@ Game = {
 
     Game.log("global car odds", Game.global_car_odds);
 
-    if (Game.enable_frustration) {
-      Game.initialize_frustration();  
-    }
+    Game.initialize_frustration();  
+    
+    Game.initialize_exclamation();  
 
     if (auto_start===true) {
       Game.start();
@@ -1220,20 +1225,38 @@ Game = {
 
   initialize_frustration : function(){
     
-    Game.log("initializing frustration assets", FRUSTRATIONS.length);
+    if (Game.enable_frustration) {
+      
+      Game.log("initializing frustration assets", FRUSTRATIONS.length);
 
-    Game.frustration = 0;
+      Game.frustration = 0;
 
-    Game.frustration_assets = _.map(FRUSTRATIONS, function(f){ 
-                                  var img = new Image();
-                                  img.src = IMAGES_DIR + f[0];
-                                  return {  image  : img, 
-                                            width  : f[1], 
-                                            height : f[2], 
-                                            top    : f[3], 
-                                            left   : f[4] };
-                                });
-    
+      Game.frustration_assets = _.map(FRUSTRATIONS, function(f){ 
+                                    var img = new Image();
+                                    img.src = IMAGES_DIR + f[0];
+                                    return {  image  : img, 
+                                              width  : f[1], 
+                                              height : f[2], 
+                                              top    : f[3], 
+                                              left   : f[4] };
+                                  });
+    }
+  },
+
+  // highlight vehicles with important===true
+  initialize_exclamation : function(){
+
+    Game.log('initializing exclamation assets', EXCLAMATIONS.length);
+
+    Game.exclamation_assets = _.map(EXCLAMATIONS, function(f){ 
+                                    var img = new Image();
+                                    img.src = IMAGES_DIR + f[0];
+                                    return {  image  : img, 
+                                              width  : f[1], 
+                                              height : f[2], 
+                                              top    : f[3], 
+                                              left   : f[4] };
+                                  });
   },
 
   adjust_frustration : function(){
@@ -1525,6 +1548,7 @@ var Car = function(car_hash){
   this.height                = car_hash && car_hash.height                ? car_hash.height          : 35;
   this.color                 = car_hash && car_hash.colors                ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
   this.type                  = car_hash && car_hash.type                  ? car_hash.type            : 'car';
+  this.important             = car_hash && car_hash.important             ? car_hash.important       : false;
   this.assets                = car_hash && car_hash.assets                ? car_hash.assets          : false;
   this.image_assets          = car_hash && car_hash.image_assets          ? car_hash.image_assets    : false;
   this.sounds                = car_hash && car_hash.sounds                ? car_hash.sounds          : false;
@@ -1727,15 +1751,20 @@ var Car = function(car_hash){
     ];
   };
 
-  this.manage_frustration = function(){
+  // this function manages the vehicle's indicators, which could be either
+  // the important (!) notification or the frustration (:() icons and sounds
+  this.show_indicators = function(){
     
     var self = this;
     
     self.actual_travel_time += 1;
 
     var travel = Math.round(self.actual_travel_time/Game.speed);
-    
-    if (travel == self.frustration_thresholds[0]) {
+
+    if (self.important===true && travel < self.frustration_thresholds[0]) {
+      return Game.exclamation_assets[0];
+      
+    } else if (travel == self.frustration_thresholds[0]) {
       
       var horn_name = 'horns_short' + (Math.floor(Math.random()*Game.raw_sounds.horns_short.length));
       Game.play_sound(horn_name);
@@ -1854,14 +1883,14 @@ var Car = function(car_hash){
     }
 
     if (Game.enable_frustration) {
-      if (frustration = self.manage_frustration()) {
+      if (indicator = self.show_indicators()) {
         Game.deferred_renders.push([ 
             function(f, p) {
               frus.drawImage( f.image, 
                              (p.left + f.left), 
                              (p.top + f.top) );
             }, 
-            frustration, 
+            indicator, 
             self.current_pos ]);
       }
     }

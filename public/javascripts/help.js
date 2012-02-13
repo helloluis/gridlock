@@ -225,7 +225,7 @@ Help = {
       };
 
     //console.log(obj.cars);
-    
+
     if (typeof obj.cars.blue=='undefined' || typeof obj.cars.yellow=='undefined') { return false; }
 
     obj.cars.blue[0].css('top', coords.blue.y[0]);
@@ -244,23 +244,38 @@ Help = {
         loop_blue(blue[1], 1, blue[1].position().left, -100, blue[1].position().top, 3500);
         loop_blue(blue[2], 2, blue[2].position().left, -100, blue[2].position().top, 4000);
 
+        next();
         // animate yellow cars stopping at the intersection
-        _.delay(function(){
-          var yellow = obj.cars.yellow;
-          yellow[0].stop(false,false).css({ top : -150, left : coords.yellow.x[0] }).animate({ top : 35 }, 1000);
-          yellow[1].stop(false,false).css({ top : -150, left : coords.yellow.x[1] }).animate({ top : 35 }, 1500);
-          yellow[2].stop(false,false).css({ top : -150, left : coords.yellow.x[2] }).animate({ top : -5 }, 2000);
-        }, 1000);
+        // _.delay(function(){
+        //   var yellow = obj.cars.yellow;
+        //   yellow[0].stop(false,false).css({ top : -150, left : coords.yellow.x[0] }).animate({ top : 35 }, 1000);
+        //   yellow[1].stop(false,false).css({ top : -150, left : coords.yellow.x[1] }).animate({ top : 35 }, 1500);
+        //   yellow[2].stop(false,false).css({ top : -150, left : coords.yellow.x[2] }).animate({ top : -5 }, 2000);  
+        // }, 1000);
         
-        // the whole thing should take about 8 sec
-        _.delay(function(){
-          obj.animate_h = false;
-          next();
-        }, 4000);
+        // the whole thing should take about 4 sec
+        // _.delay(function(){
+        //   obj.animate_h = false;
+        //   next();
+        // }, 4000);
 
       }).
+      delay(1000, 'intersection').
+      queue('intersection', function(next){
+
+        var yellow = obj.cars.yellow;
+        yellow[0].stop(false,false).css({ top : -150, left : coords.yellow.x[0] }).animate({ top : 35 }, 1000);
+        yellow[1].stop(false,false).css({ top : -150, left : coords.yellow.x[1] }).animate({ top : 35 }, 1500);
+        yellow[2].stop(false,false).css({ top : -150, left : coords.yellow.x[2] }).animate({ top : -5 }, 2000);
+
+        next();
+
+      }).
+      delay(4000, 'intersection').
       queue('intersection', function(next){
         
+        obj.animate_h = false;
+
         // finger taps the button
         finger.stop().css({ top : 300, left : 300, opacity : 0, visibility : 'visible' }).
           animate({ top : light.position().top, left : light.position().left, opacity : 1 }, {
@@ -277,12 +292,11 @@ Help = {
           });
 
       }).
+      delay(500, 'intersection').
       queue('intersection', function(next){
         
         // move away the finger
-        _.delay(function(){
-          finger.removeClass('tapped').animate({ top : -50, left : 300, opacity : 0 }, 1000);  
-        }, 500);
+        finger.removeClass('tapped').animate({ top : -50, left : 300, opacity : 0 }, 1000);  
         
         // animate the blue cars, stopping at the intersection
         var blue = obj.cars.blue;
@@ -300,9 +314,10 @@ Help = {
         loop_yellow(yellow[1], 1, yellow[1].position().left, yellow[1].position().top, 400, 3500);
         loop_yellow(yellow[2], 2, yellow[2].position().left, yellow[2].position().top, 400, 4000);
 
-        _.delay(next, 4000);
+        next();
 
       }).
+      delay(4000, 'intersection').
       queue('intersection', function(next){
         
         // finger taps the button

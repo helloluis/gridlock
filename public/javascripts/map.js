@@ -123,7 +123,6 @@ var CARS = {
       frustrates_by : 6,
       score         : 1,
       assets        : [ 
-      // 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png'
         [ 'car2_r.png', 'car2_l.png', 'car2_d.png', 'car2_u.png' ], 
         [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ]
       ]
@@ -144,6 +143,7 @@ var CARS = {
       assets      : [ 'ambulance_r_anim.png', 'ambulance_l_anim.png', 'ambulance_d_anim.png', 'ambulance_u_anim.png' ],
       animate     : true,
       animation   : { step : 12, frames : 4 },
+      important   : true,
       sounds      : [ 'ambulance' ] 
     }
 };
@@ -163,6 +163,10 @@ var FRUSTRATIONS = [
   [ 'frustration_02.png', 40, 40, -20, -25 ],
   [ 'frustration_03.png', 40, 40, -20, -25 ],
   [ 'frustration_04.png', 40, 40, -20, -25 ]
+];
+
+var EXCLAMATIONS = [
+  [ 'exclamation_01.png', 40, 40, -20, -25 ]
 ];
 
 var CAR_ODDS = { 'car' : [1,40], 'hatch' : [41,60], 'van' : [61,75], 'jeepney' : [75,90], 'bus' : [91,99], 'ambulance' : [99,100] };
@@ -269,14 +273,14 @@ var OTHERS = [ "bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_aga
 
 
 var BOSSES = [
-  { time : 45,  score : 10, speed : 4, width : 20, height : 80,  sounds : [], assets : [ "towtruck_r.png", "towtruck_l.png", "towtruck_u.png", "towtruck_d.png" ] },
-  { time : 75,  score : 10, speed : 3, width : 20, height : 100, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
-  { time : 105, score : 20, speed : 3, width : 20, height : 100, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
-  { time : 135, score : 20, speed : 3, width : 20, height : 100, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
-  { time : 165, score : 20, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
-  { time : 195, score : 30, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
-  { time : 225, score : 30, speed : 3, width : 20, height : 120, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
-  { time : 255, score : 50, speed : 2, width : 20, height : 200, interrupt_all_sounds : true, sounds : ['hearse'], assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] }
+  { time : 45,  score : 10, speed : 4, width : 20, height : 80,  important : true, sounds : [], assets : [ "towtruck_r.png", "towtruck_l.png", "towtruck_u.png", "towtruck_d.png" ] },
+  { time : 75,  score : 10, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
+  { time : 105, score : 20, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
+  { time : 135, score : 20, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
+  { time : 165, score : 20, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+  { time : 195, score : 30, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+  { time : 225, score : 30, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+  { time : 255, score : 50, speed : 2, width : 20, height : 200, important : true, interrupt_all_sounds : true, sounds : ['hearse'], assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] }
 ];
 
 var TUTORIAL = [
