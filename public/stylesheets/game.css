@@ -30,7 +30,12 @@ blockquote:before, blockquote:after,
 q:before, q:after { content: ''; content: none; }
 table { border-collapse: collapse; border-spacing: 0; }
 
-body { width:1024px; height:768px; }
+body { 
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#all { width:1024px; height:768px; margin:0 auto; display:block; }
 
 h1, h2, p { color:#333; margin-bottom:0.5em;}
 h1 { font-size:64px; font-family: 'Fugaz One', Helvetica, sans-serif; letter-spacing:-2px; text-shadow:0 3px 8px #333; }
@@ -39,7 +44,7 @@ h2, h3, label, .bttn, #score, #high_score, #timer { font-size:24px; font-family:
 p, .car_score { line-height:1.5; font-family: 'Boogaloo', Times, sans-serif; }
 em { font-style:italic; }
 
-.screen { position:absolute; top:0; left:0; width:1024px; height:768px; display:none; overflow:hidden; }
+.screen { position:absolute; top:0; left:0; width:1024px; height:768px; display:none; overflow:hidden; margin:0 auto; background-image:url(../images/loader.jpg); }
 .screen_inner { position:absolute; top:10%; bottom:10%; left:10%; right:10%; width:80%; height:80%; }
 
 #loader.screen { background:#000; display:block; }
@@ -154,8 +159,9 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #cars, .street_canvas, #frustrations { z-index:10; position:absolute; top:0px; left:0px; }
 #frustrations { z-index:13; }
 
+/*canvas { border:1px solid #fff; position:absolute; }*/
 #amber { top:210px; left:0px; }
-#baker { top:510px; left:0px; }
+#baker { top:505px; left:0px; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
@@ -195,4 +201,21 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 .car.yellow.vertical.right { background:url(../images/taxi_u.png); }
 
 .car_score { font-size:25px; position:absolute; z-index:20; opacity : 1; color:#ff0; }
+.car_score.big { font-size:36px; color:#f90; }
 #help_reward .car_score { font-size:18px; }
+
+#credits .screen_inner { padding:100px; width:600px; text-align:center; }
+#credits h1 { color:#900; text-shadow:0 0 5px #FFF; }
+#credits h2 { position:static; text-align:center; }
+#credits .screen_inner p { font-size:24px; color:#fff; text-shadow:0 0 7px #000; }
+#credits .screen_inner p a { color:#ff0; }
+#credits .bttn.intro { padding-top:20px; color:#ff0; text-shadow:0 0 7px #000; }
+
+body.pokki #minimize { display:block; }
+body.pokki #toggle_fullscreen { display:block; }
+body.pokki p a:hover {color:#fff;}
+body.pokki #score { top:30px; }
+body.pokki #high_score { top:70px; }
+body.pokki .bttn.post_to_facebook { display:none; }
+body.pokki .new_high_score h2 { font-size:60px; margin-top:40px;}
+body.pokki .bttn.quit { display:none; }
