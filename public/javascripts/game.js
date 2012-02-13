@@ -6,7 +6,11 @@ Game = {
    
   loader               : false,
   
-  enable_preloading    : true,
+  enable_preloading    : PLATFORM=='web' || PLATFORM=='pokki',
+
+  is_iOS               : PLATFORM=='ios', 
+  is_pokki             : PLATFORM=='pokki',
+  is_web               : PLATFORM=='web',
 
   is_iOS               : PLATFORM=='ios', 
   is_pokki             : PLATFORM=='pokki',
