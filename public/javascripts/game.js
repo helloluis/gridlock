@@ -280,7 +280,7 @@ Game = {
     Game.global_car_odds = Game.difficulty_increases ? Game.car_odds_levels[Game.car_odds_levels.length-1][1] : 1;
 
     Game.car_odds_total  = 0;
-    
+
     _.each(Game.car_odds, function(odds){
       Game.car_odds_total += odds[1];
     });
@@ -2331,17 +2331,17 @@ var Maker = function(){
         rand     = Math.floor(Math.random()*Game.car_odds_total),
         weight   = 0;
 
-    for (var i=0; i<Game.car_odds.length; i++) {
-      weight += Game.car_odds[i][1];
-      if ( rand < weight && 
-            (Game.global_car_odds==1.0 || 
-              Math.random() > Game.global_car_odds) ) 
-        {
+    if (Game.global_car_odds===1.0 || Math.random() < Game.global_car_odds) {
+      for (var i=0; i<Game.car_odds.length; i++) {
+        weight += Game.car_odds[i][1];
+        if ( rand < weight ) {
           return Game.car_odds[i][0];  
         }
+      } 
+    } else {
+      console.log('no car!');
+      return false;
     }
-
-    return false;
 
   };
 
@@ -2355,9 +2355,7 @@ var Maker = function(){
 
       return _.extend( _.clone(car), { image_assets : Game.factory.cars[car.type] });  
 
-    }
-
-    console.log('no car!');
+    }    
     
   };
 
@@ -2387,7 +2385,7 @@ var Maker = function(){
       var car_name = [self.street.name, self.iterations, 0].join("-"),
           car      = new Car(car_hash);
     
-      console.log('building car', car_hash.type, boss_override);
+      // console.log('building car', car_hash.type, boss_override);
 
       self.street.cars.push( car ); 
 

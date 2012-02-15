@@ -44,20 +44,20 @@ var MAP_HEIGHT = 768;
 
 var STREETS = [
   // name, orientation, top, left, width, height
-  // ["amber_left_lane1",   "horizontal",  210,   0,     1024,  20 ],
-  // ["amber_left_lane2",   "horizontal",  230,   0,     1024,  20 ],
-  // ["amber_right_lane1",  "horizontal",  260,   0,     1024,  20 ],
-  // ["amber_right_lane2",  "horizontal",  285,   0,     1024,  20 ],
+  ["amber_left_lane1",   "horizontal",  210,   0,     1024,  20 ],
+  ["amber_left_lane2",   "horizontal",  230,   0,     1024,  20 ],
+  ["amber_right_lane1",  "horizontal",  260,   0,     1024,  20 ],
+  ["amber_right_lane2",  "horizontal",  285,   0,     1024,  20 ],
   ["baker_left",         "horizontal",  512,   0,     1024,  20 ],
   ["baker_right",        "horizontal",  533,   0,     1024,  20 ],
-  // ['chang_left_lane1',   "vertical",    0,     253,   20,    768 ],
-  // ['chang_left_lane2',   "vertical",    0,     276,   20,    768 ],
-  // ['chang_right_lane1',  "vertical",    0,     306,   20,    768 ],
-  // ['chang_right_lane2',  "vertical",    0,     327,   20,    768 ],
-  // ['dexter_left_lane1',  "vertical",    0,     653,   20,    768 ],
-  // ['dexter_left_lane2',  "vertical",    0,     676,   20,    768 ],
-  // ['dexter_right_lane1', "vertical",    0,     706,   20,    768 ],
-  // ['dexter_right_lane2', "vertical",    0,     728,   20,    768 ]
+  ['chang_left_lane1',   "vertical",    0,     253,   20,    768 ],
+  ['chang_left_lane2',   "vertical",    0,     276,   20,    768 ],
+  ['chang_right_lane1',  "vertical",    0,     306,   20,    768 ],
+  ['chang_right_lane2',  "vertical",    0,     327,   20,    768 ],
+  ['dexter_left_lane1',  "vertical",    0,     653,   20,    768 ],
+  ['dexter_left_lane2',  "vertical",    0,     676,   20,    768 ],
+  ['dexter_right_lane1', "vertical",    0,     706,   20,    768 ],
+  ['dexter_right_lane2', "vertical",    0,     728,   20,    768 ]
 ];
 
 
@@ -184,6 +184,7 @@ var EXCLAMATIONS = [
 ];
 
 var CAR_ODDS = [  [ 'car',       40 ], 
+                  [ 'taxi',      20 ], 
                   [ 'hatch',     20 ], 
                   [ 'suv',       15 ], 
                   [ 'van',       15 ], 
