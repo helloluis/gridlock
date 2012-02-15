@@ -1693,6 +1693,8 @@ var Car = function(car_hash){
     if (this.orientation=='horizontal') {
       this.width  = h;
       this.height = w;
+      //console.log('flipping dimensions for', this.type);
+      //if (this.type=='towtruck') { console.log('flipping dimensions', this.width, this.height); }
     }
   };
 
@@ -1897,22 +1899,17 @@ var Car = function(car_hash){
 
         var sx = 0 + (this.width*this.current_frame);
 
-        // console.log(self.image);
         ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height); 
 
       } else {
 
-        // console.log('rendering, not animating', Game.car_sprite_layout, [this.orientation,this.left?'left':'right'].join('-'), $.inArray(Game.car_sprite_layout, [this.orientation,this.left?'left':'right'].join('-')));
         if (this.orientation=='horizontal') {
           var sx = 0 + (this.width * $.inArray([this.orientation,this.lefthand?'left':'right'].join('-'), Game.car_sprite_layout ));  
         } else {
           var sx = 0 + (this.height * $.inArray([this.orientation,this.lefthand?'left':'right'].join('-'), Game.car_sprite_layout ));
         }
         
-        // console.log(this.type, sx);
-
         ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height);
-        // ctx.drawImage(self.image, self.current_pos.left, self.current_pos.top);  
 
       }
        
@@ -1922,12 +1919,20 @@ var Car = function(car_hash){
       if (indicator = self.show_indicators()) {
         Game.deferred_renders.push([ 
             function(f, p) {
-              frus.drawImage( f.image, 
-                             (p.left + f.left), 
-                             (p.top + f.top) );
+
+              var left = p.orientation=='horizontal' ? 
+                          (p.lefthand ? p.current_pos.left+f.left : p.current_pos.left+p.width-(f.width-f.left)) :
+                          (p.lefthand ? p.current_pos.left+f.left : p.current_pos.left-f.width+(p.width/2)),
+                  top  = p.orientation=='horizontal' ? 
+                          (p.lefthand ? p.current_pos.top-(p.height/2)-(f.height+f.top) : p.current_pos.top-(p.height/2)-(f.height+f.top) ) :
+                          (p.lefthand ? p.current_pos.top+p.height-(f.height-f.top) : p.current_pos.top+f.top );
+              
+              //debugger;
+              frus.drawImage( f.image, left, top ); 
+
             }, 
             indicator, 
-            self.current_pos ]);
+            self ]);
       }
     }
 
@@ -2234,7 +2239,7 @@ var Car = function(car_hash){
     Game.arrived( this );
 
     if (this.sounds) {
-      console.log('stopping sound', this.sounds);
+      // console.log('stopping sound', this.sounds);
       Game.stop_sound(this.sounds);
     }
 
@@ -2385,7 +2390,7 @@ var Maker = function(){
       var car_name = [self.street.name, self.iterations, 0].join("-"),
           car      = new Car(car_hash);
     
-      // console.log('building car', car_hash.type, boss_override);
+      console.log('boss override', boss_override===undefined, car_hash.width, car_hash.height);
 
       self.street.cars.push( car ); 
 

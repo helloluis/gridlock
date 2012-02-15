@@ -14,7 +14,6 @@ Help = {
     this.diagrams = $(".help_illustration");
 
     this.animate_in(function(){
-      self.initialize_controls();
       self.initialize_intersection();
       self.initialize_frustration();
       self.initialize_reward();
@@ -105,16 +104,16 @@ Help = {
   },
 
   initialize_controls : function(){
-    this.diagrams.click(function(){
-      $(this).
-        css({'z-index':5}).
-        addClass('selected').
-        siblings().each(function(){ 
-          $(this).
-            removeClass('selected').
-            css('z-index',3); 
-        });
-    });  
+    // this.diagrams.click(function(){
+    //   $(this).
+    //     css({'z-index':5}).
+    //     addClass('selected').
+    //     siblings().each(function(){ 
+    //       $(this).
+    //         removeClass('selected').
+    //         css('z-index',3); 
+    //     });
+    // });  
   },
 
   initialize_intersection : function(){
