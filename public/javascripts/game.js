@@ -82,7 +82,7 @@ Game = {
 
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
-  with_sound           : false,    // globally disable all sound
+  with_sound           : true,    // globally disable all sound
   with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
   with_soundjs         : true,     // SoundJS, for Web & Pokki build
   with_sm2_sound       : false,    // SoundManager2 is what we used to use for web
