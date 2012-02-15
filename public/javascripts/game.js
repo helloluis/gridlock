@@ -16,15 +16,15 @@ Game = {
   frustration          : 0,
   high_score           : 0,
 
-  frames               : 0,    // global frame counter, don't really know what for yet
+  frames               : 0,     // global frame counter, don't really know what for yet
 
-  seconds              : 0,    // global timer, in seconds, so only increments once every 1000 millisec
+  seconds              : 0,     // global timer, in seconds, so only increments once every 1000 millisec
 
-  difficulty_increases : true, // if set to false, we don't make the game harder as time goes on
-  smart_intersections  : true, // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
-  double_buffering     : true, // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
+  difficulty_increases : true,  // if set to false, we don't make the game harder as time goes on
+  smart_intersections  : true,  // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
+  double_buffering     : true,  // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
   multiple_canvases    : false, // if set to true, we use one canvas per street
-  with_bosses          : true, // enable level bosses
+  with_bosses          : true,  // enable level bosses
 
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
@@ -59,8 +59,10 @@ Game = {
   max_cars_per_street  : MAX_CARS_PER_STREET,              
   car_types            : CARS,                             // library of car settings and assets
   car_odds             : CAR_ODDS,                         // the likelihood that a particular car will be added
-  car_odd_levels       : CAR_ODD_LEVELS.reverse(),         // modifiers for our car-creation randomness, basically making fewer cars spawn early on in the game
+  car_odds_levels      : CAR_ODDS_LEVELS.reverse(),        // modifiers for our car-creation randomness, basically making fewer cars spawn early on in the game
+  car_odds_total       : 0,                                // we populate this array with the car names based on their weights, then randomly select one to generate
   neighborhood         : NEIGHBORHOOD,                     // graphics used for the neighborhood layers
+  car_sprite_layout    : CAR_SPRITE_LAYOUT,
           
   images_dir           : IMAGES_DIR,                       // path to images
   sounds_dir           : SOUNDS_DIR,                       // path to sounds
@@ -80,9 +82,9 @@ Game = {
 
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
-  with_sound           : true,    // globally disable all sound
-  with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
-  with_soundjs         : true,   // SoundJS, for Web & Pokki build
+  with_sound           : false,    // globally disable all sound
+  with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
+  with_soundjs         : true,     // SoundJS, for Web & Pokki build
   with_sm2_sound       : false,    // SoundManager2 is what we used to use for web
 
   sound_format         : "." + SOUND_FORMATS[PLATFORM],
@@ -158,52 +160,54 @@ Game = {
         loader_percentage.text( percentage + "%" );
       });
 
-      if (Game.with_soundjs) {
-        
-        var sounds_to_load = [];
-
-        _.each(Game.raw_sounds, function(media_or_arr, key){
-          if (_.isArray(media_or_arr)) {
-
-            _.each(media_or_arr, function(media, index){
-              
-              var new_k = [key, index].join(""),
-                  src = Game.sounds_dir + media + Game.sound_format;
-
-              Game.sounds[new_k] = src;
-              sounds_to_load.push({ name : new_k, src : src, instances : 3 });
-              
-            });
-
-          } else {
-
-            var src = Game.sounds_dir + media_or_arr + Game.sound_format;
-            Game.sounds[key] = src;
-            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 1 });
-
-          }
-        });
-
-        // TODO: No boss sounds yet
-        Game.sounds.bosses = new Array;
-        _.each(Game.bosses, function(boss, idx){
-          var src = Game.sounds_dir + boss.sound + Game.sound_format; 
-          Game.sounds.bosses.push( src );
-        });
-
-        SoundJS.addBatch(sounds_to_load);
-        
-        // console.log(sounds_to_load);
-
-        SoundJS.onLoadQueueComplete = function(){
-          setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);
-        };
+      if (Game.with_sound) {
+        if (Game.with_soundjs) {
           
-      } else if (Game.with_phonegap_sound) {
-        
-        // using the Media API for theme music
-        Game.sounds['theme'] = new Media( Game.sounds_dir + SOUNDS.theme + Game.sound_format );
+          var sounds_to_load = [];
 
+          _.each(Game.raw_sounds, function(media_or_arr, key){
+            if (_.isArray(media_or_arr)) {
+
+              _.each(media_or_arr, function(media, index){
+                
+                var new_k = [key, index].join(""),
+                    src = Game.sounds_dir + media + Game.sound_format;
+
+                Game.sounds[new_k] = src;
+                sounds_to_load.push({ name : new_k, src : src, instances : 3 });
+                
+              });
+
+            } else {
+
+              var src = Game.sounds_dir + media_or_arr + Game.sound_format;
+              Game.sounds[key] = src;
+              sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 1 });
+
+            }
+          });
+
+          // TODO: No boss sounds yet
+          Game.sounds.bosses = new Array;
+          _.each(Game.bosses, function(boss, idx){
+            var src = Game.sounds_dir + boss.sound + Game.sound_format; 
+            Game.sounds.bosses.push( src );
+          });
+
+          SoundJS.addBatch(sounds_to_load);
+          
+          // console.log(sounds_to_load);
+
+          SoundJS.onLoadQueueComplete = function(){
+            setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);  
+          };
+            
+        } else if (Game.with_phonegap_sound) {
+          
+          // using the Media API for theme music
+          Game.sounds['theme'] = new Media( Game.sounds_dir + SOUNDS.theme + Game.sound_format );
+
+        }
       }
 
       TraffixLoader.initialize();
@@ -269,13 +273,17 @@ Game = {
 
     Game.initialize_tutorial();
 
-    Game.global_car_odds = Game.difficulty_increases ? Game.car_odd_levels[Game.car_odd_levels.length-1][1] : 1;
-
-    Game.log("global car odds", Game.global_car_odds);
-
     Game.initialize_frustration();  
     
     Game.initialize_exclamation();  
+
+    Game.global_car_odds = Game.difficulty_increases ? Game.car_odds_levels[Game.car_odds_levels.length-1][1] : 1;
+
+    Game.car_odds_total  = 0;
+    
+    _.each(Game.car_odds, function(odds){
+      Game.car_odds_total += odds[1];
+    });
 
     if (auto_start===true) {
       Game.start();
@@ -456,6 +464,8 @@ Game = {
       
       Game.bosses = BOSSES;
 
+      Game.boss_sequence = BOSS_SEQUENCE;
+
       Game.boss_countdown = 0;
 
       Game.boss_timer = window.setInterval(function(){
@@ -466,13 +476,13 @@ Game = {
           Game.boss_countdown+=1;
           
           // get boss hash
-          if (boss = _.detect(Game.bosses, function(boss){ return boss.time==Game.boss_countdown; })) {
+          if (boss = _.detect(Game.boss_sequence, function(boss){ return boss[1]==Game.boss_countdown; })) {
             
             // pick a random Street's Maker to usurp
             var boss_street = Game.streets[Math.floor(Math.random()*Game.streets.length)];
 
             // generate the boss
-            boss_street.maker.build_car(boss);
+            boss_street.maker.build_car(Game.bosses[boss[0]]);
 
           }    
         }
@@ -1214,12 +1224,19 @@ Game = {
 
   increment_car_odds : function(){
     if (Game.difficulty_increases) {
-      if (Game.global_car_odds!=1.0) {
-        if (arr = _.detect(Game.car_odd_levels, function(level){ return Game.score >= level[0]; })) {
-          Game.global_car_odds = arr[1];
-          return Game.global_car_odds;  
+
+      console.log("global car odds", Game.global_car_odds, Game.car_odds_total);
+      Game.log("global car odds", Game.global_car_odds, Game.car_odds_total);
+
+      if (Game.started===true) {
+        if (Game.global_car_odds!=1.0) {
+          if (arr = _.detect(Game.car_odds_levels, function(level){ return Game.score >= level[0]; })) {
+            Game.global_car_odds = arr[1];
+            return Game.global_car_odds;  
+          }  
         }  
       }
+      
     }
   },
 
@@ -1554,7 +1571,7 @@ var Car = function(car_hash){
   this.sounds                = car_hash && car_hash.sounds                ? car_hash.sounds          : false;
   this.interrupt_all_sounds  = car_hash && car_hash.interrupt_all_sounds  ? true                     : false;
   this.score                 = car_hash && car_hash.score                 ? car_hash.score           : 1;
-  this.animate               = car_hash && car_hash.animate               ? true                     : false;
+  this.animating             = car_hash && car_hash.animating             ? true                     : false;
   this.animation             = car_hash && car_hash.animation             ? car_hash.animation       : {};
   
   this.street                = false;
@@ -1618,9 +1635,16 @@ var Car = function(car_hash){
   
       if (this.image_assets) {
 
-        this.image = (this.orientation=='horizontal' ? 
-          (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
-          (this.lefthand ? this.image_assets[2] : this.image_assets[3]) ); 
+        // for sprites
+        if (this.image_assets.length===1) {
+          this.image = this.image_assets[0];
+
+        } else {
+          this.image = (this.orientation=='horizontal' ? 
+            (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
+            (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );   
+        }
+        
 
       } else {
         
@@ -1838,7 +1862,7 @@ var Car = function(car_hash){
 
   };
 
-  this.render = function(left, top){
+  this.render = function(left, top) {
     
     var self   = this,
         street = self.street,
@@ -1857,8 +1881,10 @@ var Car = function(car_hash){
       ctx.fill();
 
     } else {
-      
-      if (this.animate) {
+
+      // console.log('animating?', this.animating);
+
+      if (this.animating) {
 
         if (Game.frames == this.last_game_frame+this.step) {
           if (this.current_frame < this.animation.frames-1) {
@@ -1876,7 +1902,17 @@ var Car = function(car_hash){
 
       } else {
 
-        ctx.drawImage(self.image, self.current_pos.left, self.current_pos.top);  
+        // console.log('rendering, not animating', Game.car_sprite_layout, [this.orientation,this.left?'left':'right'].join('-'), $.inArray(Game.car_sprite_layout, [this.orientation,this.left?'left':'right'].join('-')));
+        if (this.orientation=='horizontal') {
+          var sx = 0 + (this.width * $.inArray([this.orientation,this.lefthand?'left':'right'].join('-'), Game.car_sprite_layout ));  
+        } else {
+          var sx = 0 + (this.height * $.inArray([this.orientation,this.lefthand?'left':'right'].join('-'), Game.car_sprite_layout ));
+        }
+        
+        // console.log(this.type, sx);
+
+        ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height);
+        // ctx.drawImage(self.image, self.current_pos.left, self.current_pos.top);  
 
       }
        
@@ -2213,7 +2249,7 @@ var Car = function(car_hash){
 var Factory = function(){
   
   this.cars = {};
-  this.bosses = [];
+  this.bosses = {};
 
   this.initialize = function(cars, bosses) {
 
@@ -2247,8 +2283,8 @@ var Factory = function(){
 
     });
 
-    _.each(bosses, function(boss, i){
-
+    _.each(bosses, function(boss, name){
+      
       var boss_assets = new Array;
 
       _.each(boss.assets,function(asset, j){
@@ -2257,11 +2293,11 @@ var Factory = function(){
         boss_assets.push( img );
       });
       
-      self.bosses.push(boss_assets);
+      self.bosses[name] = boss_assets;
       
     });
 
-    // console.log(self.cars);
+    console.log(self.bosses);
 
   };
 
@@ -2289,32 +2325,39 @@ var Maker = function(){
 
   };
 
-  this.generate = function(){
-
-    var self = this,
-        rand = Math.ceil(Math.random()*100),
-        car  = false;
+  this.get_random_car = function(){
     
-    _.each(self.car_odds, function(range, type){
-      if ( rand >= Math.round(range[0]*Game.global_car_odds) && 
-           rand <= Math.round(range[1]*Game.global_car_odds) ) {
-          car = self.car_types[type];
+    var self     = this,
+        rand     = Math.floor(Math.random()*Game.car_odds_total),
+        weight   = 0;
+
+    for (var i=0; i<Game.car_odds.length; i++) {
+      weight += Game.car_odds[i][1];
+      if ( rand < weight && 
+            (Game.global_car_odds==1.0 || 
+              Math.random() > Game.global_car_odds) ) 
+        {
+          return Game.car_odds[i][0];  
         }
-    });
+    }
 
-    if (car && _.isArray(car.assets[0]) && car.assets.length>1) {
+    return false;
+
+  };
+
+  this.generate  = function(){
+
+    var self = this;
+
+    if (car_type = this.get_random_car()) {
       
-      var rand2  = Math.floor(Math.random()*car.assets.length),
-          assets = car.assets[ rand2 ],
-          images = Game.factory.cars[ car.type ][ rand2 ];
-
-      return _.extend( _.clone(car), { assets : assets, image_assets : images });
-
-    } else {
+      var car = self.car_types[car_type];
 
       return _.extend( _.clone(car), { image_assets : Game.factory.cars[car.type] });  
 
     }
+
+    console.log('no car!');
     
   };
 
@@ -2330,11 +2373,11 @@ var Maker = function(){
 
   };
 
-  this.build_car = function(car_hash_override){
+  this.build_car = function(boss_override){
     var self     = this;
 
-    if (car_hash_override!==undefined) {
-      var car_hash = car_hash_override;
+    if (boss_override!==undefined) {
+      var car_hash = _.extend(boss_override, { image_assets : Game.factory.bosses[boss_override.type] });
     } else {
       var car_hash = self.generate();
     }
@@ -2344,6 +2387,8 @@ var Maker = function(){
       var car_name = [self.street.name, self.iterations, 0].join("-"),
           car      = new Car(car_hash);
     
+      console.log('building car', car_hash.type, boss_override);
+
       self.street.cars.push( car ); 
 
       car.initialize(car_name, self.street, self.street.orientation);

@@ -44,20 +44,20 @@ var MAP_HEIGHT = 768;
 
 var STREETS = [
   // name, orientation, top, left, width, height
-  ["amber_left_lane1",   "horizontal",  210,   0,     1024,  20 ],
-  ["amber_left_lane2",   "horizontal",  230,   0,     1024,  20 ],
-  ["amber_right_lane1",  "horizontal",  260,   0,     1024,  20 ],
-  ["amber_right_lane2",  "horizontal",  285,   0,     1024,  20 ],
+  // ["amber_left_lane1",   "horizontal",  210,   0,     1024,  20 ],
+  // ["amber_left_lane2",   "horizontal",  230,   0,     1024,  20 ],
+  // ["amber_right_lane1",  "horizontal",  260,   0,     1024,  20 ],
+  // ["amber_right_lane2",  "horizontal",  285,   0,     1024,  20 ],
   ["baker_left",         "horizontal",  512,   0,     1024,  20 ],
   ["baker_right",        "horizontal",  533,   0,     1024,  20 ],
-  ['chang_left_lane1',   "vertical",    0,     253,   20,    768 ],
-  ['chang_left_lane2',   "vertical",    0,     276,   20,    768 ],
-  ['chang_right_lane1',  "vertical",    0,     306,   20,    768 ],
-  ['chang_right_lane2',  "vertical",    0,     327,   20,    768 ],
-  ['dexter_left_lane1',  "vertical",    0,     653,   20,    768 ],
-  ['dexter_left_lane2',  "vertical",    0,     676,   20,    768 ],
-  ['dexter_right_lane1', "vertical",    0,     706,   20,    768 ],
-  ['dexter_right_lane2', "vertical",    0,     728,   20,    768 ]
+  // ['chang_left_lane1',   "vertical",    0,     253,   20,    768 ],
+  // ['chang_left_lane2',   "vertical",    0,     276,   20,    768 ],
+  // ['chang_right_lane1',  "vertical",    0,     306,   20,    768 ],
+  // ['chang_right_lane2',  "vertical",    0,     327,   20,    768 ],
+  // ['dexter_left_lane1',  "vertical",    0,     653,   20,    768 ],
+  // ['dexter_left_lane2',  "vertical",    0,     676,   20,    768 ],
+  // ['dexter_right_lane1', "vertical",    0,     706,   20,    768 ],
+  // ['dexter_right_lane2', "vertical",    0,     728,   20,    768 ]
 ];
 
 
@@ -116,37 +116,51 @@ var IMAGES_DIR = "images/";
 
 // all car types
 var CARS = {
-  car               : { 
-      type          : 'car', 
-      width         : 20, 
-      height        : 40, 
-      frustrates_by : 6,
-      score         : 1,
-      assets        : [ 
-        [ 'car2_r.png', 'car2_l.png', 'car2_d.png', 'car2_u.png' ], 
-        [ 'taxi_r.png', 'taxi_l.png', 'taxi_d.png', 'taxi_u.png' ]
-      ]
+  car             : {  type : 'car',      width : 20, height : 40, frustrates_by : 6, score : 1,
+      assets      : [ 'car2.png' ] 
+    },
+  taxi            : { type : 'taxi',      width : 20, height : 40, frustrates_by : 5, score : 1,
+      assets      : [ 'taxi.png' ] 
+    },
+  suv             : { type : 'suv',       width : 20, height : 40, frustrates_by : 6, score : 1,
+      assets      : [ 'suv.png' ]
     },
   hatch           : { type : 'hatch',     width : 20, height : 35, frustrates_by : 6, score : 1,
-      assets      : [ 'car1_r.png', 'car1_l.png', 'car1_d.png', 'car1_u.png' ] 
+      assets      : [ 'car1.png' ] 
     },
   jeepney         : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, score : 3,
-      assets      : [ 'jeepney_r.png', 'jeepney_l.png', 'jeepney_d.png', 'jeepney_u.png' ] 
+      assets      : [ 'jeepney.png' ] 
     },
   van             : { type : 'van',       width : 20, height : 45, frustrates_by : 4, score : 2,
-      assets      : [ 'van_r.png', 'van_l.png', 'van_d.png', 'van_u.png' ] 
+      assets      : [ 'van.png' ] 
     },
   bus             : { type : 'bus',       width : 20, height : 60, frustrates_by : 3, speed : 5, score : 4,
-      assets      : [ 'bus_r.png', 'bus_l.png', 'bus_d.png', 'bus_u.png' ] 
+      assets      : [ 'bus.png' ] 
+    },
+  police          : { type : 'police', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4,
+      assets      : [ 'carpolice_r.png', 'carpolice_l.png', 'carpolice_d.png', 'carpolice_u.png' ],
+      animating   : true,
+      animation   : { step : 6, frames : 5 },
+      important   : true,
+      sounds      : [ 'police' ]
+    },
+  firetruck       : { type : 'police', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4,
+      assets      : [ 'firetruck_r.png', 'firetruck_l.png', 'firetruck_d.png', 'firetruck_u.png' ],
+      animating   : true,
+      animation   : { step : 6, frames : 5 },
+      important   : true,
+      sounds      : [ 'police' ]
     },
   ambulance       : { type : 'ambulance', width : 20, height : 45, frustrates_by : 3, speed : 8, score : 5, 
       assets      : [ 'ambulance_r_anim.png', 'ambulance_l_anim.png', 'ambulance_d_anim.png', 'ambulance_u_anim.png' ],
-      animate     : true,
-      animation   : { step : 12, frames : 4 },
+      animating   : true,
+      animation   : { step : 6, frames : 5 },
       important   : true,
       sounds      : [ 'ambulance' ] 
     }
 };
+
+var CAR_SPRITE_LAYOUT = [ "vertical-left", "vertical-right", "horizontal-right", "horizontal-left" ];
 
 var LOADING_CARS = [
   'car2_r.png', 
@@ -169,13 +183,24 @@ var EXCLAMATIONS = [
   [ 'exclamation_01.png', 40, 40, -20, -25 ]
 ];
 
-var CAR_ODDS = { 'car' : [1,40], 'hatch' : [41,60], 'van' : [61,75], 'jeepney' : [75,90], 'bus' : [91,99], 'ambulance' : [99,100] };
+var CAR_ODDS = [  [ 'car',       40 ], 
+                  [ 'hatch',     20 ], 
+                  [ 'suv',       15 ], 
+                  [ 'van',       15 ], 
+                  [ 'jeepney',   15 ], 
+                  [ 'bus',       10 ], 
+                  [ 'ambulance',  1 ], 
+                  [ 'police',     1 ], 
+                  [ 'firetruck',  1 ], 
+                ];
+// var CAR_ODDS = { 'car' : 40, 'hatch' : 20, 'suv' : 15, 'van' : 15, 'jeepney' : 15, 'bus' : 10, 'ambulance' : 1, 'police' : 1 };
+// var CAR_ODDS = { 'car' : [1,40], 'hatch' : [41,60], 'van' : [61,75], 'jeepney' : [75,90], 'bus' : [91,99], 'ambulance' : [99,100] };
+
 
 // in order for the global car odds to go up, a player
 // has to hit a certain number of points. we start at 0.3,
-// in other words, a car is only half as likely to be spawned
-// as "normal".
-var CAR_ODD_LEVELS = [
+// in other words, a car is only a third as likely to be spawned.
+var CAR_ODDS_LEVELS = [
   [ 0,   0.3   ],
   [ 30,  0.5   ],
   [ 60,  0.7   ],
@@ -204,7 +229,8 @@ var SOUNDS = {
   frustration   : "frustration",
   arrived       : "kaching",
   ambulance     : "ambulance",
-  hearse        : "hearse"
+  hearse        : "hearse",
+  police        : "police"
 };
 
 var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
@@ -272,15 +298,43 @@ var SUCCESS_MESSAGES = [
 var OTHERS = [ "bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_again.png", "explosion.png", "bg_help.jpg" ];
 
 
-var BOSSES = [
-  { time : 45,  score : 10, speed : 4, width : 20, height : 80,  important : true, sounds : [], assets : [ "towtruck_r.png", "towtruck_l.png", "towtruck_u.png", "towtruck_d.png" ] },
-  { time : 75,  score : 10, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
-  { time : 105, score : 20, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
-  { time : 135, score : 20, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck_r.png", "truck_l.png", "truck_u.png", "truck_d.png" ] },
-  { time : 165, score : 20, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
-  { time : 195, score : 30, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
-  { time : 225, score : 30, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
-  { time : 255, score : 50, speed : 2, width : 20, height : 200, important : true, interrupt_all_sounds : true, sounds : ['hearse'], assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] }
+var BOSSES = {
+  towtruck : { type : 'towtruck', score : 10, speed : 4, width : 20, height : 80,  important : true, sounds : [], assets : [ "towtruck.png" ] },
+  truck    : { type : 'truck',    score : 10, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck.png"] },
+  convoy   : { type : 'convoy',   score : 20, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+  hearse   : { type : 'hearse',   score : 50, speed : 2, width : 20, height : 200, important : true, interrupt_all_sounds : true, sounds : ['hearse'], assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] },
+};
+
+var BOSS_SEQUENCE = [
+  [ 'towtruck', 45  ],
+  [ 'truck',    75  ],
+  [ 'truck',    105 ],
+  [ 'truck',    135 ],
+  [ 'convoy',   165 ],
+  [ 'convoy',   195 ],
+  [ 'convoy',   225 ],
+  [ 'hearse',   255 ],
+  [ 'towtruck', 300 ],
+  [ 'convoy',   315 ],
+  [ 'truck',    330 ],
+  [ 'convoy',   345 ],
+  [ 'towtruck', 360 ],
+  [ 'truck',    375 ],
+  [ 'convoy',   390 ],
+  [ 'truck',    410 ],
+  [ 'convoy',   425 ],
+  [ 'towtruck', 440 ],
+  [ 'truck',    455 ],
+  [ 'convoy',   470 ],
+  [ 'towtruck', 485 ],
+  [ 'hearse',   500 ],
+  [ 'convoy',   515 ],
+  [ 'towtruck', 530 ],
+  [ 'truck',    545 ],
+  [ 'convoy',   560 ],
+  [ 'towtruck', 575 ],
+  [ 'truck',    590 ],
+  [ 'convoy',   605 ]
 ];
 
 var TUTORIAL = [
