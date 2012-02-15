@@ -1225,7 +1225,7 @@ Game = {
   increment_car_odds : function(){
     if (Game.difficulty_increases) {
 
-      console.log("global car odds", Game.global_car_odds, Game.car_odds_total);
+      // console.log("global car odds", Game.global_car_odds, Game.car_odds_total);
       Game.log("global car odds", Game.global_car_odds, Game.car_odds_total);
 
       if (Game.started===true) {
@@ -2339,7 +2339,7 @@ var Maker = function(){
         }
       } 
     } else {
-      console.log('no car!');
+      // console.log('no car!');
       return false;
     }
 

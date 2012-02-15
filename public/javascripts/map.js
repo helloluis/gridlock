@@ -149,7 +149,7 @@ var CARS = {
       animating   : true,
       animation   : { step : 6, frames : 5 },
       important   : true,
-      sounds      : [ 'police' ]
+      sounds      : [ 'firetruck' ]
     },
   ambulance       : { type : 'ambulance', width : 20, height : 45, frustrates_by : 3, speed : 8, score : 5, 
       assets      : [ 'ambulance_r_anim.png', 'ambulance_l_anim.png', 'ambulance_d_anim.png', 'ambulance_u_anim.png' ],
@@ -231,7 +231,8 @@ var SOUNDS = {
   arrived       : "kaching",
   ambulance     : "ambulance",
   hearse        : "hearse",
-  police        : "police"
+  police        : "police",
+  firetruck     : "firetruck"
 };
 
 var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
