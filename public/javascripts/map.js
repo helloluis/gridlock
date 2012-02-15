@@ -138,21 +138,21 @@ var CARS = {
       assets      : [ 'bus.png' ] 
     },
   police          : { type : 'police', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4,
-      assets      : [ 'carpolice_r.png', 'carpolice_l.png', 'carpolice_d.png', 'carpolice_u.png' ],
+      assets      : [ 'carpolice_r.png', 'carpolice_l.png', 'carpolice_u.png', 'carpolice_d.png' ],
       animating   : true,
       animation   : { step : 6, frames : 5 },
       important   : true,
       sounds      : [ 'police' ]
     },
-  firetruck       : { type : 'police', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4,
-      assets      : [ 'firetruck_r.png', 'firetruck_l.png', 'firetruck_d.png', 'firetruck_u.png' ],
+  firetruck       : { type : 'firetruck', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4,
+      assets      : [ 'firetruck_r.png', 'firetruck_l.png', 'firetruck_u.png', 'firetruck_d.png' ],
       animating   : true,
       animation   : { step : 6, frames : 5 },
       important   : true,
       sounds      : [ 'firetruck' ]
     },
   ambulance       : { type : 'ambulance', width : 20, height : 45, frustrates_by : 3, speed : 8, score : 5, 
-      assets      : [ 'ambulance_r_anim.png', 'ambulance_l_anim.png', 'ambulance_d_anim.png', 'ambulance_u_anim.png' ],
+      assets      : [ 'ambulance_r.png', 'ambulance_l.png', 'ambulance_u.png', 'ambulance_d.png' ],
       animating   : true,
       animation   : { step : 6, frames : 5 },
       important   : true,
@@ -183,20 +183,18 @@ var EXCLAMATIONS = [
   [ 'exclamation_01.png', 40, 40, -20, -25 ]
 ];
 
-var CAR_ODDS = [  [ 'car',       40 ], 
-                  [ 'taxi',      20 ], 
-                  [ 'hatch',     20 ], 
-                  [ 'suv',       15 ], 
-                  [ 'van',       15 ], 
-                  [ 'jeepney',   15 ], 
-                  [ 'bus',       10 ], 
-                  [ 'ambulance',  1 ], 
-                  [ 'police',     1 ], 
-                  [ 'firetruck',  1 ], 
-                ];
-// var CAR_ODDS = { 'car' : 40, 'hatch' : 20, 'suv' : 15, 'van' : 15, 'jeepney' : 15, 'bus' : 10, 'ambulance' : 1, 'police' : 1 };
-// var CAR_ODDS = { 'car' : [1,40], 'hatch' : [41,60], 'van' : [61,75], 'jeepney' : [75,90], 'bus' : [91,99], 'ambulance' : [99,100] };
-
+var CAR_ODDS = [  
+  [ 'car',       40 ], 
+  [ 'taxi',      20 ], 
+  [ 'hatch',     20 ], 
+  [ 'suv',       15 ], 
+  [ 'van',       15 ], 
+  [ 'jeepney',   15 ], 
+  [ 'bus',       10 ], 
+  [ 'ambulance',  1 ], 
+  [ 'police',     1 ], 
+  [ 'firetruck',  1 ], 
+];
 
 // in order for the global car odds to go up, a player
 // has to hit a certain number of points. we start at 0.3,
