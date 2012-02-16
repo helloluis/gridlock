@@ -301,40 +301,41 @@ var OTHERS = [ "bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_aga
 
 
 var BOSSES = {
-  towtruck : { type : 'towtruck', score : 10, speed : 4, width : 20, height : 80,  important : true, sounds : [], assets : [ "towtruck.png" ] },
-  truck    : { type : 'truck',    score : 10, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck.png"] },
-  convoy   : { type : 'convoy',   score : 20, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
-  hearse   : { type : 'hearse',   score : 50, speed : 2, width : 20, height : 200, important : true, interrupt_all_sounds : true, sounds : ['hearse'], assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] },
+  towtruck  : { type : 'towtruck',  score : 10, speed : 4, width : 20, height : 80,  important : true, sounds : [], assets : [ "towtruck.png" ] },
+  truck     : { type : 'truck',     score : 10, speed : 3, width : 20, height : 100, important : true, sounds : ['horn_truck'], assets : [ "truck.png"] },
+  convoy    : { type : 'convoy',    score : 20, speed : 3, width : 20, height : 120, important : true, sounds : [], assets : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+  transport : { type : 'transport', score : 30, speed : 3, width : 20, height : 150, important : true, sounds : ['horn_truck'], assets : [ "transporter.png"] },
+  hearse    : { type : 'hearse',    score : 50, speed : 2, width : 20, height : 200, important : true, interrupt_all_sounds : true, sounds : ['hearse'], assets : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] }  
 };
 
 var BOSS_SEQUENCE = [
   [ 'towtruck', 45  ],
   [ 'truck',    75  ],
   [ 'truck',    105 ],
-  [ 'truck',    135 ],
+  [ 'convoy',   135 ],
   [ 'convoy',   165 ],
-  [ 'convoy',   195 ],
+  [ 'transport',195 ],
   [ 'convoy',   225 ],
   [ 'hearse',   255 ],
   [ 'towtruck', 300 ],
   [ 'convoy',   315 ],
   [ 'truck',    330 ],
-  [ 'convoy',   345 ],
+  [ 'transport',345 ],
   [ 'towtruck', 360 ],
   [ 'truck',    375 ],
   [ 'convoy',   390 ],
   [ 'truck',    410 ],
-  [ 'convoy',   425 ],
+  [ 'transport',425 ],
   [ 'towtruck', 440 ],
   [ 'truck',    455 ],
   [ 'convoy',   470 ],
-  [ 'towtruck', 485 ],
+  [ 'transport',485 ],
   [ 'hearse',   500 ],
   [ 'convoy',   515 ],
   [ 'towtruck', 530 ],
   [ 'truck',    545 ],
   [ 'convoy',   560 ],
-  [ 'towtruck', 575 ],
+  [ 'transport',575 ],
   [ 'truck',    590 ],
   [ 'convoy',   605 ]
 ];
