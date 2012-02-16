@@ -319,7 +319,7 @@ var BOSSES = {
   transport : { type : 'transport', score : 30, speed : 3, width : 20, height : 150, 
     important : true, 
     sounds : ['horn_truck'], 
-    assets : [ "transporter.png"] },
+    assets : [ "car_transporter.png"] },
 
   hearse      : { type : 'hearse',   score : 50, speed : 2, width : 20, height : 200, 
     important : true, 
