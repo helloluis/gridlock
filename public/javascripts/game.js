@@ -1636,9 +1636,7 @@ var Car = function(car_hash){
           (this.lefthand ? this.assets[2] : this.assets[3]) );        
       }
 
-      
-
-      if (this.animate) {
+      if (this.animating) {
 
         // we store the current Game.frame number that this Car is created on, 
         // then wait until (this.last_game_frame+this.step) before switching to the next frame
