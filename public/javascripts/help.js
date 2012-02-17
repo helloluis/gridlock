@@ -416,9 +416,11 @@ Help = {
         loop_blue(blue[0], 0, blue[0].position().left, -100, blue[0].position().top, 3000);
         loop_blue(blue[1], 1, blue[1].position().left, -100, blue[1].position().top, 3500);
         loop_blue(blue[2], 2, blue[2].position().left, -100, blue[2].position().top, 4000);
+        
+        next();
 
       }).
-      delay(4000).
+      delay(2000, 'frustration').
       queue('frustration', function(next){
         var i = 0; 
         self.frustration.dom.everyTime(1000,function(){

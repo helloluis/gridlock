@@ -53,7 +53,7 @@ Game = {
    
   max_speed            : MAX_SPEED,
   max_frustration      : 100,
-  enable_frustration   : true,
+  enable_thoughtbubbles : true,
    
   maker_freq           : MAKER_FREQUENCY,                  // how often does a Maker add a new car to the road
   max_cars_per_street  : MAX_CARS_PER_STREET,              
@@ -131,15 +131,8 @@ Game = {
           Game.loader.add(img);
       });
 
-      _.each(FRUSTRATIONS, function(f){
-        var img = new PxLoaderImage(Game.images_dir + f[0]);
-          Game.loader.add(img);
-      });
-
-      _.each(EXCLAMATIONS, function(e){
-        var img = new PxLoaderImage(Game.images_dir + e[0]);
-          Game.loader.add(img);
-      });
+      var img = new PxLoaderImage(Game.images_dir + THOUGHTBUBBLES_SPRITE);
+      Game.loader.add(img);
 
       _.each(OTHERS, function(o){
         var img = new PxLoaderImage(Game.images_dir + o);
@@ -273,9 +266,7 @@ Game = {
 
     Game.initialize_tutorial();
 
-    Game.initialize_frustration();  
-    
-    Game.initialize_exclamation();  
+    Game.initialize_thoughtbubbles();
 
     Game.global_car_odds = Game.difficulty_increases ? Game.car_odds_levels[Game.car_odds_levels.length-1][1] : 1;
 
@@ -374,7 +365,7 @@ Game = {
     }
     
     Game.frustration_canvas = document.getElementById('frustrations');
-    Game.frustration_context = Game.frustration_canvas.getContext('2d');
+    Game.bubble_context = Game.frustration_canvas.getContext('2d');
 
     if (Game.debug==true) {
       $(".neighborhood").css({'background':"#121212"});
@@ -545,7 +536,7 @@ Game = {
 
     }
       
-    Game.frustration_context.clearRect(0, 0, Game.width, Game.height);
+    Game.bubble_context.clearRect(0, 0, Game.width, Game.height);
 
     Game.deferred_renders = new Array;
 
@@ -595,7 +586,7 @@ Game = {
     Game.streets = [];
     Game.score = 0;
     Game.score_cont.text('0');
-    Game.initialize_frustration();
+    Game.initialize_thoughtbubbles();
     Game.initialize_high_score();
 
     $(".restart").hide();
@@ -1240,40 +1231,30 @@ Game = {
     }
   },
 
-  initialize_frustration : function(){
+  initialize_thoughtbubbles : function(){
     
-    if (Game.enable_frustration) {
+    if (Game.enable_thoughtbubbles) {
       
-      Game.log("initializing frustration assets", FRUSTRATIONS.length);
+      Game.log("initializing thoughtbubble assets");
 
       Game.frustration = 0;
 
-      Game.frustration_assets = _.map(FRUSTRATIONS, function(f){ 
-                                    var img = new Image();
-                                    img.src = IMAGES_DIR + f[0];
-                                    return {  image  : img, 
-                                              width  : f[1], 
-                                              height : f[2], 
-                                              top    : f[3], 
-                                              left   : f[4] };
-                                  });
+      Game.thoughtbubble_sprite = new Image();
+      Game.thoughtbubble_sprite.src = IMAGES_DIR + THOUGHTBUBBLES_SPRITE;
+      
+      Game.thoughtbubble_assets = {};
+      _.each(THOUGHTBUBBLES, function(t, i){
+        Game.thoughtbubble_assets[t] = {
+            width    : THOUGHTBUBBLES_DIMENSIONS[0],
+            height   : THOUGHTBUBBLES_DIMENSIONS[1],
+            off_top  : THOUGHTBUBBLES_DIMENSIONS[2],
+            off_left : THOUGHTBUBBLES_DIMENSIONS[3],
+            top      : 0,
+            left     : (THOUGHTBUBBLES_DIMENSIONS[0]*i)
+          };
+      });
+
     }
-  },
-
-  // highlight vehicles with important===true
-  initialize_exclamation : function(){
-
-    Game.log('initializing exclamation assets', EXCLAMATIONS.length);
-
-    Game.exclamation_assets = _.map(EXCLAMATIONS, function(f){ 
-                                    var img = new Image();
-                                    img.src = IMAGES_DIR + f[0];
-                                    return {  image  : img, 
-                                              width  : f[1], 
-                                              height : f[2], 
-                                              top    : f[3], 
-                                              left   : f[4] };
-                                  });
   },
 
   adjust_frustration : function(){
@@ -1620,8 +1601,8 @@ var Car = function(car_hash){
     this.initialize_origins(); 
     this.initialize_intersecting();
     
-    if (Game.enable_frustration) {
-      this.initialize_frustration();  
+    if (Game.enable_thoughtbubbles) {
+      this.initialize_thoughtbubbles();  
     }
     
     this.initialize_sounds();
@@ -1768,7 +1749,7 @@ var Car = function(car_hash){
     });
   };
 
-  this.initialize_frustration = function(){
+  this.initialize_thoughtbubbles = function(){
     this.frustration_thresholds = [
       Math.round(this.ideal_travel_time/2),
       Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.35)),
@@ -1779,7 +1760,7 @@ var Car = function(car_hash){
 
   // this function manages the vehicle's indicators, which could be either
   // the important (!) notification or the frustration (:() icons and sounds
-  this.show_indicators = function(){
+  this.show_thoughtbubbles = function(){
     
     var self = this;
     
@@ -1787,8 +1768,13 @@ var Car = function(car_hash){
 
     var travel = Math.round(self.actual_travel_time/Game.speed);
 
-    if (self.important===true && travel < self.frustration_thresholds[0]) {
-      return Game.exclamation_assets[0];
+    if (travel < self.frustration_thresholds[0]) {
+      
+      if (_.include(_.keys(Game.thoughtbubble_assets), self.type)) {
+        return Game.thoughtbubble_assets[self.type];  
+      } else if (self.important===true) {
+        return Game.thoughtbubble_assets.important;
+      } 
       
     } else if (travel == self.frustration_thresholds[0]) {
       
@@ -1798,7 +1784,7 @@ var Car = function(car_hash){
     } else if (travel > self.frustration_thresholds[0] && travel < self.frustration_thresholds[1]) {
 
       if (self.moving===false) {
-        return Game.frustration_assets[0];
+        return Game.thoughtbubble_assets.frustration_01;
       }
 
     } else if (travel == self.frustration_thresholds[1]) {
@@ -1808,13 +1794,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.frustration_assets[0];
+        return Game.thoughtbubble_assets.frustration_01;
       }
     
     } else if (travel > self.frustration_thresholds[1] && travel < self.frustration_thresholds[2]) {
       
       if (self.moving===false) {
-        return Game.frustration_assets[1];  
+        return Game.thoughtbubble_assets.frustration_02;  
       }
 
     } else if (travel == self.frustration_thresholds[2]) {
@@ -1826,13 +1812,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.frustration_assets[1];
+        return Game.thoughtbubble_assets.frustration_02;
       }
 
     } else if (travel > self.frustration_thresholds[2] && travel < self.frustration_thresholds[3]) {
       
       if (self.moving===false) {
-        return Game.frustration_assets[2];  
+        return Game.thoughtbubble_assets.frustration_03;  
       }
     
     } else if (travel === self.frustration_thresholds[3]) {
@@ -1841,13 +1827,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.frustration_assets[2];  
+        return Game.thoughtbubble_assets.frustration_03;
       }
     
     } else if (travel > self.frustration_thresholds[3] && travel < self.ideal_travel_time) {
 
       if (self.moving===false) {
-        return Game.frustration_assets[3];  
+        return Game.thoughtbubble_assets.frustration_04;
       }
       
     } else if (travel === self.ideal_travel_time) {
@@ -1855,7 +1841,7 @@ var Car = function(car_hash){
       Game.end_with_frustration();
 
       if (self.moving===false) {
-        return Game.frustration_assets[3];  
+        return Game.thoughtbubble_assets.frustration_04;
       }
 
     }
@@ -1869,7 +1855,7 @@ var Car = function(car_hash){
     var self   = this,
         street = self.street,
         ctx    = self.street.context,
-        frus   = Game.frustration_context;
+        bub    = Game.bubble_context;
 
     if (Game.debug===true) {
       ctx.beginPath();
@@ -1915,20 +1901,20 @@ var Car = function(car_hash){
        
     }
 
-    if (Game.enable_frustration) {
-      if (indicator = self.show_indicators()) {
+    if (Game.enable_thoughtbubbles) {
+      if (indicator = self.show_thoughtbubbles()) {
         Game.deferred_renders.push([ 
             function(f, p) {
 
               var left = p.orientation=='horizontal' ? 
-                          (p.lefthand ? p.current_pos.left+f.left : p.current_pos.left+p.width-(f.width-f.left)) :
-                          (p.lefthand ? p.current_pos.left+f.left : p.current_pos.left-f.width+(p.width/2)),
+                          (p.lefthand ? p.current_pos.left+f.off_left : p.current_pos.left+p.width-(f.width-f.off_left)) :
+                          (p.lefthand ? p.current_pos.left+f.off_left : p.current_pos.left-f.width+(p.width/2)),
                   top  = p.orientation=='horizontal' ? 
-                          (p.lefthand ? p.current_pos.top-(p.height/2)-(f.height+f.top) : p.current_pos.top-(p.height/2)-(f.height+f.top) ) :
-                          (p.lefthand ? p.current_pos.top+p.height-(f.height-f.top) : p.current_pos.top+f.top );
+                          (p.lefthand ? p.current_pos.top-(p.height/2)-(f.height+f.off_top) : p.current_pos.top-(p.height/2)-(f.height+f.off_top) ) :
+                          (p.lefthand ? p.current_pos.top+p.height-(f.height-f.off_top) : p.current_pos.top+f.off_top );
               
-              //debugger;
-              frus.drawImage( f.image, left, top ); 
+              
+              bub.drawImage( Game.thoughtbubble_sprite, f.left, f.top, f.width, f.height, left, top, f.width, f.height ); 
 
             }, 
             indicator, 
@@ -2390,7 +2376,7 @@ var Maker = function(){
       var car_name = [self.street.name, self.iterations, 0].join("-"),
           car      = new Car(car_hash);
     
-      console.log('boss override', boss_override===undefined, car_hash.width, car_hash.height);
+      // console.log('boss override', boss_override===undefined, car_hash.width, car_hash.height);
 
       self.street.cars.push( car ); 
 

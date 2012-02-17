@@ -171,6 +171,22 @@ var LOADING_CARS = [
   'bus_r.png'
 ];
 
+// width, height, offset top, offset left
+var THOUGHTBUBBLES_DIMENSIONS = [ 40, 40, -25, -25 ];
+
+var THOUGHTBUBBLES_SPRITE = "thoughtbubbles.png";
+
+var THOUGHTBUBBLES = [
+   'ambulance',
+   'police',
+   'firetruck',
+   'important',
+   'frustration_01',
+   'frustration_02',
+   'frustration_03',
+   'frustration_04'
+];
+
 var FRUSTRATIONS = [
   // filename, width, height, offset top, offset left
   [ 'frustration_01.png', 40, 40, -25, -25 ],
