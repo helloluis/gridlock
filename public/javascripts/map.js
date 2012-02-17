@@ -195,10 +195,6 @@ var FRUSTRATIONS = [
   [ 'frustration_04.png', 40, 40, -25, -25 ]
 ];
 
-var EXCLAMATIONS = [
-  [ 'exclamation_01.png', 40, 40, -20, -25 ]
-];
-
 var CAR_ODDS = [  
   [ 'car',       40 ], 
   [ 'taxi',      20 ], 

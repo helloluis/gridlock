@@ -23,13 +23,12 @@ Game = {
   difficulty_increases : true,  // if set to false, we don't make the game harder as time goes on
   smart_intersections  : true,  // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
   double_buffering     : true,  // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
-  multiple_canvases    : false, // if set to true, we use one canvas per street
   with_bosses          : true,  // enable level bosses
 
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
 
-  enable_tutorial      : true,
+  enable_canvas        : false, // if set to true, use Canvas to animate. if false, use the DOM.
    
   fps                  : FPS,
   timer                : 0,
@@ -349,23 +348,34 @@ Game = {
     
     Game.log("double buffering?", Game.double_buffering);
 
-    if (Game.double_buffering) {
-      Game.car_canvas  = document.getElementById('cars');
-      Game.real_car_context = Game.car_canvas.getContext('2d');
+    if (Game.enable_canvas) {
       
-      Game.virtual_car_canvas = document.createElement('canvas');
-      Game.virtual_car_canvas.width = Game.width;
-      Game.virtual_car_canvas.height = Game.height;
-      Game.car_context = Game.virtual_car_canvas.getContext('2d');
-    
+      if (Game.double_buffering) {
+
+        Game.car_canvas  = document.getElementById('cars');
+        Game.real_car_context = Game.car_canvas.getContext('2d');
+        
+        Game.virtual_car_canvas = document.createElement('canvas');
+        Game.virtual_car_canvas.width = Game.width;
+        Game.virtual_car_canvas.height = Game.height;
+        Game.car_context = Game.virtual_car_canvas.getContext('2d');
+      
+      } else {
+
+        Game.car_canvas  = document.getElementById('cars');
+        Game.car_context = Game.car_canvas.getContext('2d');  
+        
+      }
+      
+      Game.bubble_canvas = document.getElementById('frustrations');
+      Game.bubble_context = Game.bubble_canvas.getContext('2d');  
+
     } else {
-      Game.car_canvas  = document.getElementById('cars');
-      Game.car_context = Game.car_canvas.getContext('2d');  
       
+      $("#cars").replaceWith("<div id='cars'></div>");
+
     }
     
-    Game.frustration_canvas = document.getElementById('frustrations');
-    Game.bubble_context = Game.frustration_canvas.getContext('2d');
 
     if (Game.debug==true) {
       $(".neighborhood").css({'background':"#121212"});
@@ -493,30 +503,50 @@ Game = {
       
       Game.frames+=1;
 
-      Game.clear_canvases();
+      if (Game.enable_canvas) {
 
-      if (Game.debug==true) {
-        Game.show_game_objects();  
-      }
+        Game.clear_canvases();
 
-      _.each(Game.streets, function(street){
-        _.each(street.cars, function(car){
-          car.animate();
-        });
-      });
-
-      if (Game.double_buffering) {
-        Game.real_car_context.drawImage(Game.virtual_car_canvas, 0, 0);
-      }
-
-      _.each(Game.deferred_renders, function(arr) {
-        if (_.isFunction(arr[0])) {
-          var func = arr[0];
-          arr.splice(0,1);
-          func(arr[0], arr[1]); // TODO: Figure out how to use Function.apply() here so we can have a dynamic number of arguments
+        if (Game.debug==true) {
+          Game.show_game_objects();  
         }
-      });
 
+        _.each(Game.streets, function(street){
+          _.each(street.cars, function(car){
+            car.animate();
+          });
+        });
+
+        if (Game.double_buffering) {
+          Game.real_car_context.drawImage(Game.virtual_car_canvas, 0, 0);
+        }
+
+        _.each(Game.deferred_renders, function(arr) {
+          if (_.isFunction(arr[0])) {
+            var func = arr[0];
+            arr.splice(0,1);
+            func(arr[0], arr[1]); 
+          }
+        });
+
+      } else {
+        
+        _.each(Game.streets, function(street){
+          _.each(street.cars, function(car){
+            car.animate();
+          });
+        });
+
+        _.each(Game.deferred_renders, function(arr) {
+          if (_.isFunction(arr[0])) {
+            var func = arr[0];
+            arr.splice(0,1);
+            func(arr[0], arr[1]); 
+          }
+        });
+
+      }
+      
       //new frame
       requestAnimFrame(function(){
         Game.animate();  
@@ -1555,6 +1585,8 @@ var Car = function(car_hash){
   this.animating             = car_hash && car_hash.animating             ? true                     : false;
   this.animation             = car_hash && car_hash.animation             ? car_hash.animation       : {};
   
+  this.dom                   = car_hash && car_hash.dom                   ? car_hash.dom             : false;
+
   this.street                = false;
   this.moving                = false;
   
@@ -1636,9 +1668,7 @@ var Car = function(car_hash){
           (this.lefthand ? this.assets[2] : this.assets[3]) );        
       }
 
-      
-
-      if (this.animate) {
+      if (this.animating) {
 
         // we store the current Game.frame number that this Car is created on, 
         // then wait until (this.last_game_frame+this.step) before switching to the next frame

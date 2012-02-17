@@ -171,7 +171,6 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 
 .intersection { width:50px; height:50px; z-index:14; -webkit-tap-highlight-color: rgba(0,0,0,0) }
 .stoplight { position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:3; background:url(../images/control_horizontal.png) no-repeat 50% 50%; opacity:0.7; -webkit-tap-highlight-color: rgba(0,0,0,0); cursor: pointer; }
-/* .stoplight.vertical { -webkit-transform:rotate(90deg) translateZ(0); -webkit-tap-highlight-color: rgba(0,0,0,0) } */
 .stoplight.vertical { background-image:url(../images/control_vertical.png); }
 .explosion { position:absolute; z-index:13; background-image: url(../images/explosion.png); width:80px; height:80px; background-repeat:no-repeat; }
 .frustration { position:absolute; width:15px; height:15px; background-image: url(../images/frustration.png); z-index:9; }
@@ -189,16 +188,82 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #overlay { background:rgba(0,0,0,0.7); position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:19; }
 #overlay .bttn { top:40%; left:42%; }
 
-.car.horizontal { width:40px; height:20px; }
-.car.vertical { width:20px; height:40px; }
-.car.blue.horizontal { background:url(../images/car2_l.png); }
-.car.blue.horizontal.right { background:url(../images/car2_r.png); }
-.car.blue.vertical { background:url(../images/car2_d.png); }
-.car.blue.vertical.right { background:url(../images/car2_u.png); }
-.car.yellow.horizontal { background:url(../images/taxi_l.png); }
-.car.yellow.horizontal.right { background:url(../images/taxi_r.png); }
-.car.yellow.vertical { background:url(../images/taxi_d.png); }
-.car.yellow.vertical.right { background:url(../images/taxi_u.png); }
+
+/******************/
+/* VEHICLE STYLES */
+/******************/
+
+.car { width:20px; height:40px; background:url(../images/car2.png); }
+.car.vertical.right { background-position:-40px 0px; }
+.car.horizontal { width:40px; height:20px; background-position:-120px 0px; }
+.car.horizontal.right { background-position:-80px 0px; }
+
+.car.hatch { height:35px; background:url(../images/car1.png); }
+.car.hatch.vertical.right { background-position:-35px 0px; }
+.car.hatch.horizontal { width:35px; height:20px; background-position:-105px 0px; }
+.car.hatch.horizontal.right { background-position:-70px 0px; }
+
+.car.taxi { background:url(../images/taxi.png); }
+.car.police { background:url(../images/carpolice_u.png); }
+.car.police.vertical.right { background:url(../images/carpolice_d.png); }
+.car.police.horizontal { background:url(../images/carpolice_l.png); }
+.car.police.horizontal.right { background:url(../images/carpolice_r.png); }
+
+.car.firetruck { background:url(../images/firetruck_u.png); }
+.car.firetruck.vertical.right { background:url(../images/firetruck_d.png); }
+.car.firetruck.horizontal { background:url(../images/firetruck_l.png); }
+.car.firetruck.horizontal.right { background:url(../images/firetruck_r.png); }
+
+.car.ambulance { background:url(../images/ambulance_u.png); height:45px; }
+.car.ambulance.vertical.right { background:url(../images/ambulance_d.png); }
+.car.ambulance.horizontal { width:45px; background:url(../images/ambulance_l.png); }
+.car.ambulance.horizontal.right { background:url(../images/ambulance_r.png); }
+
+.car.suv { background:url(../images/suv.png); }
+
+.car.jeepney, .car.van { height:45px; background:url(../images/jeepney.png); }
+.car.jeepney.vertical.right,
+  .car.van.vertical.right { background-position:-45px 0px; }
+.car.jeepney.horizontal,
+  .car.van.horizontal { width:45px; background-position:-90px 0px; }
+.car.jeepney.horizontal.right,
+  .car.van.horizontal.right { background-position:-135px 0px; }
+
+.car.van { background:url(../images/van.png); }
+
+.car.bus { height:60px; background:url(../images/bus.png); }
+.car.bus.vertical.right { background-position:-60px 0px; }
+.car.bus.horizontal { width:60px; background-position:-120px 0px; }
+.car.bus.horizontal.right { background-position:-180px 0px; }
+
+.car.boss.towtruck { height:80px; background:url(../images/towtruck.png); }
+.car.boss.towtruck.vertical.right { background-position: -80px 0px; }
+.car.boss.towtruck.horizontal { background-position: -160px 0px; }
+.car.boss.towtruck.horizontal.right { background-position: -240px 0px; }
+
+.car.boss.truck { height:100px; background:url(../images/truck.png); }
+.car.boss.truck.vertical.right { background-position:-100px 0px; }
+.car.boss.truck.horizontal { width:100px; background-position:-200px 0px; }
+.car.boss.truck.horizontal.right { background-position:-300px 0px; }
+
+.car.boss.convoy { height: 120px; background:url(../images/convoy_u.png); }
+.car.boss.convoy.vertical.right { background:url(../images/convoy_d.png); }
+.car.boss.convoy.horizontal { height:120px; background:url(../images/convoy_l.png); }
+.car.boss.convoy.horizontal.right { background:url(../images/convoy_r.png); }
+
+.car.boss.transporter { height:150px; background:url(../images/car_transporter.png); }
+.car.boss.transporter.vertical.right { background-position:-150px 0px; }
+.car.boss.transporter.horizontal { width:150px; background-position:-300px 0px; }
+.car.boss.transporter.horizontal.right { background-position:-450px 0px; }
+
+.car.boss.hearse { height: 200px; background:url(../images/hearse_u.png); }
+.car.boss.hearse.vertical.right { background:url(../images/hearse_d.png); }
+.car.boss.hearse.horizontal { height:200px; background:url(../images/hearse_l.png); }
+.car.boss.hearse.horizontal.right { background:url(../images/hearse_r.png); }
+
+/******************/
+/******************/
+
 
 .car_score { font-size:25px; position:absolute; z-index:20; opacity : 1; color:#ff0; }
 .car_score.big { font-size:36px; color:#f90; }
