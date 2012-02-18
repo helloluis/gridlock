@@ -60,8 +60,9 @@ a, #intro p strong { color:#fc0; }
 #intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; position:absolute; }
 #intro blockquote { font-size:18px; padding:10px 20px; }
 #intro h3 { padding:10px 0px 0px 0px; margin-bottom:0px; font-size:24px; color:#fff; }
-#intro .high_score_cont { position:absolute; top:380px; left:20px; color:#ff9; text-shadow:2px 2px 3px #000; }
-#intro .high_score_cont h3 { font-size:32px; }
+#intro .high_score_cont { position:absolute; bottom:20px; right:20px; color:#fff; text-shadow:2px 2px 3px #000; }
+#intro .high_score_cont label { float:left; margin-right:10px; line-height:32px; margin-bottom:0px; }
+#intro .high_score_cont h3 { float:left; font-size:32px; line-height:1; padding-top:0px; }
 #intro .examples { display:block; clear:both; overflow:hidden; margin-bottom:10px; margin-left:200px; }
 #intro h1, #intro h2 { text-align:center; }
 .bttn, .buttons li { cursor:pointer; }
@@ -123,7 +124,7 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #messages h2 { font-size:60px; }
 #messages .new_high_score { overflow:hidden; }
 #messages .new_high_score h1 { float:left; width:35%; margin-right:35px; text-align:right; line-height:2; color:#ff0; font-size:80px; }
-#messages .new_high_score h2 { float:left; font-size:48px; text-align:left; margin-bottom:10px; }
+#messages .new_high_score h2 { float:left; font-size:60px; text-align:left; margin-bottom:10px; }
 #messages .new_high_score p { float:left; font-size:36px; line-height:1.2; color:#fff; position:static; text-align:left; width:400px; }
 #messages .new_high_score .facebook { float:left; width:36px; height:36px; margin-right:10px; background:url(../images/facebook.png); margin-bottom:-2px; }
 #messages .new_high_score p.bttn { color:#9be; }
