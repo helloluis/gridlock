@@ -1075,7 +1075,7 @@ Game = {
 
   play_sound_theme : function(){
     Game.log('playing sound theme');
-    Game.play_sound('theme', true, 50);  
+    Game.play_sound('theme', true);  
   },
 
   stop_sound_theme : function(){
@@ -1101,7 +1101,7 @@ Game = {
 
       } else if (Game.with_soundjs) {
         if (loop) {
-          SoundJS.play( sound, null, 0.5, true );
+          SoundJS.play( sound, null, 1, true );
         } else {
           if (interrupt_all) {
             SoundJS.play( sound, SoundJS.INTERUPT_ANY );
@@ -1372,7 +1372,7 @@ Game = {
         } else {
           Game.stop_sound_theme();
           Game.stop_all_sounds(true);
-          Game.play_sound('frustration',false,50,true);
+          Game.play_sound('frustration',false,100,true);
           var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
           Game.show_message( "<h2 class='quip'>" + message + "</h2>" );
 
