@@ -163,12 +163,12 @@ var CARS = {
 var CAR_SPRITE_LAYOUT = [ "vertical-left", "vertical-right", "horizontal-right", "horizontal-left" ];
 
 var LOADING_CARS = [
-  'car2_r.png', 
-  'taxi_r.png', 
-  'car1_r.png', 
-  'jeepney_r.png', 
-  'van_r.png', 
-  'bus_r.png'
+  'car2.png', 
+  'taxi.png', 
+  'car1.png', 
+  'jeepney.png', 
+  'van.png', 
+  'bus.png'
 ];
 
 // width, height, offset top, offset left
@@ -195,10 +195,6 @@ var FRUSTRATIONS = [
   [ 'frustration_04.png', 40, 40, -25, -25 ]
 ];
 
-var EXCLAMATIONS = [
-  [ 'exclamation_01.png', 40, 40, -20, -25 ]
-];
-
 var CAR_ODDS = [  
   [ 'car',       40 ], 
   [ 'taxi',      20 ], 
@@ -207,9 +203,9 @@ var CAR_ODDS = [
   [ 'van',       15 ], 
   [ 'jeepney',   15 ], 
   [ 'bus',       10 ], 
-  [ 'ambulance', 1 ], 
-  [ 'police',    1 ], 
-  [ 'firetruck', 1 ], 
+  [ 'ambulance', 1  ], 
+  [ 'police',    1  ], 
+  [ 'firetruck', 1  ] 
 ];
 
 // in order for the global car odds to go up, a player
@@ -254,8 +250,8 @@ var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
 var SOUND_SPRITE = "sprite01.mp3";
 
 var SOUND_SPRITE_MAP = {
-  'ambulance'    : { start : 0.00, end : 7.3 },
-  'theme'        : { start : 8.00, end : 80.0, loop : true },
+  'ambulance'    : { start : 0.00,  end : 7.3 },
+  'theme'        : { start : 8.00,  end : 80.0, loop : true },
   'horns_short1' : { start : 81.00, end : 81.8 }
 };
 
@@ -311,38 +307,83 @@ var SUCCESS_MESSAGES = [
 ];
 
 
-var OTHERS = [ "bg_polaroid.png", "traffix_logo.png", "bttn_play.png", "bttn_again.png", "explosion.png", "bg_help.jpg" ];
+var OTHERS = [ 
+  "bg_polaroid.png", 
+  "traffix_logo.png", 
+  "bttn_play.png", 
+  "bttn_again.png", 
+  "explosion.png", 
+  "bg_help.jpg" 
+];
 
 
 var BOSSES = {
 
-  towtruck    : { type : 'towtruck', score : 10, speed : 4, width : 20, height : 80,  
+  towtruck    : { 
+    boss      : true, 
+    type      : 'towtruck', 
+    score     : 10, 
+    speed     : 4, 
+    width     : 20, 
+    height    : 80,  
     important : true, 
     sounds    : [], 
     assets    : [ "towtruck.png" ] },
 
-  truck       : { type : 'truck',    score : 10, speed : 3, width : 20, height : 100, 
+  truck       : { 
+    boss      : true, 
+    type      : 'truck',    
+    score     : 10, 
+    speed     : 3, 
+    width     : 20, 
+    height    : 100, 
     important : true, 
-    sounds    : ['horn_truck'], 
-    assets    : [ "truck.png"] },
+    sounds    : [ 'horn_truck' ], 
+    assets    : [ "truck.png" ] },
 
-  convoy      : { type : 'convoy',   score : 20, speed : 3, width : 20, height : 120, 
+  convoy      : { 
+    boss      : true, 
+    type      : 'convoy',   
+    score     : 20, 
+    speed     : 3, 
+    width     : 20, 
+    height    : 120, 
     important : true, 
-    animating : true, animation : { step : 6, frames : 4 }, 
+    animating : true, 
+    animation : { step : 6, frames : 4 }, 
     sounds    : [], 
-    assets    : [ "convoy_r.png", "convoy_l.png", "convoy_u.png", "convoy_d.png" ] },
+    assets    : [ "convoy_r.png", 
+                  "convoy_l.png", 
+                  "convoy_u.png", 
+                  "convoy_d.png" ] },
 
-  transport : { type : 'transport', score : 30, speed : 3, width : 20, height : 150, 
+  transport   : { 
+    boss      : true, 
+    type      : 'transport', 
+    score     : 30, 
+    speed     : 3, 
+    width     : 20, 
+    height    : 150, 
     important : true, 
-    sounds : ['horn_truck'], 
-    assets : [ "car_transporter.png"] },
+    sounds    : [ 'horn_truck' ], 
+    assets    : [ "transporter.png" ] },
 
-  hearse      : { type : 'hearse',   score : 50, speed : 2, width : 20, height : 200, 
+  hearse      : { 
+    boss      : true, 
+    type      : 'hearse',   
+    score     : 50, 
+    speed     : 2, 
+    width     : 20, 
+    height    : 200, 
     important : true, 
     interrupt_all_sounds : true, 
-    animating : true, animation : { step : 2, frames : 24 },
+    animating : true, 
+    animation : { step : 2, frames : 24 },
     sounds    : [ 'hearse' ], 
-    assets    : [ "hearse_r.png", "hearse_l.png", "hearse_d.png", "hearse_u.png" ] 
+    assets    : [ "hearse_r.png", 
+                  "hearse_l.png", 
+                  "hearse_d.png", 
+                  "hearse_u.png" ] 
   }
 
 };
