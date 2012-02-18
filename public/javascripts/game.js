@@ -694,7 +694,7 @@ Game = {
     });
 
     $(".bttn.credits").click(function(){
-      console.log('disabled?');
+      //console.log('disabled?');
       if (!$(this).hasClass('disabled')) {
         Game.show_credits();
       }
@@ -1244,7 +1244,13 @@ Game = {
           }
         });
 
-    Game.play_sound('arrived');
+    if (score < 5) {
+      Game.play_sound('arrived');  
+    } else if (score>= 5 && score < 10) {
+      Game.play_sound('arrived_2');
+    } else if (score >= 10) {
+      Game.play_sound('arrived_3');
+    }
 
     if (Game.score > Game.high_score) {
       Game.score_cont.addClass('higher_score');
@@ -2000,7 +2006,7 @@ var Car = function(car_hash){
         if (self.indicator != indicator) {
           self.indicator = indicator;
           var changed = true;
-          console.log('changed!', indicator);
+          // console.log('changed!', indicator);
         }
 
         Game.deferred_renders.push([ 
@@ -2018,11 +2024,11 @@ var Car = function(car_hash){
             
             } else {
               
-              console.log(left, top);
+              //console.log(left, top);
 
               if (p.bubble) {
                 if (c) {
-                  console.log('changing to', f.type);
+                  //console.log('changing to', f.type);
                   p.bubble.addClass(f.type);  
                 }
                 
@@ -2350,12 +2356,10 @@ var Car = function(car_hash){
     Game.arrived( this );
 
     if (this.sounds) {
-      // console.log('stopping sound', this.sounds);
       Game.stop_sound(this.sounds);
     }
 
     if (this.interrupt_all_sounds===true) {
-      console.log('resuming theme from boss interruption');
       Game.play_sound_theme();
     }
 
@@ -2420,7 +2424,7 @@ var Factory = function(){
       
     });
 
-    console.log(self.bosses);
+    //console.log(self.bosses);
 
   };
 
@@ -2458,12 +2462,12 @@ var Maker = function(){
       for (var i=0; i<Game.car_odds.length; i++) {
         weight += Game.car_odds[i][1];
         if ( rand < weight ) {
-          console.log(Game.seconds, Game.frames, 'generating',Game.car_odds[i][0]);
+          //console.log(Game.seconds, Game.frames, 'generating',Game.car_odds[i][0]);
           return Game.car_odds[i][0];  
         }
       } 
     } else {
-      console.log(Game.seconds, Game.frames, 'no car!');
+      //console.log(Game.seconds, Game.frames, 'no car!');
       return false;
     }
 

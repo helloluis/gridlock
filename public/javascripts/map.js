@@ -239,6 +239,8 @@ var SOUNDS = {
   explosion     : "explosion_short",
   frustration   : "frustration",
   arrived       : "kaching",
+  arrived_2     : "kaching2",
+  arrived_3     : "kaching3",
   ambulance     : "ambulance",
   hearse        : "hearse",
   police        : "police",
