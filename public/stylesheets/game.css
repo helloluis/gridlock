@@ -260,10 +260,10 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 .car.boss.convoy.horizontal { width:120px; height:20px; background:url(../images/convoy_l.png); }
 .car.boss.convoy.horizontal.right { background:url(../images/convoy_r.png); }
 
-.car.boss.transporter { height:150px; background-image:url(../images/car_transporter.png); }
-.car.boss.transporter.vertical.right { background-position:-150px 0px; }
-.car.boss.transporter.horizontal { width:150px; height:20px; background-position:-450px 0px; }
-.car.boss.transporter.horizontal.right { background-position:-300px 0px; }
+.car.boss.transport { height:150px; background-image:url(../images/transporter.png); }
+.car.boss.transport.vertical.right { background-position:-150px 0px; }
+.car.boss.transport.horizontal { width:150px; height:20px; background-position:-450px 0px; }
+.car.boss.transport.horizontal.right { background-position:-300px 0px; }
 
 .car.boss.hearse { height: 200px; background:url(../images/hearse_u.png); }
 .car.boss.hearse.vertical.right { background:url(../images/hearse_d.png); }
