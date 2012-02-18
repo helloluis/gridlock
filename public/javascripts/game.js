@@ -33,7 +33,7 @@ Game = {
   fps                  : FPS,
   timer                : 0,
   
-  show_timer           : true,
+  show_timer           : false,
 
   speed                : 1,     // the global speed of the Game can be modified by the user so all events occur faster
 
@@ -486,7 +486,7 @@ Game = {
             // pick a random Street's Maker to usurp
             var boss_street = Game.streets[Math.floor(Math.random()*Game.streets.length)];
 
-            console.log(Game.seconds, Game.frames, Game.bosses[boss[0]].type);
+            // console.log(Game.seconds, Game.frames, Game.bosses[boss[0]].type);
             // generate the boss
             boss_street.maker.build_car(Game.bosses[boss[0]]);
 
@@ -1210,6 +1210,7 @@ Game = {
         Game.paused = false;
         Game.messages.hide();
         Game.start_counters();
+        Game.start_scores();
         Game.start_controls();
         Game.start_streets();
 
@@ -1334,6 +1335,21 @@ Game = {
       i+=1;
       
     });
+  },
+
+  start_scores : function(){
+    
+    var score = $("#score"),
+        hiscore = $("#high_score");
+
+    hiscore.css('right','-' + score.outerWidth());
+
+    score.css('right','-' + score.outerWidth()).
+      animate({ right : 0 }, { duration : 500, complete : function(){
+        hiscore.animate({ right : 0 });
+      }
+    });
+
   },
 
   end_with_frustration : function(){    

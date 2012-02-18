@@ -90,7 +90,7 @@ a, #intro p strong { color:#fc0; }
 
 /* BUTTONS */
 .bttn { z-index:18; position:absolute; -webkit-tap-highlight-color: rgba(0,0,0,0) }
-#game .bttn, #game #score, #game .high_score { text-shadow:3px 3px 3px #000; }
+#game .bttn { text-shadow:3px 3px 3px #000; }
 
 #timer { position:absolute; z-index:15; font-size:20px; color:#fff; top: 70px; left : 50px; }
 
@@ -100,9 +100,11 @@ a, #intro p strong { color:#fc0; }
 .bttn.credits, .bttn.leaderboards { font-size:16px; }
 .bttn.credits { bottom:20px; left:30px; text-shadow: 0 0 7px #000; }
 .bttn.leaderboards { bottom:20px; right:30px; text-shadow: 0 0 7px #000; }
-.bttn.pause, .bttn.quit { top:20px; left:20px; color:#fff; }
+.bttn.pause, .bttn.mute, .bttn.quit { background:url(../images/bttn_small.png); width:40px; height:40px; text-indent:-2000px; top:20px; left:20px; }
+.bttn.pause { background-position:-40px 0px; }
 .bttn.quit { left: 100px; }
-.bttn.mute { bottom:20px; left:20px; color:#fff; }
+.bttn.mute { top:auto; bottom:20px; background-position:-120px 0px; }
+.bttn.mute.muted { background-position:-80px 0px; }
 .bttn.disabled { opacity:0.5; }
 .bttn.speed { bottom:30px; right:20px; color:#fff; }
 .bttn.resume { text-indent:-2000px; background:url(../images/bttn_resume.png); width:130px; height:140px; }
@@ -127,11 +129,11 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #messages .new_high_score p.bttn { color:#9be; }
  
 
-#score, #high_score { position:absolute; text-align:right; top:20px; right:20px; width:100px; height:50px; font-size:48px; color:#fff; z-index:20; }
+#score, #high_score { position:absolute; top:10px; right:0px; z-index:20; background:url(../images/score_2.png); width:85px; height:50px; padding:20px 25px; color:#fff; text-align:right; font-size:48px; }
+#high_score { background-image:url(../images/high_score.png); height:20px; width: 85px; padding:16px 25px 20px; top:120px; font-size:24px; color:#eec; }
 #score.higher_score { color:#ff0; }
 #score.good { color:#9c0; }
 #score.bad { color:#c00; }
-#high_score { font-size:24px; top:80px; right:25px; }
 
 #debugger { position:absolute; top:60px; left:10px; width:240px; height:auto; z-index:30; font-size:12px; color:#fff; background:rgba(0,0,0,0.7); padding:10px; }
 #debugger p { color:#fff; font-family: Helvetica; }
@@ -286,7 +288,7 @@ body.pokki #minimize { display:block; }
 body.pokki #toggle_fullscreen { display:block; }
 body.pokki p a:hover {color:#fff;}
 body.pokki #score { top:30px; }
-body.pokki #high_score { top:70px; }
+body.pokki #high_score { top:130px; }
 body.pokki .bttn.post_to_facebook { display:none; }
 body.pokki .new_high_score h2 { font-size:60px; margin-top:40px;}
 body.pokki .bttn.quit { display:none; }
