@@ -22,7 +22,7 @@ TraffixLoader = {
         .bind("load readystatechange", function(){ 
           self.loaded_cars.push( $(this) );
         })
-        .addClass('car')
+        .addClass('car horizontal left')
         .attr("src", IMAGES_DIR + car_src)
         .appendTo(self.loading_cont);
     });

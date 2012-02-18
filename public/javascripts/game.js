@@ -367,13 +367,16 @@ Game = {
         
       }
       
-      Game.bubble_canvas = document.getElementById('frustrations');
+      Game.bubble_canvas = document.getElementById('bubbles');
       Game.bubble_context = Game.bubble_canvas.getContext('2d');  
 
     } else {
       
       $("#cars").replaceWith("<div id='cars'></div>");
       Game.car_canvas = $("#cars");
+
+      $("#bubbles").replaceWith("<div id='bubbles'></div>");
+      Game.bubble_canvas = $("#bubbles");
 
     }
     
@@ -483,6 +486,7 @@ Game = {
             // pick a random Street's Maker to usurp
             var boss_street = Game.streets[Math.floor(Math.random()*Game.streets.length)];
 
+            console.log(Game.seconds, Game.frames, Game.bosses[boss[0]].type);
             // generate the boss
             boss_street.maker.build_car(Game.bosses[boss[0]]);
 
@@ -526,7 +530,7 @@ Game = {
           if (_.isFunction(arr[0])) {
             var func = arr[0];
             arr.splice(0,1);
-            func(arr[0], arr[1]); 
+            func(arr[0], arr[1], arr[2]); 
           }
         });
 
@@ -542,7 +546,7 @@ Game = {
           if (_.isFunction(arr[0])) {
             var func = arr[0];
             arr.splice(0,1);
-            func(arr[0], arr[1]); 
+            func(arr[0], arr[1], arr[2]); 
           }
         });
 
@@ -1179,6 +1183,7 @@ Game = {
       Game.clear_canvases();  
     } else {
       Game.car_canvas.empty();
+      Game.bubble_canvas.empty();
     }
     
     Game.log('clearing canvas before countdown');
@@ -1280,6 +1285,7 @@ Game = {
       Game.thoughtbubble_assets = {};
       _.each(THOUGHTBUBBLES, function(t, i){
         Game.thoughtbubble_assets[t] = {
+            type     : t,
             width    : THOUGHTBUBBLES_DIMENSIONS[0],
             height   : THOUGHTBUBBLES_DIMENSIONS[1],
             off_top  : THOUGHTBUBBLES_DIMENSIONS[2],
@@ -1591,7 +1597,7 @@ var Car = function(car_hash){
   this.animation             = car_hash && car_hash.animation             ? car_hash.animation       : {};
   
   this.dom                   = car_hash && car_hash.dom                   ? car_hash.dom             : false;
-
+  this.bubble                = false;
   this.street                = false;
   this.moving                = false;
   
@@ -1651,28 +1657,32 @@ var Car = function(car_hash){
 
     } else {
   
-      if (this.image_assets) {
+      if (Game.enable_canvas) {
 
-        // for sprites
-        if (this.image_assets.length===1) {
-          this.image = this.image_assets[0];
+        if (this.image_assets) {
+
+          // for sprites
+          if (this.image_assets.length===1) {
+            this.image = this.image_assets[0];
+
+          } else {
+            this.image = (this.orientation=='horizontal' ? 
+              (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
+              (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );   
+          }
+          
 
         } else {
-          this.image = (this.orientation=='horizontal' ? 
-            (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
-            (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );   
+          
+          this.image = new Image();
+
+          this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
+            (this.lefthand ? this.assets[0] : this.assets[1]) : 
+            (this.lefthand ? this.assets[2] : this.assets[3]) );        
         }
-        
-
-      } else {
-        
-        this.image = new Image();
-
-        this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
-          (this.lefthand ? this.assets[0] : this.assets[1]) : 
-          (this.lefthand ? this.assets[2] : this.assets[3]) );        
+  
       }
-
+      
       if (this.animating) {
 
         // we store the current Game.frame number that this Car is created on, 
@@ -1793,8 +1803,9 @@ var Car = function(car_hash){
     ];
   };
 
-  // this function manages the vehicle's indicators, which could be either
-  // the important (!) notification or the frustration (:() icons and sounds
+  // this function does double duty by managing the vehicle's indicators, which could be either
+  // the important (!) notification or the frustration (:() icons and sounds,
+  // as well as reporting the frustration levels of each vehicle
   this.show_thoughtbubbles = function(){
     
     var self = this;
@@ -1938,32 +1949,87 @@ var Car = function(car_hash){
     } else {
       
       if (self.dom) {
-        self.dom.css({ top : self.current_pos.top, left : self.current_pos.left });  
+        if (self.animating) {
+          if (Game.frames == this.last_game_frame+this.step) {
+            if (this.current_frame < this.animation.frames-1) {
+              this.current_frame += 1;  
+            } else {
+              this.current_frame = 0;
+            }
+            this.last_game_frame = Game.frames;
+          } 
+
+          var bg_pos = 0 + (this.width*this.current_frame);
+
+          self.dom.
+            css({ top  : self.current_pos.top, 
+                  left : self.current_pos.left,
+                  backgroundPosition : "-" + bg_pos + "px 0px" });
+
+        } else {
+
+          self.dom.
+            css({ top  : self.current_pos.top, 
+                  left : self.current_pos.left });
+
+        }
       }
 
     }
     
 
-    // if (Game.enable_thoughtbubbles) {
-    //   if (indicator = self.show_thoughtbubbles()) {
-    //     Game.deferred_renders.push([ 
-    //         function(f, p) {
+    if (Game.enable_thoughtbubbles) {
+      if (indicator = self.show_thoughtbubbles()) {
+        
+        if (self.indicator != indicator) {
+          self.indicator = indicator;
+          var changed = true;
+          console.log('changed!', indicator);
+        }
 
-    //           var left = p.orientation=='horizontal' ? 
-    //                       (p.lefthand ? p.current_pos.left+f.off_left : p.current_pos.left+p.width-(f.width-f.off_left)) :
-    //                       (p.lefthand ? p.current_pos.left+f.off_left : p.current_pos.left-f.width+(p.width/2)),
-    //               top  = p.orientation=='horizontal' ? 
-    //                       (p.lefthand ? p.current_pos.top-(p.height/2)-(f.height+f.off_top) : p.current_pos.top-(p.height/2)-(f.height+f.off_top) ) :
-    //                       (p.lefthand ? p.current_pos.top+p.height-(f.height-f.off_top) : p.current_pos.top+f.off_top );
-              
-              
-    //           bub.drawImage( Game.thoughtbubble_sprite, f.left, f.top, f.width, f.height, left, top, f.width, f.height ); 
+        Game.deferred_renders.push([ 
+          function(f, p, c) {
 
-    //         }, 
-    //         indicator, 
-    //         self ]);
-    //   }
-    // }
+            var left = p.orientation=='horizontal' ? 
+                        (p.lefthand ? p.current_pos.left+f.off_left : p.current_pos.left+p.width-(f.width-f.off_left)) :
+                        (p.lefthand ? p.current_pos.left+f.off_left : p.current_pos.left-f.width+(p.width/2)),
+                top  = p.orientation=='horizontal' ? 
+                        (p.lefthand ? p.current_pos.top-(p.height/2)-(f.height+f.off_top) : p.current_pos.top-(p.height/2)-(f.height+f.off_top) ) :
+                        (p.lefthand ? p.current_pos.top+p.height-(f.height-f.off_top) : p.current_pos.top+f.off_top );
+            
+            if (Game.enable_canvas) {
+              bub.drawImage( Game.thoughtbubble_sprite, f.left, f.top, f.width, f.height, left, top, f.width, f.height );   
+            
+            } else {
+              
+              console.log(left, top);
+
+              if (p.bubble) {
+                if (c) {
+                  console.log('changing to', f.type);
+                  p.bubble.addClass(f.type);  
+                }
+                
+                p.bubble.css({ top : top, left : left });
+
+              } else {
+                p.bubble = $("<div class='bubble'></div>").
+                  addClass(f.type).
+                  css({ top : top, left : left });
+
+                Game.bubble_canvas.append(p.bubble);
+
+              }
+
+            }            
+
+          }, 
+          indicator, 
+          self,
+          changed ]);
+
+      }
+    }
 
   };
 
@@ -2279,6 +2345,9 @@ var Car = function(car_hash){
 
     if (!Game.enable_canvas && this.dom) {
       this.dom.remove();
+      if (this.bubble) {
+        this.bubble.remove();  
+      }
     }
   };
 
@@ -2373,11 +2442,12 @@ var Maker = function(){
       for (var i=0; i<Game.car_odds.length; i++) {
         weight += Game.car_odds[i][1];
         if ( rand < weight ) {
+          console.log(Game.seconds, Game.frames, 'generating',Game.car_odds[i][0]);
           return Game.car_odds[i][0];  
         }
       } 
     } else {
-      // console.log('no car!');
+      console.log(Game.seconds, Game.frames, 'no car!');
       return false;
     }
 
@@ -2410,6 +2480,7 @@ var Maker = function(){
 
     return $("<div class='car'></div>").
       addClass(car.type).
+      addClass(car.boss ? 'boss' : '').
       addClass(this.street.orientation).
       addClass(this.street.lefthand ? 'left' : 'right').
       appendTo(Game.car_canvas);
@@ -2432,7 +2503,12 @@ var Maker = function(){
     var self     = this;
 
     if (boss_override!==undefined) {
-      var car_hash = _.extend(boss_override, { image_assets : Game.factory.bosses[boss_override.type] });
+      if (Game.enable_canvas) {
+        var car_hash = _.extend(boss_override, { image_assets : Game.factory.bosses[boss_override.type] });  
+      } else {
+        var car_hash = _.extend(boss_override, { dom : self.generate_in_dom(boss_override) });
+      }
+      
     } else {
       var car_hash = self.generate();
     }
