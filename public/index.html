@@ -24,9 +24,9 @@
   <script src="javascripts/map.js"></script>
   <script src="javascripts/sound.js"></script>
   <script src="javascripts/loader.js"></script>
-  <script src="javascripts/pokkiBrowser.js"></script>
+  <!--<script src="javascripts/pokkiBrowser.js"></script>-->
   <script>
-    PLATFORM = 'pokki';
+    PLATFORM = 'ios';
     APP_URL  = "http://traffix.infinite.ly";
     APP_ID   = "192448444187818";
   </script>
@@ -170,8 +170,11 @@
 <script src="javascripts/help.js"></script>
 
 <script>
-  window.pauseFromPokki  = function(){ Game.pause(); Game.pause_menus(); console.log('pausing game'); };
-  window.resumeFromPokki = function(){ Game.resume_menus(); console.log('resuming game'); };
+
+  if (PLATFORM=='pokki') {
+    window.pauseFromPokki  = function(){ Game.pause(); Game.pause_menus(); console.log('pausing game'); };
+    window.resumeFromPokki = function(){ Game.resume_menus(); console.log('resuming game'); };  
+  }  
 
   $(function(){
     $("body").addClass(PLATFORM);
