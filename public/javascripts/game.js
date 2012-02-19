@@ -6,7 +6,7 @@ Game = {
    
   loader               : false,
   
-  enable_preloading    : PLATFORM=='web' || PLATFORM=='pokki',
+  enable_preloading    : true,
 
   is_iOS               : PLATFORM=='ios', 
   is_pokki             : PLATFORM=='pokki',
@@ -20,25 +20,24 @@ Game = {
   frustration          : 0,
   high_score           : 0,
 
-  frames               : 0,    // global frame counter, don't really know what for yet
+  frames               : 0,     // global frame counter, don't really know what for yet
 
-  seconds              : 0,    // global timer, in seconds, so only increments once every 1000 millisec
+  seconds              : 0,     // global timer, in seconds, so only increments once every 1000 millisec
 
-  difficulty_increases : true, // if set to false, we don't make the game harder as time goes on
-  smart_intersections  : true, // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
-  double_buffering     : true, // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
-  multiple_canvases    : false, // if set to true, we use one canvas per street
-  with_bosses          : true, // enable level bosses
+  difficulty_increases : true,  // if set to false, we don't make the game harder as time goes on
+  smart_intersections  : true,  // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
+  double_buffering     : true,  // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
+  with_bosses          : true,  // enable level bosses
 
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
 
-  enable_tutorial      : true,
+  enable_canvas        : false, // if set to true, use Canvas to animate. if false, use the DOM.
    
   fps                  : FPS,
   timer                : 0,
   
-  show_timer           : true,
+  show_timer           : false,
 
   speed                : 1,     // the global speed of the Game can be modified by the user so all events occur faster
 
@@ -57,14 +56,16 @@ Game = {
    
   max_speed            : MAX_SPEED,
   max_frustration      : 100,
-  enable_frustration   : true,
+  enable_thoughtbubbles : true,
    
   maker_freq           : MAKER_FREQUENCY,                  // how often does a Maker add a new car to the road
   max_cars_per_street  : MAX_CARS_PER_STREET,              
   car_types            : CARS,                             // library of car settings and assets
   car_odds             : CAR_ODDS,                         // the likelihood that a particular car will be added
-  car_odd_levels       : CAR_ODD_LEVELS.reverse(),         // modifiers for our car-creation randomness, basically making fewer cars spawn early on in the game
+  car_odds_levels      : CAR_ODDS_LEVELS.reverse(),        // modifiers for our car-creation randomness, basically making fewer cars spawn early on in the game
+  car_odds_total       : 0,                                // we populate this array with the car names based on their weights, then randomly select one to generate
   neighborhood         : NEIGHBORHOOD,                     // graphics used for the neighborhood layers
+  car_sprite_layout    : CAR_SPRITE_LAYOUT,
           
   images_dir           : IMAGES_DIR,                       // path to images
   sounds_dir           : SOUNDS_DIR,                       // path to sounds
@@ -85,8 +86,8 @@ Game = {
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
   with_sound           : true,    // globally disable all sound
-  with_phonegap_sound  : false,   // we use the Phonegap sound library for iOS
-  with_soundjs         : true,   // SoundJS, for Web & Pokki build
+  with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
+  with_soundjs         : true,     // SoundJS, for Web & Pokki build
   with_sm2_sound       : false,    // SoundManager2 is what we used to use for web
 
   sound_format         : "." + SOUND_FORMATS[PLATFORM],
@@ -111,116 +112,80 @@ Game = {
 
     if (!Game.debug_visually) { Game.debug_cont.hide(); }
 
-    // Game.loader = new PxLoader();
-    Game.loader = new html5Preloader();
-
-    Game.loading_screen = $("#loader");
-
-    var loader_percentage = $(".loading_percentage", Game.loading_screen);
-
     Game.log("enable_preloading?", Game.enable_preloading);
 
     if (Game.enable_preloading) {
+
+      Game.loading_screen = $("#loader");
+
+      var loader_percentage = $(".loading_percentage", Game.loading_screen);
       
-      _.each(Game.car_types, function(car){
-        _.each(_.flatten(car.assets),function(fc){
-          var img = new PxLoaderImage(Game.images_dir + fc);
-          Game.loader.add(img);
-        });
-      });
+      var preload_assets = function(){
 
-      _.each(Game.neighborhood, function(n){
-        var img = new PxLoaderImage(Game.images_dir + n);
-          Game.loader.add(img);
-      });
+        Game.loader = new PxLoader();
+        // Game.loader = new html5Preloader();
 
-      _.each(FRUSTRATIONS, function(f){
-        var img = new PxLoaderImage(Game.images_dir + f[0]);
-          Game.loader.add(img);
-      });
-
-      _.each(EXCLAMATIONS, function(e){
-        var img = new PxLoaderImage(Game.images_dir + e[0]);
-          Game.loader.add(img);
-      });
-
-      _.each(OTHERS, function(o){
-        var img = new PxLoaderImage(Game.images_dir + o);
-        Game.loader.add(img);
-      }); 
-
-      _.each(BOSSES, function(b){
-        _.each(b.assets,function(ba){
-          var img = new PxLoaderImage(Game.images_dir + ba);
-          Game.loader.add(img);
-        });
-      });
-
-      loader_percentage.text("0%");
-
-      Game.loader.addProgressListener(function(e) { 
-        var percentage = Math.round((e.completedCount/e.totalCount)*100);
-        loader_percentage.text( percentage + "%" );
-      });
-
-      if (Game.with_soundjs) {
-        
-        var sounds_to_load = [];
-
-        _.each(Game.raw_sounds, function(media_or_arr, key){
-          if (_.isArray(media_or_arr)) {
-
-            _.each(media_or_arr, function(media, index){
-              
-              var new_k = [key, index].join(""),
-                  src = Game.sounds_dir + media + Game.sound_format;
-
-              Game.sounds[new_k] = src;
-              sounds_to_load.push({ name : new_k, src : src, instances : 3 });
-              
-            });
-
-          } else {
-
-            var src = Game.sounds_dir + media_or_arr + Game.sound_format;
-            Game.sounds[key] = src;
-            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 1 });
-
-          }
+        _.each(Game.car_types, function(car){
+          _.each(_.flatten(car.assets),function(a){
+            Game.loader.addImage(Game.images_dir + a);
+          });
         });
 
-        // TODO: No boss sounds yet
-        Game.sounds.bosses = new Array;
-        _.each(Game.bosses, function(boss, idx){
-          var src = Game.sounds_dir + boss.sound + Game.sound_format; 
-          Game.sounds.bosses.push( src );
+        _.each(Game.neighborhood, function(a){
+          Game.loader.addImage(Game.images_dir + a);
         });
 
-        SoundJS.addBatch(sounds_to_load);
-        
-        // console.log(sounds_to_load);
+        Game.loader.addFiles(Game.images_dir + THOUGHTBUBBLES_SPRITE);
 
-        SoundJS.onLoadQueueComplete = function(){
-          setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);
-        };
+        _.each(OTHERS, function(a){
+          Game.loader.addImage(Game.images_dir + a);
+        }); 
+
+        _.each(BOSSES, function(b){
+          _.each(b.assets,function(a){
+            Game.loader.addImage(Game.images_dir + a);
+          });
+        });
+
+        if (Game.with_sound) {
           
-      } else if (Game.with_phonegap_sound) {
-        
-        // using the Media API for theme music
-        Game.sounds['theme'] = new Media( Game.sounds_dir + SOUNDS.theme + Game.sound_format );
+          _.each(Game.raw_sounds, function(media_or_arr, key){
+            if (_.isArray(media_or_arr)) {
+              _.each(media_or_arr, function(media, index){
+                Game.loader.addSound( Game.sounds_dir + media + Game.sound_format );
+              });
 
-      }
+            } else {
+
+              Game.loader.addSound( Game.sounds_dir + media_or_arr + Game.sound_format );
+              
+            }
+          });
+
+          Game.sounds.bosses = new Array;
+          _.each(Game.bosses, function(boss, idx) {
+            Game.loader.addSound( Game.sounds_dir + boss.sound + Game.sound_format ); 
+          });
+
+        }
+        
+        Game.loader.onfinish(function(){
+          TraffixLoader.stop();
+          Game.initialize(auto_start);
+        });
+
+        loader_percentage.
+          text("0%").
+          everyTime(500, function(){
+            console.log( 'loader', Game.loader.getProgress() );  
+          }); 
+      
+      };
 
       TraffixLoader.initialize();
       
-      Game.loader.addCompletionListener(function(){
-        TraffixLoader.stop();
-        Game.initialize(auto_start);
-      });
+      _.delay(preload_assets, 1000);
 
-      _.delay(function(){
-        Game.loader.start();  
-      }, 1000);
 
     } else {
       
@@ -274,13 +239,15 @@ Game = {
 
     Game.initialize_tutorial();
 
-    Game.global_car_odds = Game.difficulty_increases ? Game.car_odd_levels[Game.car_odd_levels.length-1][1] : 1;
+    Game.initialize_thoughtbubbles();
 
-    Game.log("global car odds", Game.global_car_odds);
+    Game.global_car_odds = Game.difficulty_increases ? Game.car_odds_levels[Game.car_odds_levels.length-1][1] : 1;
 
-    Game.initialize_frustration();  
-    
-    Game.initialize_exclamation();  
+    Game.car_odds_total  = 0;
+
+    _.each(Game.car_odds, function(odds){
+      Game.car_odds_total += odds[1];
+    });
 
     if (auto_start===true) {
       Game.start();
@@ -355,23 +322,38 @@ Game = {
     
     Game.log("double buffering?", Game.double_buffering);
 
-    if (Game.double_buffering) {
-      Game.car_canvas  = document.getElementById('cars');
-      Game.real_car_context = Game.car_canvas.getContext('2d');
+    if (Game.enable_canvas) {
       
-      Game.virtual_car_canvas = document.createElement('canvas');
-      Game.virtual_car_canvas.width = Game.width;
-      Game.virtual_car_canvas.height = Game.height;
-      Game.car_context = Game.virtual_car_canvas.getContext('2d');
-    
+      if (Game.double_buffering) {
+
+        Game.car_canvas  = document.getElementById('cars');
+        Game.real_car_context = Game.car_canvas.getContext('2d');
+        
+        Game.virtual_car_canvas = document.createElement('canvas');
+        Game.virtual_car_canvas.width = Game.width;
+        Game.virtual_car_canvas.height = Game.height;
+        Game.car_context = Game.virtual_car_canvas.getContext('2d');
+      
+      } else {
+
+        Game.car_canvas  = document.getElementById('cars');
+        Game.car_context = Game.car_canvas.getContext('2d');  
+        
+      }
+      
+      Game.bubble_canvas = document.getElementById('bubbles');
+      Game.bubble_context = Game.bubble_canvas.getContext('2d');  
+
     } else {
-      Game.car_canvas  = document.getElementById('cars');
-      Game.car_context = Game.car_canvas.getContext('2d');  
       
+      $("#cars").replaceWith("<div id='cars'></div>");
+      Game.car_canvas = $("#cars");
+
+      $("#bubbles").replaceWith("<div id='bubbles'></div>");
+      Game.bubble_canvas = $("#bubbles");
+
     }
     
-    Game.frustration_canvas = document.getElementById('frustrations');
-    Game.frustration_context = Game.frustration_canvas.getContext('2d');
 
     if (Game.debug==true) {
       $(".neighborhood").css({'background':"#121212"});
@@ -461,6 +443,8 @@ Game = {
       
       Game.bosses = BOSSES;
 
+      Game.boss_sequence = BOSS_SEQUENCE;
+
       Game.boss_countdown = 0;
 
       Game.boss_timer = window.setInterval(function(){
@@ -471,13 +455,14 @@ Game = {
           Game.boss_countdown+=1;
           
           // get boss hash
-          if (boss = _.detect(Game.bosses, function(boss){ return boss.time==Game.boss_countdown; })) {
+          if (boss = _.detect(Game.boss_sequence, function(boss){ return boss[1]==Game.boss_countdown; })) {
             
             // pick a random Street's Maker to usurp
             var boss_street = Game.streets[Math.floor(Math.random()*Game.streets.length)];
 
+            // console.log(Game.seconds, Game.frames, Game.bosses[boss[0]].type);
             // generate the boss
-            boss_street.maker.build_car(boss);
+            boss_street.maker.build_car(Game.bosses[boss[0]]);
 
           }    
         }
@@ -497,30 +482,50 @@ Game = {
       
       Game.frames+=1;
 
-      Game.clear_canvases();
+      if (Game.enable_canvas) {
 
-      if (Game.debug==true) {
-        Game.show_game_objects();  
-      }
+        Game.clear_canvases();
 
-      _.each(Game.streets, function(street){
-        _.each(street.cars, function(car){
-          car.animate();
-        });
-      });
-
-      if (Game.double_buffering) {
-        Game.real_car_context.drawImage(Game.virtual_car_canvas, 0, 0);
-      }
-
-      _.each(Game.deferred_renders, function(arr) {
-        if (_.isFunction(arr[0])) {
-          var func = arr[0];
-          arr.splice(0,1);
-          func(arr[0], arr[1]); // TODO: Figure out how to use Function.apply() here so we can have a dynamic number of arguments
+        if (Game.debug==true) {
+          Game.show_game_objects();  
         }
-      });
 
+        _.each(Game.streets, function(street){
+          _.each(street.cars, function(car){
+            car.animate();
+          });
+        });
+
+        if (Game.double_buffering) {
+          Game.real_car_context.drawImage(Game.virtual_car_canvas, 0, 0);
+        }
+
+        _.each(Game.deferred_renders, function(arr) {
+          if (_.isFunction(arr[0])) {
+            var func = arr[0];
+            arr.splice(0,1);
+            func(arr[0], arr[1], arr[2]); 
+          }
+        });
+
+      } else {
+        
+        _.each(Game.streets, function(street){
+          _.each(street.cars, function(car){
+            car.animate();
+          });
+        });
+
+        _.each(Game.deferred_renders, function(arr) {
+          if (_.isFunction(arr[0])) {
+            var func = arr[0];
+            arr.splice(0,1);
+            func(arr[0], arr[1], arr[2]); 
+          }
+        });
+
+      }
+      
       //new frame
       requestAnimFrame(function(){
         Game.animate();  
@@ -540,7 +545,7 @@ Game = {
 
     }
       
-    Game.frustration_context.clearRect(0, 0, Game.width, Game.height);
+    Game.bubble_context.clearRect(0, 0, Game.width, Game.height);
 
     Game.deferred_renders = new Array;
 
@@ -590,7 +595,7 @@ Game = {
     Game.streets = [];
     Game.score = 0;
     Game.score_cont.text('0');
-    Game.initialize_frustration();
+    Game.initialize_thoughtbubbles();
     Game.initialize_high_score();
 
     $(".restart").hide();
@@ -602,9 +607,44 @@ Game = {
 
     Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_soundjs);
 
-    if (Game.with_sound){
-      if (Game.with_phonegap_sound) {
+    if (Game.with_sound) {
+      if (Game.with_soundjs) {
+        
+        var sounds_to_load = [];
 
+        _.each(Game.raw_sounds, function(media_or_arr, key){
+          if (_.isArray(media_or_arr)) {
+
+            _.each(media_or_arr, function(media, index){
+              
+              var new_k = [key, index].join(""),
+                  src = Game.sounds_dir + media + Game.sound_format;
+
+              Game.sounds[new_k] = src;
+              sounds_to_load.push({ name : new_k, src : src, instances : 3 });
+              
+            });
+
+          } else {
+
+            var src = Game.sounds_dir + media_or_arr + Game.sound_format;
+            Game.sounds[key] = src;
+            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 1 });
+
+          }
+        });
+
+        Game.sounds.bosses = new Array;
+        _.each(Game.bosses, function(boss, idx){
+          var src = Game.sounds_dir + boss.sound + Game.sound_format; 
+          Game.sounds.bosses.push( src );
+        });
+        
+        SoundJS.addBatch(sounds_to_load);
+
+          
+      } else if (Game.with_phonegap_sound) {
+        
         _.each(Game.raw_sounds, function(media_or_arr, key){
           if (_.isArray(media_or_arr)) {
             _.each(media_or_arr, function(media, index){
@@ -619,9 +659,10 @@ Game = {
             }
           }          
         });
-        
+
       }
-    }
+    }  
+
   },
 
   initialize_buttons : function(){
@@ -663,7 +704,6 @@ Game = {
     });
 
     $(".bttn.credits").click(function(){
-      console.log('disabled?');
       if (!$(this).hasClass('disabled')) {
         Game.show_credits();
       }
@@ -1044,7 +1084,7 @@ Game = {
 
   play_sound_theme : function(){
     Game.log('playing sound theme');
-    Game.play_sound('theme', true, 50);  
+    Game.play_sound('theme', true);  
   },
 
   stop_sound_theme : function(){
@@ -1070,7 +1110,7 @@ Game = {
 
       } else if (Game.with_soundjs) {
         if (loop) {
-          SoundJS.play( sound, null, 0.5, true );
+          SoundJS.play( sound, null, 1, true );
         } else {
           if (interrupt_all) {
             SoundJS.play( sound, SoundJS.INTERUPT_ANY );
@@ -1148,8 +1188,13 @@ Game = {
     
     $("#overlay").hide();    
     
-    Game.clear_canvases();
-
+    if (Game.enable_canvas) {
+      Game.clear_canvases();  
+    } else {
+      Game.car_canvas.empty();
+      Game.bubble_canvas.empty();
+    }
+    
     Game.log('clearing canvas before countdown');
 
     _.delay(function(){
@@ -1174,6 +1219,7 @@ Game = {
         Game.paused = false;
         Game.messages.hide();
         Game.start_counters();
+        Game.start_scores();
         Game.start_controls();
         Game.start_streets();
 
@@ -1207,7 +1253,13 @@ Game = {
           }
         });
 
-    Game.play_sound('arrived');
+    if (score < 5) {
+      Game.play_sound('arrived');  
+    } else if (score>= 5 && score < 10) {
+      Game.play_sound('arrived_2');
+    } else if (score >= 10) {
+      Game.play_sound('arrived_3');
+    }
 
     if (Game.score > Game.high_score) {
       Game.score_cont.addClass('higher_score');
@@ -1219,49 +1271,48 @@ Game = {
 
   increment_car_odds : function(){
     if (Game.difficulty_increases) {
-      if (Game.global_car_odds!=1.0) {
-        if (arr = _.detect(Game.car_odd_levels, function(level){ return Game.score >= level[0]; })) {
-          Game.global_car_odds = arr[1];
-          return Game.global_car_odds;  
+
+      // console.log("global car odds", Game.global_car_odds, Game.car_odds_total);
+      Game.log("global car odds", Game.global_car_odds, Game.car_odds_total);
+
+      if (Game.started===true) {
+        if (Game.global_car_odds!=1.0) {
+          if (arr = _.detect(Game.car_odds_levels, function(level){ return Game.score >= level[0]; })) {
+            Game.global_car_odds = arr[1];
+            return Game.global_car_odds;  
+          }  
         }  
       }
+      
     }
   },
 
-  initialize_frustration : function(){
+  initialize_thoughtbubbles : function(){
     
-    if (Game.enable_frustration) {
+    if (Game.enable_thoughtbubbles) {
       
-      Game.log("initializing frustration assets", FRUSTRATIONS.length);
+      Game.log("initializing thoughtbubble assets");
 
       Game.frustration = 0;
 
-      Game.frustration_assets = _.map(FRUSTRATIONS, function(f){ 
-                                    var img = new Image();
-                                    img.src = IMAGES_DIR + f[0];
-                                    return {  image  : img, 
-                                              width  : f[1], 
-                                              height : f[2], 
-                                              top    : f[3], 
-                                              left   : f[4] };
-                                  });
+      Game.thoughtbubble_sprite = new Image();
+      Game.thoughtbubble_sprite.src = IMAGES_DIR + THOUGHTBUBBLES_SPRITE;
+      
+      Game.thoughtbubble_assets = {};
+      _.each(THOUGHTBUBBLES, function(t, i){
+        Game.thoughtbubble_assets[t] = {
+            type     : t,
+            width    : THOUGHTBUBBLES_DIMENSIONS[0],
+            height   : THOUGHTBUBBLES_DIMENSIONS[1],
+            off_top  : THOUGHTBUBBLES_DIMENSIONS[2],
+            off_left : THOUGHTBUBBLES_DIMENSIONS[3],
+            top      : 0,
+            left     : (THOUGHTBUBBLES_DIMENSIONS[0]*i)
+          };
+      });
+
     }
-  },
 
-  // highlight vehicles with important===true
-  initialize_exclamation : function(){
-
-    Game.log('initializing exclamation assets', EXCLAMATIONS.length);
-
-    Game.exclamation_assets = _.map(EXCLAMATIONS, function(f){ 
-                                    var img = new Image();
-                                    img.src = IMAGES_DIR + f[0];
-                                    return {  image  : img, 
-                                              width  : f[1], 
-                                              height : f[2], 
-                                              top    : f[3], 
-                                              left   : f[4] };
-                                  });
   },
 
   adjust_frustration : function(){
@@ -1302,6 +1353,21 @@ Game = {
     });
   },
 
+  start_scores : function(){
+    
+    var score = $("#score"),
+        hiscore = $("#high_score");
+
+    hiscore.css('right','-' + score.outerWidth());
+
+    score.css('right','-' + score.outerWidth()).
+      animate({ right : 0 }, { duration : 500, complete : function(){
+        hiscore.animate({ right : 0 });
+      }
+    });
+
+  },
+
   end_with_frustration : function(){    
 
     // we delay the game end slightly so that the canvas has time 
@@ -1322,7 +1388,7 @@ Game = {
         } else {
           Game.stop_sound_theme();
           Game.stop_all_sounds(true);
-          Game.play_sound('frustration',false,50,true);
+          Game.play_sound('frustration',false,100,true);
           var message = Game.frustration_messages[Math.floor(Math.random()*Game.frustration_messages.length)];
           Game.show_message( "<h2 class='quip'>" + message + "</h2>" );
 
@@ -1559,9 +1625,11 @@ var Car = function(car_hash){
   this.sounds                = car_hash && car_hash.sounds                ? car_hash.sounds          : false;
   this.interrupt_all_sounds  = car_hash && car_hash.interrupt_all_sounds  ? true                     : false;
   this.score                 = car_hash && car_hash.score                 ? car_hash.score           : 1;
-  this.animate               = car_hash && car_hash.animate               ? true                     : false;
+  this.animating             = car_hash && car_hash.animating             ? true                     : false;
   this.animation             = car_hash && car_hash.animation             ? car_hash.animation       : {};
   
+  this.dom                   = car_hash && car_hash.dom                   ? car_hash.dom             : false;
+  this.bubble                = false;
   this.street                = false;
   this.moving                = false;
   
@@ -1608,8 +1676,8 @@ var Car = function(car_hash){
     this.initialize_origins(); 
     this.initialize_intersecting();
     
-    if (Game.enable_frustration) {
-      this.initialize_frustration();  
+    if (Game.enable_thoughtbubbles) {
+      this.initialize_thoughtbubbles();  
     }
     
     this.initialize_sounds();
@@ -1621,24 +1689,33 @@ var Car = function(car_hash){
 
     } else {
   
-      if (this.image_assets) {
+      if (Game.enable_canvas) {
 
-        this.image = (this.orientation=='horizontal' ? 
-          (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
-          (this.lefthand ? this.image_assets[2] : this.image_assets[3]) ); 
+        if (this.image_assets) {
 
-      } else {
-        
-        this.image = new Image();
+          // for sprites
+          if (this.image_assets.length===1) {
+            this.image = this.image_assets[0];
 
-        this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
-          (this.lefthand ? this.assets[0] : this.assets[1]) : 
-          (this.lefthand ? this.assets[2] : this.assets[3]) );        
+          } else {
+            this.image = (this.orientation=='horizontal' ? 
+              (this.lefthand ? this.image_assets[0] : this.image_assets[1]) : 
+              (this.lefthand ? this.image_assets[2] : this.image_assets[3]) );   
+          }
+          
+
+        } else {
+          
+          this.image = new Image();
+
+          this.image.src = Game.images_dir + (this.orientation=='horizontal' ? 
+            (this.lefthand ? this.assets[0] : this.assets[1]) : 
+            (this.lefthand ? this.assets[2] : this.assets[3]) );        
+        }
+  
       }
-
       
-
-      if (this.animate) {
+      if (this.animating) {
 
         // we store the current Game.frame number that this Car is created on, 
         // then wait until (this.last_game_frame+this.step) before switching to the next frame
@@ -1674,6 +1751,8 @@ var Car = function(car_hash){
     if (this.orientation=='horizontal') {
       this.width  = h;
       this.height = w;
+      //console.log('flipping dimensions for', this.type);
+      //if (this.type=='towtruck') { console.log('flipping dimensions', this.width, this.height); }
     }
   };
 
@@ -1747,7 +1826,7 @@ var Car = function(car_hash){
     });
   };
 
-  this.initialize_frustration = function(){
+  this.initialize_thoughtbubbles = function(){
     this.frustration_thresholds = [
       Math.round(this.ideal_travel_time/2),
       Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.35)),
@@ -1756,9 +1835,10 @@ var Car = function(car_hash){
     ];
   };
 
-  // this function manages the vehicle's indicators, which could be either
-  // the important (!) notification or the frustration (:() icons and sounds
-  this.show_indicators = function(){
+  // this function does double duty by managing the vehicle's indicators, which could be either
+  // the important (!) notification or the frustration (:() icons and sounds,
+  // as well as reporting the frustration levels of each vehicle
+  this.show_thoughtbubbles = function(){
     
     var self = this;
     
@@ -1766,8 +1846,13 @@ var Car = function(car_hash){
 
     var travel = Math.round(self.actual_travel_time/Game.speed);
 
-    if (self.important===true && travel < self.frustration_thresholds[0]) {
-      return Game.exclamation_assets[0];
+    if (travel < self.frustration_thresholds[0]) {
+      
+      if (_.include(_.keys(Game.thoughtbubble_assets), self.type)) {
+        return Game.thoughtbubble_assets[self.type];  
+      } else if (self.important===true) {
+        return Game.thoughtbubble_assets.important;
+      } 
       
     } else if (travel == self.frustration_thresholds[0]) {
       
@@ -1777,7 +1862,7 @@ var Car = function(car_hash){
     } else if (travel > self.frustration_thresholds[0] && travel < self.frustration_thresholds[1]) {
 
       if (self.moving===false) {
-        return Game.frustration_assets[0];
+        return Game.thoughtbubble_assets.frustration_01;
       }
 
     } else if (travel == self.frustration_thresholds[1]) {
@@ -1787,13 +1872,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.frustration_assets[0];
+        return Game.thoughtbubble_assets.frustration_01;
       }
     
     } else if (travel > self.frustration_thresholds[1] && travel < self.frustration_thresholds[2]) {
       
       if (self.moving===false) {
-        return Game.frustration_assets[1];  
+        return Game.thoughtbubble_assets.frustration_02;  
       }
 
     } else if (travel == self.frustration_thresholds[2]) {
@@ -1805,13 +1890,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.frustration_assets[1];
+        return Game.thoughtbubble_assets.frustration_02;
       }
 
     } else if (travel > self.frustration_thresholds[2] && travel < self.frustration_thresholds[3]) {
       
       if (self.moving===false) {
-        return Game.frustration_assets[2];  
+        return Game.thoughtbubble_assets.frustration_03;  
       }
     
     } else if (travel === self.frustration_thresholds[3]) {
@@ -1820,13 +1905,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.frustration_assets[2];  
+        return Game.thoughtbubble_assets.frustration_03;
       }
     
     } else if (travel > self.frustration_thresholds[3] && travel < self.ideal_travel_time) {
 
       if (self.moving===false) {
-        return Game.frustration_assets[3];  
+        return Game.thoughtbubble_assets.frustration_04;
       }
       
     } else if (travel === self.ideal_travel_time) {
@@ -1834,7 +1919,7 @@ var Car = function(car_hash){
       Game.end_with_frustration();
 
       if (self.moving===false) {
-        return Game.frustration_assets[3];  
+        return Game.thoughtbubble_assets.frustration_04;
       }
 
     }
@@ -1843,60 +1928,138 @@ var Car = function(car_hash){
 
   };
 
-  this.render = function(left, top){
+  this.render = function(left, top) {
     
     var self   = this,
         street = self.street,
         ctx    = self.street.context,
-        frus   = Game.frustration_context;
+        bub    = Game.bubble_context;
 
-    if (Game.debug===true) {
-      ctx.beginPath();
+    if (Game.enable_canvas) {
+      if (Game.debug===true) {
+        ctx.beginPath();
 
-      ctx.rect( self.current_pos.left, 
-            self.current_pos.top, 
-            self.width, 
-            self.height );
+        ctx.rect( self.current_pos.left, 
+              self.current_pos.top, 
+              self.width, 
+              self.height );
 
-      ctx.fillStyle = this.color;
-      ctx.fill();
-
-    } else {
-      
-      if (this.animate) {
-
-        if (Game.frames == this.last_game_frame+this.step) {
-          if (this.current_frame < this.animation.frames-1) {
-            this.current_frame += 1;  
-          } else {
-            this.current_frame = 0;
-          }
-          this.last_game_frame = Game.frames;
-        } 
-
-        var sx = 0 + (this.width*this.current_frame);
-
-        // console.log(self.image);
-        ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height); 
+        ctx.fillStyle = this.color;
+        ctx.fill();
 
       } else {
 
-        ctx.drawImage(self.image, self.current_pos.left, self.current_pos.top);  
+        if (this.animating) {
 
+          if (Game.frames == this.last_game_frame+this.step) {
+            if (this.current_frame < this.animation.frames-1) {
+              this.current_frame += 1;  
+            } else {
+              this.current_frame = 0;
+            }
+            this.last_game_frame = Game.frames;
+          } 
+
+          var sx = 0 + (this.width*this.current_frame);
+
+          ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height); 
+
+        } else {
+
+          if (this.orientation=='horizontal') {
+            var sx = 0 + (this.width * $.inArray([this.orientation,this.lefthand?'left':'right'].join('-'), Game.car_sprite_layout ));  
+          } else {
+            var sx = 0 + (this.height * $.inArray([this.orientation,this.lefthand?'left':'right'].join('-'), Game.car_sprite_layout ));
+          }
+          
+          ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height);
+
+        }
+         
       }
-       
-    }
 
-    if (Game.enable_frustration) {
-      if (indicator = self.show_indicators()) {
+    } else {
+      
+      if (self.dom) {
+        if (self.animating) {
+          if (Game.frames == this.last_game_frame+this.step) {
+            if (this.current_frame < this.animation.frames-1) {
+              this.current_frame += 1;  
+            } else {
+              this.current_frame = 0;
+            }
+            this.last_game_frame = Game.frames;
+          } 
+
+          var bg_pos = 0 + (this.width*this.current_frame);
+
+          self.dom.
+            css({ top  : self.current_pos.top, 
+                  left : self.current_pos.left,
+                  backgroundPosition : "-" + bg_pos + "px 0px" });
+
+        } else {
+
+          self.dom.
+            css({ top  : self.current_pos.top, 
+                  left : self.current_pos.left });
+
+        }
+      }
+
+    }
+    
+
+    if (Game.enable_thoughtbubbles) {
+      if (indicator = self.show_thoughtbubbles()) {
+        
+        if (self.indicator != indicator) {
+          self.indicator = indicator;
+          var changed = true;
+          // console.log('changed!', indicator);
+        }
+
         Game.deferred_renders.push([ 
-            function(f, p) {
-              frus.drawImage( f.image, 
-                             (p.left + f.left), 
-                             (p.top + f.top) );
-            }, 
-            indicator, 
-            self.current_pos ]);
+          function(f, p, c) {
+
+            var left = p.orientation=='horizontal' ? 
+                        (p.lefthand ? p.current_pos.left+f.off_left : p.current_pos.left+p.width-(f.width-f.off_left)) :
+                        (p.lefthand ? p.current_pos.left+f.off_left : p.current_pos.left-f.width+(p.width/2)),
+                top  = p.orientation=='horizontal' ? 
+                        (p.lefthand ? p.current_pos.top-(p.height/2)-(f.height+f.off_top) : p.current_pos.top-(p.height/2)-(f.height+f.off_top) ) :
+                        (p.lefthand ? p.current_pos.top+p.height-(f.height-f.off_top) : p.current_pos.top+f.off_top );
+            
+            if (Game.enable_canvas) {
+              bub.drawImage( Game.thoughtbubble_sprite, f.left, f.top, f.width, f.height, left, top, f.width, f.height );   
+            
+            } else {
+              
+              //console.log(left, top);
+
+              if (p.bubble) {
+                if (c) {
+                  //console.log('changing to', f.type);
+                  p.bubble.addClass(f.type);  
+                }
+                
+                p.bubble.css({ top : top, left : left });
+
+              } else {
+                p.bubble = $("<div class='bubble'></div>").
+                  addClass(f.type).
+                  css({ top : top, left : left });
+
+                Game.bubble_canvas.append(p.bubble);
+
+              }
+
+            }            
+
+          }, 
+          indicator, 
+          self,
+          changed ]);
+
       }
     }
 
@@ -2203,14 +2366,20 @@ var Car = function(car_hash){
     Game.arrived( this );
 
     if (this.sounds) {
-      console.log('stopping sound', this.sounds);
       Game.stop_sound(this.sounds);
     }
 
     if (this.interrupt_all_sounds===true) {
-      console.log('resuming theme from boss interruption');
       Game.play_sound_theme();
     }
+
+    if (!Game.enable_canvas && this.dom) {
+      this.dom.remove();
+      if (this.bubble) {
+        this.bubble.remove();  
+      }
+    }
+
   };
 
 };
@@ -2218,7 +2387,7 @@ var Car = function(car_hash){
 var Factory = function(){
   
   this.cars = {};
-  this.bosses = [];
+  this.bosses = {};
 
   this.initialize = function(cars, bosses) {
 
@@ -2252,8 +2421,8 @@ var Factory = function(){
 
     });
 
-    _.each(bosses, function(boss, i){
-
+    _.each(bosses, function(boss, name){
+      
       var boss_assets = new Array;
 
       _.each(boss.assets,function(asset, j){
@@ -2262,11 +2431,9 @@ var Factory = function(){
         boss_assets.push( img );
       });
       
-      self.bosses.push(boss_assets);
+      self.bosses[name] = boss_assets;
       
     });
-
-    // console.log(self.cars);
 
   };
 
@@ -2294,33 +2461,59 @@ var Maker = function(){
 
   };
 
-  this.generate = function(){
-
-    var self = this,
-        rand = Math.ceil(Math.random()*100),
-        car  = false;
+  this.get_random_car = function(){
     
-    _.each(self.car_odds, function(range, type){
-      if ( rand >= Math.round(range[0]*Game.global_car_odds) && 
-           rand <= Math.round(range[1]*Game.global_car_odds) ) {
-          car = self.car_types[type];
+    var self     = this,
+        rand     = Math.floor(Math.random()*Game.car_odds_total),
+        weight   = 0;
+
+    if (Game.global_car_odds===1.0 || Math.random() < Game.global_car_odds) {
+      for (var i=0; i<Game.car_odds.length; i++) {
+        weight += Game.car_odds[i][1];
+        if ( rand < weight ) {
+          //console.log(Game.seconds, Game.frames, 'generating',Game.car_odds[i][0]);
+          return Game.car_odds[i][0];  
         }
-    });
-
-    if (car && _.isArray(car.assets[0]) && car.assets.length>1) {
-      
-      var rand2  = Math.floor(Math.random()*car.assets.length),
-          assets = car.assets[ rand2 ],
-          images = Game.factory.cars[ car.type ][ rand2 ];
-
-      return _.extend( _.clone(car), { assets : assets, image_assets : images });
-
+      } 
     } else {
-
-      return _.extend( _.clone(car), { image_assets : Game.factory.cars[car.type] });  
-
+      //console.log(Game.seconds, Game.frames, 'no car!');
+      return false;
     }
+
+  };
+
+  this.generate  = function(){
+
+    var self = this;
+
+    if (car_type = this.get_random_car()) {
+      
+      var car = self.car_types[car_type];
+
+      if (Game.enable_canvas) {
+        
+        return _.extend( _.clone(car), { image_assets : Game.factory.cars[car.type] });  
+          
+      } else {
+        
+        return _.extend( _.clone(car), { dom : self.generate_in_dom(car) });  
+
+      }
+      
+
+    }    
     
+  };
+
+  this.generate_in_dom = function(car){
+
+    return $("<div class='car'></div>").
+      addClass(car.type).
+      addClass(car.boss ? 'boss' : '').
+      addClass(this.street.orientation).
+      addClass(this.street.lefthand ? 'left' : 'right').
+      appendTo(Game.car_canvas);
+
   };
 
   this.make = function(){
@@ -2335,11 +2528,16 @@ var Maker = function(){
 
   };
 
-  this.build_car = function(car_hash_override){
+  this.build_car = function(boss_override){
     var self     = this;
 
-    if (car_hash_override!==undefined) {
-      var car_hash = car_hash_override;
+    if (boss_override!==undefined) {
+      if (Game.enable_canvas) {
+        var car_hash = _.extend(boss_override, { image_assets : Game.factory.bosses[boss_override.type] });  
+      } else {
+        var car_hash = _.extend(boss_override, { dom : self.generate_in_dom(boss_override) });
+      }
+      
     } else {
       var car_hash = self.generate();
     }

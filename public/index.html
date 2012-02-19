@@ -8,7 +8,7 @@
   
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  <meta name = "viewport" content = "width = device-width, initial-scale = 1, user-scalable = no">
+  <meta name="viewport" content="width = device-width, initial-scale = 1, user-scalable = no">
 
   <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/apple-touch-icon-h.png" />
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/apple-touch-icon-m.png" />
@@ -20,12 +20,11 @@
   <link rel="stylesheet" href="stylesheets/game.css"/>
  
   <script src="javascripts/modernizr.js"></script>
-  <script src="javascripts/h5p.js"></script>
+  <script src="javascripts/loader.js"></script>
   <script src="javascripts/map.js"></script>
   <script src="javascripts/sound.js"></script>
   <script src="javascripts/underscore.js"></script>
-  <!-- <script src="javascripts/loader.js"></script> -->
-  <!--<script src="javascripts/pokkiBrowser.js"></script>-->
+
   <script>
     PLATFORM = 'web';
     APP_URL  = "http://traffix.infinite.ly";
@@ -51,13 +50,10 @@
 
 <body>
 
-<a id="minimize" href="#">&mdash;</a>
-<a id="toggle_fullscreen">&#10065;</a>
-
 <div id="all">
 
-  <div id="fb-root"></div>
-  <script src='http://connect.facebook.net/en_US/all.js'></script>
+  <!-- <div id="fb-root"></div>
+  <script src='http://connect.facebook.net/en_US/all.js'></script> -->
 
   <div id="debugger"></div>
 
@@ -130,9 +126,9 @@
     <h2 class="bttn restart">Try Again</h2>
   
     <div id="messages"><h1>Starting ...</h1></div>
-
-    <div id="score" title="Score">0</div>
-    <div id="high_score" class="high_score" title="High Score">0</div>
+    
+    <div id="score" title="Score" style="right:-135px">0</div>
+    <div id="high_score" class="high_score" title="High Score" style="right:-135px">0</div>
 
     <div id="map">
       
@@ -144,7 +140,7 @@
       <div class="intersection baker dexter" data-streets="baker dexter"><div class='stoplight horizontal'></div></div>
 
       <canvas id="cars" width="1024" height="768"></canvas>
-      <canvas id="frustrations" width="1024" height="768"></canvas>
+      <canvas id="bubbles" width="1024" height="768"></canvas>
       
       <div class="buildings"></div>
 

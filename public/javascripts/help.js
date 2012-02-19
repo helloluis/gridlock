@@ -14,7 +14,6 @@ Help = {
     this.diagrams = $(".help_illustration");
 
     this.animate_in(function(){
-      self.initialize_controls();
       self.initialize_intersection();
       self.initialize_frustration();
       self.initialize_reward();
@@ -105,16 +104,16 @@ Help = {
   },
 
   initialize_controls : function(){
-    this.diagrams.click(function(){
-      $(this).
-        css({'z-index':5}).
-        addClass('selected').
-        siblings().each(function(){ 
-          $(this).
-            removeClass('selected').
-            css('z-index',3); 
-        });
-    });  
+    // this.diagrams.click(function(){
+    //   $(this).
+    //     css({'z-index':5}).
+    //     addClass('selected').
+    //     siblings().each(function(){ 
+    //       $(this).
+    //         removeClass('selected').
+    //         css('z-index',3); 
+    //     });
+    // });  
   },
 
   initialize_intersection : function(){
@@ -125,7 +124,7 @@ Help = {
     this.intersection.dom       = $("#help_intersection");
     this.intersection.cont      = $(".help_background", this.intersection.dom);
 
-    this.build_cars(this.intersection, 3, 3, false, true);
+    this.build_cars(this.intersection, 3, 3, true, true);
 
   },
 
@@ -133,7 +132,7 @@ Help = {
   // the other two just spawn their cars as needed by their animate() methods
   restart_intersection : function(){
     
-    this.build_cars(this.intersection, 3, 3, false, true);
+    this.build_cars(this.intersection, 3, 3, true, true);
     this.start_intersection();
 
   },
@@ -358,7 +357,7 @@ Help = {
 
   animate_frustration : function(){
     
-    this.build_cars(this.frustration, 3, 3);
+    this.build_cars(this.frustration, 3, 3, true);
 
     var self   = this,
         obj    = this.frustration,
@@ -417,9 +416,11 @@ Help = {
         loop_blue(blue[0], 0, blue[0].position().left, -100, blue[0].position().top, 3000);
         loop_blue(blue[1], 1, blue[1].position().left, -100, blue[1].position().top, 3500);
         loop_blue(blue[2], 2, blue[2].position().left, -100, blue[2].position().top, 4000);
+        
+        next();
 
       }).
-      delay(4000).
+      delay(2000, 'frustration').
       queue('frustration', function(next){
         var i = 0; 
         self.frustration.dom.everyTime(1000,function(){
@@ -479,7 +480,9 @@ Help = {
             appendTo(self.reward.cont);
         };
 
-    self.build_cars(obj, 3, 0, true);
+    self.build_cars(obj, 3, 0);
+
+    self.reward.loops = new Array;
 
     self.reward.loops = new Array;
 
