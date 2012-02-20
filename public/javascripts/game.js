@@ -6,7 +6,7 @@ Game = {
    
   loader               : false,
   
-  enable_preloading    : true,
+  enable_preloading    : false,
 
   is_iOS               : PLATFORM=='ios', 
   is_pokki             : PLATFORM=='pokki',
@@ -114,9 +114,9 @@ Game = {
 
     Game.log("enable_preloading?", Game.enable_preloading);
 
-    if (Game.enable_preloading) {
+    Game.loading_screen = $("#loader");
 
-      Game.loading_screen = $("#loader");
+    if (Game.enable_preloading) {
 
       var loader_percentage = $(".loading_percentage", Game.loading_screen);
       
@@ -608,42 +608,7 @@ Game = {
     Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_soundjs);
 
     if (Game.with_sound) {
-      if (Game.with_soundjs) {
-        
-        var sounds_to_load = [];
-
-        _.each(Game.raw_sounds, function(media_or_arr, key){
-          if (_.isArray(media_or_arr)) {
-
-            _.each(media_or_arr, function(media, index){
-              
-              var new_k = [key, index].join(""),
-                  src = Game.sounds_dir + media + Game.sound_format;
-
-              Game.sounds[new_k] = src;
-              sounds_to_load.push({ name : new_k, src : src, instances : 3 });
-              
-            });
-
-          } else {
-
-            var src = Game.sounds_dir + media_or_arr + Game.sound_format;
-            Game.sounds[key] = src;
-            sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 1 });
-
-          }
-        });
-
-        Game.sounds.bosses = new Array;
-        _.each(Game.bosses, function(boss, idx){
-          var src = Game.sounds_dir + boss.sound + Game.sound_format; 
-          Game.sounds.bosses.push( src );
-        });
-        
-        SoundJS.addBatch(sounds_to_load);
-
-          
-      } else if (Game.with_phonegap_sound) {
+      if (Game.with_phonegap_sound) {
         
         _.each(Game.raw_sounds, function(media_or_arr, key){
           if (_.isArray(media_or_arr)) {
