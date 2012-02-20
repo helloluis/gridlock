@@ -1,3 +1,5 @@
+/* needs jQuery.pause.js */
+
 Help = {
 
   intersection : { dom : false, cars : {}, coordinates : {} },
@@ -15,7 +17,6 @@ Help = {
       self.initialize_controls();
       self.initialize_intersection();
       self.initialize_frustration();
-      // self.initialize_acceleration();
       self.initialize_reward();
     });
 
@@ -75,7 +76,6 @@ Help = {
       callback.call();
       self.start_intersection();
       self.start_frustration();
-      // self.start_acceleration();
       self.start_reward();
     }, 3000);
 
@@ -125,7 +125,16 @@ Help = {
     this.intersection.dom       = $("#help_intersection");
     this.intersection.cont      = $(".help_background", this.intersection.dom);
 
-    this.build_cars(this.intersection, 3, 3);
+    this.build_cars(this.intersection, 3, 3, false, true);
+
+  },
+
+  // only the intersection screen needs this convenience method,
+  // the other two just spawn their cars as needed by their animate() methods
+  restart_intersection : function(){
+    
+    this.build_cars(this.intersection, 3, 3, false, true);
+    this.start_intersection();
 
   },
 
@@ -136,8 +145,6 @@ Help = {
 
     var obj = this.frustration,
         stoplight = $(".stoplight", this.frustration.dom).show();
-
-    this.build_cars(this.frustration, 3, 3);
 
   },
 
@@ -156,13 +163,13 @@ Help = {
 
   },
 
-  build_cars : function(object, num_blue, num_yellow, left) {
+  build_cars : function(object, num_blue, num_yellow, blue_left, yellow_left) {
     object.cars.blue = [];
     object.cars.yellow = [];
 
     for (var i=0; i < num_blue; i++) {
       object.cars.blue.push(
-        $("<div class='car horizontal " + (left ? "left" : "right") + " blue'></div>").
+        $("<div class='car horizontal " + (blue_left ? "left" : "right") + " blue'></div>").
           css({ position : "absolute", 
                 top : 90, 
                 left : 400 }).
@@ -171,7 +178,7 @@ Help = {
 
     for (var i=0; i < num_yellow; i++) {
       object.cars.yellow.push(
-        $("<div class='car vertical " + (left ? "left" : "right") + " yellow'></div>").
+        $("<div class='car vertical " + (yellow_left ? "left" : "right") + " yellow'></div>").
           css({ position : "absolute", 
                 top : -150, 
                 left : 100 }).
@@ -188,7 +195,7 @@ Help = {
         coords = {  blue   : { x : 400, y : [ 90, 70, 90] },
                     yellow : { x : [ 100, 122, 100], y : -100 }
                  };
-    
+
     // looping functions for both blue and yellow cars
     var loop_blue = function(car, i, x1, x2, y, duration) {
         car.
@@ -217,6 +224,10 @@ Help = {
             });
       };
 
+    //console.log(obj.cars);
+
+    if (typeof obj.cars.blue=='undefined' || typeof obj.cars.yellow=='undefined') { return false; }
+
     obj.cars.blue[0].css('top', coords.blue.y[0]);
     obj.cars.blue[1].css('top', coords.blue.y[1]);
     obj.cars.blue[2].css('top', coords.blue.y[2]);
@@ -233,23 +244,38 @@ Help = {
         loop_blue(blue[1], 1, blue[1].position().left, -100, blue[1].position().top, 3500);
         loop_blue(blue[2], 2, blue[2].position().left, -100, blue[2].position().top, 4000);
 
+        next();
         // animate yellow cars stopping at the intersection
-        _.delay(function(){
-          var yellow = obj.cars.yellow;
-          yellow[0].stop(false,false).css({ top : -150, left : coords.yellow.x[0] }).animate({ top : 35 }, 1000);
-          yellow[1].stop(false,false).css({ top : -150, left : coords.yellow.x[1] }).animate({ top : 35 }, 1500);
-          yellow[2].stop(false,false).css({ top : -150, left : coords.yellow.x[2] }).animate({ top : -5 }, 2000);
-        }, 1000);
+        // _.delay(function(){
+        //   var yellow = obj.cars.yellow;
+        //   yellow[0].stop(false,false).css({ top : -150, left : coords.yellow.x[0] }).animate({ top : 35 }, 1000);
+        //   yellow[1].stop(false,false).css({ top : -150, left : coords.yellow.x[1] }).animate({ top : 35 }, 1500);
+        //   yellow[2].stop(false,false).css({ top : -150, left : coords.yellow.x[2] }).animate({ top : -5 }, 2000);  
+        // }, 1000);
         
-        // the whole thing should take about 8 sec
-        _.delay(function(){
-          obj.animate_h = false;
-          next();
-        }, 4000);
+        // the whole thing should take about 4 sec
+        // _.delay(function(){
+        //   obj.animate_h = false;
+        //   next();
+        // }, 4000);
 
       }).
+      delay(1000, 'intersection').
+      queue('intersection', function(next){
+
+        var yellow = obj.cars.yellow;
+        yellow[0].stop(false,false).css({ top : -150, left : coords.yellow.x[0] }).animate({ top : 35 }, 1000);
+        yellow[1].stop(false,false).css({ top : -150, left : coords.yellow.x[1] }).animate({ top : 35 }, 1500);
+        yellow[2].stop(false,false).css({ top : -150, left : coords.yellow.x[2] }).animate({ top : -5 }, 2000);
+
+        next();
+
+      }).
+      delay(4000, 'intersection').
       queue('intersection', function(next){
         
+        obj.animate_h = false;
+
         // finger taps the button
         finger.stop().css({ top : 300, left : 300, opacity : 0, visibility : 'visible' }).
           animate({ top : light.position().top, left : light.position().left, opacity : 1 }, {
@@ -266,12 +292,11 @@ Help = {
           });
 
       }).
+      delay(500, 'intersection').
       queue('intersection', function(next){
         
         // move away the finger
-        _.delay(function(){
-          finger.removeClass('tapped').animate({ top : -50, left : 300, opacity : 0 }, 1000);  
-        }, 500);
+        finger.removeClass('tapped').animate({ top : -50, left : 300, opacity : 0 }, 1000);  
         
         // animate the blue cars, stopping at the intersection
         var blue = obj.cars.blue;
@@ -289,9 +314,10 @@ Help = {
         loop_yellow(yellow[1], 1, yellow[1].position().left, yellow[1].position().top, 400, 3500);
         loop_yellow(yellow[2], 2, yellow[2].position().left, yellow[2].position().top, 400, 4000);
 
-        _.delay(next, 4000);
+        next();
 
       }).
+      delay(4000, 'intersection').
       queue('intersection', function(next){
         
         // finger taps the button
@@ -332,12 +358,14 @@ Help = {
 
   animate_frustration : function(){
     
+    this.build_cars(this.frustration, 3, 3);
+
     var self   = this,
         obj    = this.frustration,
         light  = $(".stoplight", obj.dom).show().addClass('horizontal').removeClass('vertical'),
         frus   = [ 'frustration01', 'frustration02', 'frustration03' ],
         coords = {  blue   : { x : 400, y : [ 90, 70, 90] },
-                    yellow : { x : [ 152, 175, 152], y : 350 },
+                    yellow : { x : [ 152, 175, 152 ], y : 350 },
                  };
     
     this.frustration.animate_h = true;
@@ -390,23 +418,23 @@ Help = {
         loop_blue(blue[1], 1, blue[1].position().left, -100, blue[1].position().top, 3500);
         loop_blue(blue[2], 2, blue[2].position().left, -100, blue[2].position().top, 4000);
 
-        _.delay(function(){
-          var i = 0; 
-          self.frustration.dom.everyTime(1000,function(){
-            
-            var pos = obj.cars.yellow[i%3].position(),
-                f   = $($(".frustration", obj.cont).get(i%3));
-            
-            f.css({ top : pos.top-30, left : pos.left-40, visibility : 'visible' }).addClass( frus[i%3] );
+      }).
+      delay(4000).
+      queue('frustration', function(next){
+        var i = 0; 
+        self.frustration.dom.everyTime(1000,function(){
+          
+          var pos = obj.cars.yellow[i%3].position(),
+              f   = $($(".frustration", obj.cont).get(i%3));
+          
+          f.css({ top : pos.top-30, left : pos.left-40, visibility : 'visible' }).addClass( frus[i%3] );
 
-            i+=1;
+          i+=1;
 
-            if (i==9) {
-              $(this).stopTime();
-            }
-          });
-        }, 4000);
-
+          if (i==9) {
+            $(this).stopTime();
+          }
+        });
       });
 
     self.frustration.dom.dequeue('frustration');
@@ -437,6 +465,7 @@ Help = {
                   score(x2, y);
                 } 
             });
+            return car;
           },
         score = function(left, top) {
           $("<div class='car_score'>+1</div>").
@@ -452,13 +481,15 @@ Help = {
 
     self.build_cars(obj, 3, 0, true);
 
+    self.reward.loops = new Array;
+
     self.reward.dom.
       queue('reward', function(next){
         
-        loop(obj.cars.blue[0], -40, 300, 120, 2000);
-        loop(obj.cars.blue[1], -40, 300, 140, 3000);
+        self.reward.loops.push( loop(obj.cars.blue[0], -40, 300, 120, 2000) );
+        self.reward.loops.push( loop(obj.cars.blue[1], -40, 300, 140, 3000) );
         _.delay(function(){
-          loop(obj.cars.blue[2], -40, 300, 120, 2000);
+          self.reward.loops.push( loop(obj.cars.blue[2], -40, 300, 120, 2000) );
         },1000);
 
       });
@@ -529,22 +560,52 @@ Help = {
 
   },
 
+  stop_intersection : function(){
+
+    if (this.intersection.dom) {
+      $(".car", this.intersection.dom).stop(false,false);
+      $(".finger", this.intersection.dom).stop(false,false);
+      this.intersection.dom.stop(false,false).stopTime();
+    
+      this.intersection.cars = { blue : [], yellow : [] };
+      this.intersection.cont.empty();
+      this.intersection.animating = false;
+      this.intersection.cars = {};  
+    }
+    
+  },
+
+  stop_frustration : function(){
+
+    if (this.frustration.dom) {
+      $(".car", this.frustration.dom).stop(false,false);
+      this.frustration.dom.stop(false,false).stopTime();
+      this.frustration.cont.empty();
+      this.frustration.animating  = false;
+      this.frustration.cars = {};  
+    }
+    
+  },
+
+  stop_reward : function(){
+
+    if (this.reward.dom) {
+      this.reward.dom.stop(false,false).stopTime();
+      $(".car", this.reward.cont).stop(false,false);
+      this.reward.cont.empty();
+      this.reward.animating  = false;
+      this.reward.cars = {};
+    }
+    
+  },
+
   stop_all : function(){
     
-    this.intersection.dom.stop(false,false).stopTime();
-    this.frustration.dom.stop(false,false).stopTime();
-    // this.acceleration.dom.stop(false,false).stopTime();
-    this.reward.dom.stop(false,false).stopTime();
-
-    this.intersection.cont.empty();
-    this.frustration.cont.empty();
-    // this.acceleration.cont.empty();
-    this.reward.cont.empty();
-
-    this.intersection.animating = false;
-    this.frustration.animating  = false;
-    // this.acceleration.animating = false;
-    this.reward.animating  = false;
+    console.log("Stopping all menus");
+    
+    this.stop_intersection();
+    this.stop_frustration();
+    this.stop_reward();
 
   }
   

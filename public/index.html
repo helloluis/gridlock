@@ -20,12 +20,14 @@
   <link rel="stylesheet" href="stylesheets/game.css"/>
  
   <script src="javascripts/modernizr.js"></script>
-  <script src="javascripts/underscore.js"></script>
+  <script src="javascripts/h5p.js"></script>
   <script src="javascripts/map.js"></script>
   <script src="javascripts/sound.js"></script>
-  <script src="javascripts/loader.js"></script>
+  <script src="javascripts/underscore.js"></script>
+  <!-- <script src="javascripts/loader.js"></script> -->
+  <!--<script src="javascripts/pokkiBrowser.js"></script>-->
   <script>
-    PLATFORM = 'pokki';
+    PLATFORM = 'web';
     APP_URL  = "http://traffix.infinite.ly";
     APP_ID   = "192448444187818";
   </script>
@@ -50,9 +52,6 @@
 <body>
 
 <div id="all">
-
-  <a id="minimize" href="#">&mdash;</a>
-  <a id="toggle_fullscreen">&#10065;</a>
 
   <div id="fb-root"></div>
   <script src='http://connect.facebook.net/en_US/all.js'></script>
@@ -126,8 +125,7 @@
     <h2 class="bttn pause">Pause</h2>
     <h2 class="bttn quit">Quit</h2>
     <h2 class="bttn restart">Try Again</h2>
-    <h2 class="bttn speed">Faster</h2>
-
+  
     <div id="messages"><h1>Starting ...</h1></div>
 
     <div id="score" title="Score">0</div>
@@ -136,11 +134,6 @@
     <div id="map">
       
       <div class="neighborhood"></div>
-      
-      <div id="amber"  data-name="amber" class="street horizontal lanes_4"></div>
-      <div id="baker"  data-name="baker" class="street horizontal lanes_2"></div>
-      <div id="chang"  data-name="chang" class="street vertical lanes_4"></div>
-      <div id="dexter" data-name="dexter" class="street vertical lanes_4"></div>
 
       <div class="intersection amber chang"  data-streets="amber chang"><div class='stoplight horizontal'></div></div>
       <div class="intersection amber dexter" data-streets="amber dexter"><div class='stoplight horizontal'></div></div>
@@ -177,6 +170,9 @@
 <script src="javascripts/help.js"></script>
 
 <script>
+  window.pauseFromPokki  = function(){ Game.pause(); Game.pause_menus(); console.log('pausing game'); };
+  window.resumeFromPokki = function(){ Game.resume_menus(); console.log('resuming game'); };
+
   $(function(){
     $("body").addClass(PLATFORM);
     var auto_start = document.location.hash.indexOf("autostart")!==-1;
