@@ -225,28 +225,24 @@ var SOUNDS_DIR = "sounds/";
 
 // all sounds and music
 var SOUNDS = { 
-  horns_short   : [
-    "horn1",
-    "horn2",
-    "horn3",
-    "horn4" 
-  ],
-  horns_long    : [
-    "horn_long1",
-    "horn_long2"
-  ],
-  horn_truck    : "horn_truck",
-  countdown     : "countdown",
-  theme         : "bg",
-  explosion     : "explosion_short",
-  frustration   : "frustration",
-  arrived       : "kaching",
-  arrived_2     : "kaching2",
-  arrived_3     : "kaching3",
-  ambulance     : "ambulance",
-  hearse        : "hearse",
-  police        : "police",
-  firetruck     : "firetruck"
+  horns_short_1 : ["horn1",2],
+  horns_short_2 : ["horn2",2],
+  horns_short_3 : ["horn3",2],
+  horns_short_4 : ["horn4",2],
+  horns_long_1  : ["horn_long1",2],
+  horns_long_2  : ["horn_long2",2],
+  horn_truck    : ["horn_truck",1],
+  countdown     : ["countdown",1],
+  theme         : ["bg",1],
+  explosion     : ["explosion_short",1],
+  frustration   : ["frustration",1],
+  arrived       : ["kaching",8],
+  arrived_2     : ["kaching2",2],
+  arrived_3     : ["kaching3",1],
+  ambulance     : ["ambulance",3],
+  hearse        : ["hearse",1],
+  police        : ["police",3],
+  firetruck     : ["firetruck",3]
 };
 
 var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
@@ -274,6 +270,7 @@ var COLLISION_MESSAGES = [
   "KA-BOOOOM!",
   "You like making things explode, huh?",
   "\"Never drive faster than your guardian angel can fly.\"  ~ Unknown",
+  "\"Traffic signals in New York are just rough guidelines.\" ~ David Letterman",
   "\"My driving abilities from Mexico have helped me get through Hollywood.\" ~ Salma Hayek",
   "\"Living with a conscience is like driving a car with the brakes on.\" ~ Budd Schulberg",
   "\"Until you've learned to drive, you've never really learned how to swear.\" ~ Robert Paul",
@@ -290,9 +287,12 @@ var FRUSTRATION_MESSAGES = [
   "Too hard for you?",
   "Fruit Ninja might be a better game for you",
   "Too much time playing PvZ?",
+  "\"Safety doesn't happen by accident.\" ~ Unknown",
   "\"When everything's coming your way, you're in the wrong lane.\" ~ Unknown",
   "\"A car is not the only thing that can be recalled by its maker.\" ~ Unknown",
+  "\"I'd like to have the flying car, I think that'd be really cool.\" ~ Rupert Grint",
   "Honking means they're getting annoyed at you",
+  "\"A suburban mother's role is to deliver children obstetrically once, and by car forever after.\" ~ Peter De Vries",
   "\"Natives who beat drums to drive off evil spirits are objects of scorn to smart Americans who blow horns to break up traffic jams.\"  ~ Mary Ellen Kelly",
   "\"Anywhere from 10% to more than 70% of people in urban traffic are simply looking for parking.\" ~ Tom Vanderbilt",
   "Drivers in one-third of U.S. cities spend more than 40 hours a year (an entire work week) in traffic that is not moving.",

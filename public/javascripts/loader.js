@@ -284,9 +284,9 @@ function PxLoader(settings) {
 
     // prints the status of each resource to the console
     var log = this.log = function(showAll) {
-        if (!window.console) {
-            return;
-        }
+        // if (!window.console) {
+        //     return;
+        // }
 
         var elapsedSeconds = Math.round((+new Date - timeStarted) / 1000);
         window.console.log('PxLoader elapsed: ' + elapsedSeconds + ' sec');
@@ -488,17 +488,17 @@ function PxLoaderSound(id, url, instances) {
 
     this.tags = undefined;
     this.priority = undefined;
-    this.sound = SoundJS.add(id, url, instances);
+    this.sound = { id : id, url : url , instances : instances };
 
     this.start = function(pxLoader) {
       // we need the loader ref so we can notify upon completion
       loader = pxLoader;
+      SoundJS.add(this.sound.id, this.sound.url, this.sound.instances);
 
-      loader.onTimeout(self);        
     };
 
     this.checkStatus = function() {
-      if (self.sound.getCurrentLoadProgress()==1) {
+      if (SoundJS.isLoaded(this.sound.id)) {
         loader.onLoad(self);
       } 
     };
@@ -516,51 +516,5 @@ function PxLoaderSound(id, url, instances) {
 PxLoader.prototype.addSound = function(id, url, instances) {
   var soundLoader = new PxLoaderSound(id, url, instances);
   this.add(soundLoader);
-  return soundLoader.sound;
+  return soundLoader.sound; // doesn't return the actual Audio element, since SoundJS potentially creates multiple instances per sound
 };
-
-
-//
-// TODO: PxLoader Plugin that works with SoundJS
-//
-
-function PxLoaderResource(url, tags, priority) { 
-    var self = this; 
-        loader = null; 
- 
-    // used by the loader to categorize and prioritize 
-    this.tags = tags; 
-    this.priority = priority; 
- 
-    // called by PxLoader to trigger download 
-    this.start = function(pxLoader) { 
-        // we need the loader ref so we can notify upon completion 
-        loader = pxLoader; 
- 
-        // set up event handlers so we send the loader progress updates 
- 
-        // there are 3 possible events we can tell the loader about: 
-        // loader.onLoad(self);    // the resource loaded 
-        // loader.onError(self);   // an error occured 
-        // loader.onTimeout(self); // timeout while waiting 
- 
-        // start downloading 
-    }; 
- 
-    // called by PxLoader to check status of image (fallback in case 
-    // the event listeners are not triggered). 
-    this.checkStatus = function() { 
-        // report any status changes to the loader 
-        // no need to do anything if nothing has changed 
-    }; 
- 
-    // called by PxLoader when it is no longer waiting 
-    this.onTimeout = function() { 
-        // must report a status to the loader: load, error, or timeout 
-    }; 
- 
-    // returns a name for the resource that can be used in logging 
-    this.getName = function() { 
-        return url; 
-    } 
-} 
