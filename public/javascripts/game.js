@@ -32,7 +32,7 @@ Game = {
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
 
-  enable_canvas        : false, // if set to true, use Canvas to animate. if false, use the DOM.
+  enable_canvas        : true, // if set to true, use Canvas to animate. if false, use the DOM.
    
   fps                  : FPS,
   timer                : 0,
