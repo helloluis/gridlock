@@ -2,7 +2,7 @@ Game = {
 
   debug                : false,  // set to TRUE to visualize barriers and intersections
   debug_cont           : false,
-  debug_visually       : false,
+  debug_visually       : false,  // set to TRUE to overlay a visible log on the game
    
   loader               : false,
   
@@ -20,6 +20,10 @@ Game = {
 
   seconds              : 0,     // global timer, in seconds, so only increments once every 1000 millisec
 
+  enable_canvas        : true,  // if set to true, use Canvas to animate. if false, use the DOM.
+
+  rounded_numbers      : true,  // dont use floating-point numbers for speed
+
   difficulty_increases : true,  // if set to false, we don't make the game harder as time goes on
   smart_intersections  : true,  // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
   double_buffering     : true,  // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
@@ -27,8 +31,6 @@ Game = {
 
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
-
-  enable_canvas        : false, // if set to true, use Canvas to animate. if false, use the DOM.
    
   fps                  : FPS,
   timer                : 0,
@@ -81,10 +83,11 @@ Game = {
 
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
-  with_sound           : true,    // globally disable all sound
-  with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
-  with_soundjs         : true,     // SoundJS, for Web & Pokki build
+  with_sound           : true,     // globally disable all sound
+  with_phonegap_sound  : true,     // we use the Phonegap sound library for iOS
+  with_soundjs         : false,    // SoundJS, for Web & Pokki build
   with_sm2_sound       : false,    // SoundManager2 is what we used to use for web
+  muted                : false,
 
   sound_format         : "." + SOUND_FORMATS[PLATFORM],
  
@@ -174,7 +177,7 @@ Game = {
 
               var src = Game.sounds_dir + media_or_arr + Game.sound_format;
               Game.sounds[key] = src;
-              sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 1 });
+              sounds_to_load.push({ name : key, src : src, instances : key=='arrived' ? 8 : 2 });
 
             }
           });
@@ -194,11 +197,6 @@ Game = {
             setTimeout(function(){ myVar = SoundJS.play("horns_short1", SoundJS.INTERUPT_ANY)}, 3000);  
           };
             
-        } else if (Game.with_phonegap_sound) {
-          
-          // using the Media API for theme music
-          Game.sounds['theme'] = new Media( Game.sounds_dir + SOUNDS.theme + Game.sound_format );
-
         }
       }
 
@@ -629,6 +627,28 @@ Game = {
 
   },
 
+  /* 
+  
+  Limitations in the PhoneGap framework prevent us from managing our sounds in a straightforward fashion.
+  When using the SoundPlug plugin, the sounds need to be referenced from the root of the app folder, not
+  within the www/ folder the way other resources are organized.
+  However, when using PhoneGap's Media API, we can safely reference audio within the www folder. So our
+  filesystem structure tends to look like this:
+
+  root
+    -- app.xcodeproj
+    -- sounds
+    ---- sound_effect.wav
+    -- www
+    ---- index.html
+    ---- sounds
+    ------ theme_music.wav
+
+  This is because sound effects tend to be played via SoundPlug (which uses the System Sounds API of iOS
+  for more responsiveness) whereas theme_music is played via PhoneGap Media, which allows it to be
+  muted, stopped and manipulated. 
+
+  */
   initialize_sounds : function() {
 
     Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_soundjs);
@@ -643,8 +663,9 @@ Game = {
               Game.sounds[new_k] = Game.sounds_dir + media + Game.sound_format;
             });
           } else {
-            if (key==='theme') {
+            if (key=='theme') {
               Game.sounds[key] = new Media(Game.sounds_dir + media_or_arr + Game.sound_format);
+              Game.log('initializing theme music', Game.sounds[key]);
             } else {
               Game.sounds[key] = Game.sounds_dir + media_or_arr + Game.sound_format;   
             }
@@ -1058,14 +1079,12 @@ Game = {
 
   mute : function(){
     $(".bttn.mute").addClass('muted').text('Un-mute');
-    Game.with_sound = false;
     Game.muted = true;
     Game.stop_all_sounds();
   },
 
   unmute : function(){
-    $(".bttn.mute").removeClass('muted').text('Mute');
-    Game.with_sound = true;
+    $(".bttn.mute").removeClass('muted').text('Mute');    
     Game.muted = false;
     SoundJS.setMute(false);
     if (Game.started) {
@@ -1091,7 +1110,7 @@ Game = {
 
     if (volume===undefined) { volume = 100; }
     
-    if (Game.with_sound) {
+    if (Game.with_sound && !Game.muted) {
       if (Game.with_phonegap_sound) {
         if (loop) {
           Game.loop_sound(sound, volume);
@@ -1114,31 +1133,40 @@ Game = {
   },
 
   loop_sound : function(sound, volume) {
+    
     if (Game.with_phonegap_sound) {
       
+      console.log('playing sound ', sound);
       Game.sounds[sound].play();
 
       Game.theme_timer = setInterval(function(){ 
-          Game.sounds[sound].play(); 
+          if (Game.started && !Game.ended && !Game.paused && !Game.muted) {
+            Game.sounds[sound].play();   
+          } else {
+            Game.theme_timer.clearInterval();
+          }
         }, 72002);
       
     } else if (Game.with_soundjs) {
       
-      SoundJS.play(sound, SoundJS.INTERRUPT_NONE, 50, true);
+      SoundJS.play(sound, SoundJS.INTERRUPT_NONE, 100, true);
 
     }
   },
 
   stop_sound : function(sound) {
     
-    Game.log('stopping sound', sound);
+    if (Game.with_sound) {
+      
+      if (Game.with_phonegap_sound) {
+        if (sound=='theme') {
+          Game.sounds[sound].stop();  
+        }
 
-    if (Game.with_phonegap_sound) {
-      Game.sounds[sound].stop()
+      } else if (Game.with_soundjs) {
+        SoundJS.stop(sound);
 
-    } else if (Game.with_soundjs) {
-      SoundJS.stop(sound);
-
+      }  
     }
     
   },
@@ -1754,7 +1782,7 @@ var Car = function(car_hash){
 
   // TODO!
   this.play_sound_loop = function(){
-    if (Game.with_sound) {
+    if (Game.with_sound && !Game.muted) {
       //console.log(this.sounds);
       Game.play_sound(this.sounds);
       if (this.interrupt_all_sounds===true) {
@@ -2278,20 +2306,21 @@ var Car = function(car_hash){
 
     } else {
       
+      var new_pos = Game.rounded_numbers ? Math.round(self.speed*Game.speed) : self.speed*Game.speed;
+
       if (self.orientation=='horizontal') {
         if (self.lefthand) {
-          self.current_pos.left-=self.speed*Game.speed;  
+          self.current_pos.left-=new_pos;
         } else {
-          self.current_pos.left+=self.speed*Game.speed;    
+          self.current_pos.left+=new_pos;
         }
       } else {
         if (self.lefthand) {
-          self.current_pos.top+=self.speed*Game.speed;  
+          self.current_pos.top+=new_pos;  
         } else {
-          self.current_pos.top-=self.speed*Game.speed;    
+          self.current_pos.top-=new_pos;
         }
       }
-  
 
       if (self.has_arrived()) {
         self.arrived();
