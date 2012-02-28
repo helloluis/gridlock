@@ -223,39 +223,27 @@ var SOUNDS_DIR = "sounds/";
 
 // all sounds and music
 var SOUNDS = { 
-  horns_short   : [
-    "horn1",
-    "horn2",
-    "horn3",
-    "horn4" 
-  ],
-  horns_long    : [
-    "horn_long1",
-    "horn_long2"
-  ],
-  horn_truck    : "horn_truck",
-  countdown     : "countdown",
-  theme         : "bg",
-  explosion     : "explosion_short",
-  frustration   : "frustration",
-  arrived       : "kaching",
-  arrived_2     : "kaching2",
-  arrived_3     : "kaching3",
-  ambulance     : "ambulance",
-  hearse        : "hearse",
-  police        : "police",
-  firetruck     : "firetruck"
+  horns_short_1 : ["horn1",2],
+  horns_short_2 : ["horn2",2],
+  horns_short_3 : ["horn3",2],
+  horns_short_4 : ["horn4",2],
+  horns_long_1  : ["horn_long1",2],
+  horns_long_2  : ["horn_long2",2],
+  horn_truck    : ["horn_truck",1],
+  countdown     : ["countdown",1],
+  theme         : ["bg",1],
+  explosion     : ["explosion_short",1],
+  frustration   : ["frustration",1],
+  arrived       : ["kaching",8],
+  arrived_2     : ["kaching2",2],
+  arrived_3     : ["kaching3",1],
+  ambulance     : ["ambulance",3],
+  hearse        : ["hearse",1],
+  police        : ["police",3],
+  firetruck     : ["firetruck",3]
 };
 
 var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
-
-var SOUND_SPRITE = "sprite01.mp3";
-
-var SOUND_SPRITE_MAP = {
-  'ambulance'    : { start : 0.00,  end : 7.3 },
-  'theme'        : { start : 8.00,  end : 80.0, loop : true },
-  'horns_short1' : { start : 81.00, end : 81.8 }
-};
 
 var NEIGHBORHOOD = [
   "bg.jpg"
@@ -303,7 +291,6 @@ var SUCCESS_MESSAGES = [
   "Awesome!",
   "Cool!",
   "Crazy!",
-  "Ikaw na! Ikaw na ang MMDA!",
   "Fantastic!",
   "You Don't Suck After All!"
 ];
