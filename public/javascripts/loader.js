@@ -518,3 +518,4 @@ PxLoader.prototype.addSound = function(id, url, instances) {
   this.add(soundLoader);
   return soundLoader.sound; // doesn't return the actual Audio element, since SoundJS potentially creates multiple instances per sound
 };
+

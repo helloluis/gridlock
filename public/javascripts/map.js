@@ -163,12 +163,12 @@ var CARS = {
 var CAR_SPRITE_LAYOUT = [ "vertical-left", "vertical-right", "horizontal-right", "horizontal-left" ];
 
 var LOADING_CARS = [
-  'car2.png', 
-  'taxi.png', 
-  'car1.png', 
-  'jeepney.png', 
-  'van.png', 
-  'bus.png'
+  'car', 
+  'taxi', 
+  'hatch', 
+  'jeepney', 
+  'van', 
+  'bus'
 ];
 
 // width, height, offset top, offset left
@@ -195,6 +195,7 @@ var FRUSTRATIONS = [
   [ 'frustration_04.png', 40, 40, -25, -25 ]
 ];
 
+
 var CAR_ODDS = [  
   [ 'car',       40 ], 
   [ 'taxi',      20 ], 
@@ -207,6 +208,7 @@ var CAR_ODDS = [
   [ 'police',    1  ], 
   [ 'firetruck', 1  ] 
 ];
+
 
 // in order for the global car odds to go up, a player
 // has to hit a certain number of points. we start at 0.3,
@@ -260,6 +262,7 @@ var COLLISION_MESSAGES = [
   "KA-BOOOOM!",
   "You like making things explode, huh?",
   "\"Never drive faster than your guardian angel can fly.\"  ~ Unknown",
+  "\"Traffic signals in New York are just rough guidelines.\" ~ David Letterman",
   "\"My driving abilities from Mexico have helped me get through Hollywood.\" ~ Salma Hayek",
   "\"Living with a conscience is like driving a car with the brakes on.\" ~ Budd Schulberg",
   "\"Until you've learned to drive, you've never really learned how to swear.\" ~ Robert Paul",
@@ -276,9 +279,12 @@ var FRUSTRATION_MESSAGES = [
   "Too hard for you?",
   "Fruit Ninja might be a better game for you",
   "Too much time playing PvZ?",
+  "\"Safety doesn't happen by accident.\" ~ Unknown",
   "\"When everything's coming your way, you're in the wrong lane.\" ~ Unknown",
   "\"A car is not the only thing that can be recalled by its maker.\" ~ Unknown",
+  "\"I'd like to have the flying car, I think that'd be really cool.\" ~ Rupert Grint",
   "Honking means they're getting annoyed at you",
+  "\"A suburban mother's role is to deliver children obstetrically once, and by car forever after.\" ~ Peter De Vries",
   "\"Natives who beat drums to drive off evil spirits are objects of scorn to smart Americans who blow horns to break up traffic jams.\"  ~ Mary Ellen Kelly",
   "\"Anywhere from 10% to more than 70% of people in urban traffic are simply looking for parking.\" ~ Tom Vanderbilt",
   "Drivers in one-third of U.S. cities spend more than 40 hours a year (an entire work week) in traffic that is not moving.",
@@ -376,6 +382,7 @@ var BOSSES = {
   }
 
 };
+
 
 // var BOSS_SEQUENCE = [
 //   [ 'towtruck',  15 ],

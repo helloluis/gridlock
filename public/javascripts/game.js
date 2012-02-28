@@ -12,6 +12,10 @@ Game = {
   is_pokki             : PLATFORM=='pokki',
   is_web               : PLATFORM=='web',
 
+  is_iOS               : PLATFORM=='ios', 
+  is_pokki             : PLATFORM=='pokki',
+  is_web               : PLATFORM=='web',
+
   score                : 0,
   frustration          : 0,
   high_score           : 0,
@@ -81,10 +85,9 @@ Game = {
 
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
    
-  with_sound           : true,    // globally disable all sound
+  with_sound           : true,     // globally disable all sound
   with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
   with_soundjs         : true,     // SoundJS, for Web & Pokki build
-  with_sm2_sound       : false,    // SoundManager2 is what we used to use for web
 
   sound_format         : "." + SOUND_FORMATS[PLATFORM],
  
@@ -598,26 +601,20 @@ Game = {
 
     Game.log("initializing sounds", Game.with_sound, Game.with_phonegap_sound, Game.with_soundjs);
 
-    if (Game.with_sound){
+    if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
-
-        _.each(Game.raw_sounds, function(media_or_arr, key){
-          if (_.isArray(media_or_arr)) {
-            _.each(media_or_arr, function(media, index){
-              var new_k = [key, index].join("");
-              Game.sounds[new_k] = Game.sounds_dir + media + Game.sound_format;
-            });
-          } else {
-            if (key==='theme') {
-              Game.sounds[key] = new Media(Game.sounds_dir + media_or_arr + Game.sound_format);
-            } else {
-              Game.sounds[key] = Game.sounds_dir + media_or_arr + Game.sound_format;   
-            }
-          }          
-        });
         
+        _.each(Game.raw_sounds, function(media, key){
+          if (key==='theme') {
+            Game.sounds[key] = new Media(Game.sounds_dir + media[0] + Game.sound_format);
+          } else {
+            Game.sounds[key] = Game.sounds_dir + media[0] + Game.sound_format;   
+          }         
+        });
+
       }
-    }
+    }  
+
   },
 
   initialize_buttons : function(){
@@ -659,7 +656,6 @@ Game = {
     });
 
     $(".bttn.credits").click(function(){
-      //console.log('disabled?');
       if (!$(this).hasClass('disabled')) {
         Game.show_credits();
       }
@@ -1050,7 +1046,7 @@ Game = {
 
   play_sound : function(sound, loop, volume, interrupt_all) {
     
-    // console.log('playing sound', sound, loop);
+    console.log('playing sound', sound, loop);
 
     if (_.isUndefined(Game.sounds[sound])) { return false; }
 
@@ -1065,13 +1061,14 @@ Game = {
         }
 
       } else if (Game.with_soundjs) {
-        if (loop) {
+
+        if (loop===true) {
           SoundJS.play( sound, null, 1, true );
         } else {
-          if (interrupt_all) {
+          if (interrupt_all===true) {
             SoundJS.play( sound, SoundJS.INTERUPT_ANY );
           } else {
-            SoundJS.play( sound, SoundJS.INTERUPT_LATE );  
+            SoundJS.play( sound, SoundJS.INTERUPT_LATE );
           }
         }
       }
@@ -1268,6 +1265,7 @@ Game = {
       });
 
     }
+
   },
 
   adjust_frustration : function(){
@@ -2334,6 +2332,7 @@ var Car = function(car_hash){
         this.bubble.remove();  
       }
     }
+
   };
 
 };
@@ -2388,8 +2387,6 @@ var Factory = function(){
       self.bosses[name] = boss_assets;
       
     });
-
-    //console.log(self.bosses);
 
   };
 

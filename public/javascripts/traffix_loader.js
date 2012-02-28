@@ -15,15 +15,14 @@ TraffixLoader = {
     self.dom = $("#loading_cars");
     self.loading_cont = $("#loading_container");
 
-    _.each(self.loading_cars, function(car_src){
-      $("<img/>")
+    _.each(self.loading_cars, function(car_class){
+      $("<div class='car horizontal left'></div>")
         .unbind("load")
         .unbind("readystatechange")
         .bind("load readystatechange", function(){ 
           self.loaded_cars.push( $(this) );
         })
-        .addClass('car horizontal left')
-        .attr("src", IMAGES_DIR + car_src)
+        .addClass(car_class)
         .appendTo(self.loading_cont);
     });
 

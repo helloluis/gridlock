@@ -484,6 +484,8 @@ Help = {
 
     self.reward.loops = new Array;
 
+    self.reward.loops = new Array;
+
     self.reward.dom.
       queue('reward', function(next){
         
