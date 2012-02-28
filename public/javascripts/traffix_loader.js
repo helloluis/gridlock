@@ -2,7 +2,7 @@
 TraffixLoader = {
 	
   freq : 1200,
-  force_wait : 30000, // should be 0, normally
+  force_wait : 120000, // should be 0, normally
   dom : false,
 
   loading_cars : LOADING_CARS,
@@ -40,11 +40,14 @@ TraffixLoader = {
       origin_left = dom_w + 50;
     
     self.dom.stopTime().everyTime( self.freq, function(){
+
       var new_car   = self.loaded_cars[Math.floor(Math.random()*self.loaded_cars.length)],
           cars      = $(".car", self.dom),
           last_car  = $(cars.get(cars.length-1)),
           dest_left = last_car.length ? (last_car.position().left + last_car.width()) : 0;
       
+      console.log(new_car);
+
       if (dest_left > dom_w - 50) {
         
         self.animate_out();
