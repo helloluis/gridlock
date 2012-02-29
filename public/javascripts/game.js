@@ -89,7 +89,7 @@ Game = {
   with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
   with_soundjs         : true,     // SoundJS, for Web & Pokki build
 
-  sound_format         : "." + SOUND_FORMATS[PLATFORM],
+  sound_format         : "." + (PLATFORM=='web' && BrowserDetect.browser=='Firefox' ? SOUND_FORMATS.pokki : SOUND_FORMATS[PLATFORM]),
  
   raw_sounds           : SOUNDS,  // our library of sounds
   sounds               : {},
