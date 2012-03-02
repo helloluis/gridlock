@@ -105,7 +105,9 @@ Game = {
 
   preload : function(auto_start){
 
-    Game.dom = $("#game");
+    Game.cont = $("#all");
+    
+    Game.dom  = $("#game");
     
     Game.debug_cont = $("#debugger");
 
@@ -114,6 +116,8 @@ Game = {
     Game.log("enable_preloading?", Game.enable_preloading);
 
     Game.loading_screen = $("#loader");
+
+    Game.detect_resolution();
 
     if (Game.enable_preloading) {
 
@@ -186,6 +190,39 @@ Game = {
       Game.initialize(auto_start);
 
     }
+
+  },
+
+  detect_resolution : function(){
+
+    Game.ideal_width    = 1024;
+    Game.ideal_height   = 768;
+    Game.compact_width  = 1024;
+    Game.compact_height = 600;
+
+    Game.window_width   = $(window).width();
+    Game.window_height  = $(window).height();
+    Game.screen_width   = window.screen.width;
+    Game.screen_height  = window.screen.height;
+
+    if (Game.window_width >= Game.ideal_width && Game.window_height >= Game.ideal_height) {
+      Game.width  = Game.ideal_width;
+      Game.height = Game.ideal_height;
+
+    } else {
+      // if the screen can actually accomodate our game, but only if full-screened
+      if (Game.screen_width >= Game.ideal_width && Game.screen_height >= Game.ideal_height) {
+        Game.width  = Game.ideal_width;
+        Game.height = Game.ideal_height;
+
+      } else {
+        Game.width  = Game.compact_width;
+        Game.height = Game.compact_height;  
+
+      }
+    }
+
+    Game.cont.addClass('width' + Game.width).addClass('height' + Game.height);
 
   },
 
