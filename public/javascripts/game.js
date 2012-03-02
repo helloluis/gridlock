@@ -106,7 +106,7 @@ Game = {
   preload : function(auto_start){
 
     Game.cont = $("#all");
-    
+
     Game.dom  = $("#game");
     
     Game.debug_cont = $("#debugger");
@@ -205,6 +205,7 @@ Game = {
     Game.screen_width   = window.screen.width;
     Game.screen_height  = window.screen.height;
 
+    // if the window.width and window.height are within 50 pixels of the ideal, we do nothing
     if (Game.window_width >= Game.ideal_width && Game.window_height >= Game.ideal_height) {
       Game.width  = Game.ideal_width;
       Game.height = Game.ideal_height;
