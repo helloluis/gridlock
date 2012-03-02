@@ -16,6 +16,8 @@ Game = {
   is_pokki             : PLATFORM=='pokki',
   is_web               : PLATFORM=='web',
 
+  is_licensed          : true,
+
   score                : 0,
   frustration          : 0,
   high_score           : 0,
@@ -87,7 +89,8 @@ Game = {
    
   with_sound           : true,     // globally disable all sound
   with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
-  with_soundjs         : true,     // SoundJS, for Web & Pokki build
+  with_soundjs         : false,    // SoundJS, for Web & Pokki build
+  with_soundmanager2   : true,     // pure web version
 
   sound_format         : "." + (PLATFORM=='web' && BrowserDetect.browser=='Firefox' ? SOUND_FORMATS.pokki : SOUND_FORMATS[PLATFORM]),
  
@@ -147,6 +150,27 @@ Game = {
 
         if (Game.with_sound) {
           
+          if (Game.with_soundmanager2) {
+
+            soundManager.flashVersion = 9; 
+            soundManager.useHighPerformance = true; // reduces delays 
+             
+            
+            soundManager.flashLoadTimeout = 500; // reduce the default 1 sec delay to 500 ms 
+             
+            soundManager.audioFormats.mp3.required = false; // mp3 is required by default, but we don't want any requirements 
+             
+            soundManager.ontimeout(function(status) { 
+                soundManager.useHTML5Audio = true; 
+                soundManager.preferFlash = false; 
+                soundManager.reboot(); 
+            }); // flash may timeout if not installed or when flashblock is installed  
+             
+            soundManager.onready(function() { 
+              console.log('soundmanager ready');
+            }); 
+          }
+
           _.each(Game.raw_sounds, function(media, key){
             Game.sounds[key] = Game.sounds_dir + media[0] + Game.sound_format;
             Game.loader.addSound( key, Game.sounds_dir + media[0] + Game.sound_format, media[1] );
@@ -168,7 +192,7 @@ Game = {
         Game.loader.addCompletionListener(function(){
           TraffixLoader.stop();
           Game.initialize(auto_start);
-          SoundJS.play('horns_short_2');
+          Game.play_sound('horns_short_2');
         });
       
         Game.loader.start();
@@ -257,7 +281,7 @@ Game = {
         Game.pause();
       });
 
-      $("#credits a.external").click(function(){
+      $("#credits a.external, #pintsized").click(function(){
         pokki.openURLInDefaultBrowser($(this).attr('href'));
       });
     }
@@ -1018,17 +1042,27 @@ Game = {
   },
 
   mute : function(){
+    
     $(".bttn.mute").addClass('muted').text('Un-mute');
+    
     Game.with_sound = false;
     Game.muted = true;
+    
     Game.stop_all_sounds();
+
   },
 
   unmute : function(){
+    
     $(".bttn.mute").removeClass('muted').text('Mute');
+    
     Game.with_sound = true;
     Game.muted = false;
-    SoundJS.setMute(false);
+
+    if (Game.with_soundjs) {
+      SoundJS.setMute(false);  
+    } 
+    
     if (Game.started) {
       Game.play_sound_theme();  
     }
@@ -1054,8 +1088,8 @@ Game = {
     
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
-        if (loop) {
-          Game.loop_sound(sound, volume);
+        if (loop===true && sound=='theme') {
+          Game.loop_sound_theme();
         } else {
           PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
         }
@@ -1063,7 +1097,7 @@ Game = {
       } else if (Game.with_soundjs) {
 
         if (loop===true) {
-          SoundJS.play( sound, null, 1, true );
+          SoundJS.play( sound, SoundJS.INTERRUPT_NONE, 50, true );
         } else {
           if (interrupt_all===true) {
             SoundJS.play( sound, SoundJS.INTERUPT_ANY );
@@ -1071,24 +1105,33 @@ Game = {
             SoundJS.play( sound, SoundJS.INTERUPT_LATE );
           }
         }
+
+      } else if (Game.with_soundmanager2) {
+
+        if (loop===true) {
+          soundManager.play(sound, {volume:volume, loops:10});
+        } else {
+          soundManager.play(sound, {volume:volume});
+        }
+
       }
     }
   },
 
-  loop_sound : function(sound, volume) {
-    if (Game.with_phonegap_sound) {
+  loop_sound_theme : function() {
+    
+    console.log('looping sound manually');
+
+    if (Game.with_phonegap_sound && !Game.muted) {
       
       Game.sounds[sound].play();
 
       Game.theme_timer = setInterval(function(){ 
-          Game.sounds[sound].play(); 
+          Game.sounds['theme'].play(); 
         }, 72002);
       
-    } else if (Game.with_soundjs) {
-      
-      SoundJS.play(sound, SoundJS.INTERRUPT_NONE, 50, true);
-
     }
+
   },
 
   stop_sound : function(sound) {
@@ -1100,6 +1143,9 @@ Game = {
 
     } else if (Game.with_soundjs) {
       SoundJS.stop(sound);
+
+    } else if (Game.with_soundmanager2) {
+      soundManager.stop(sound);
 
     }
     
@@ -1275,7 +1321,7 @@ Game = {
 
   start_controls : function() {
     
-    var i = 0;
+    var i = 0, j = 0;
 
     $(".stoplight").each(function(idx, el){
       var el     = $(el), 
@@ -1304,6 +1350,31 @@ Game = {
       i+=1;
       
     });
+
+    if (Game.platform!='ios') {
+
+      $(".key").each(function(idx, k){
+        
+        var key = $(k);
+        
+        _.delay(function(){
+          
+          key.
+            animate({ opacity : 1 }, 300).
+            everyTime(500,function(){
+              $(this).toggleClass('frame2');
+            }, 10).
+            oneTime(5000,function(){
+              key.animate({ opacity : 0 },300);
+            });
+
+        }, (j*300));
+        
+        j+=1;
+
+      });  
+    }
+
   },
 
   start_scores : function(){
@@ -2496,10 +2567,12 @@ var Maker = function(){
     }
 
     if (car_hash) {
-      
+            
       var car_name = [self.street.name, self.iterations, 0].join("-"),
           car      = new Car(car_hash);
-    
+      
+      console.log(car_hash.type);
+
       self.street.cars.push( car ); 
 
       car.initialize(car_name, self.street, self.street.orientation);

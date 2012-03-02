@@ -294,3 +294,17 @@ body.pokki #high_score { top:130px; }
 body.pokki .bttn.post_to_facebook { display:none; }
 body.pokki .new_high_score h2 { font-size:60px; margin-top:40px;}
 body.pokki .bttn.quit { display:none; }
+
+.key { width:95px; height:112px; background:url(../images/keys.png); top: 130px; left:170px; position:absolute; z-index:30; display:block; opacity:0; } 
+.key.frame2 { background-position:-100px 0px; }
+.key.key2 { left:auto; right:180px; background-position:-200px 0px; }
+.key.key2.frame2 { background-position:-300px 0px; }
+.key.key3 { top:550px; left:180px; background-position:0px -120px; }
+.key.key3.frame2 { background-position:-100px -110px; }
+.key.key4 { left:auto; top:550px; right:180px; background-position:-195px -120px; }
+.key.key4.frame2 { background-position:-300px -110px; }
+
+body.ios .key { display:none; }
+/*body.web .key, body.pokki .key { display:block; }*/
+
+#pintsized { width:250px; height:75px; background:url(../images/brewed_by_pintsized.png); position:absolute; bottom:-20px; left:30px; text-indent:-2000px; }

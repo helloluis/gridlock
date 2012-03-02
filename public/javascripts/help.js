@@ -35,6 +35,7 @@ Help = {
         score   = $(".high_score_cont", dom).hide(),
         play    = $(".start_game", dom).hide(),
         credits = $(".credits", dom).hide(),
+        pintsized = $("#pintsized", dom).hide(),
         leaders = $(".leaderboards", dom).hide();
 
     dom.animate({ top : 0 });
@@ -95,6 +96,7 @@ Help = {
     $(".high_score_cont", dom).hide(),
     $(".start_game", dom).hide(),
     $(".credits", dom).hide(),
+    $("#pintsized", dom).hide(),
     $(".leaderboards", dom).hide();
 
     if (callback!==undefined) {
