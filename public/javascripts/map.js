@@ -39,8 +39,9 @@ a car bumping into another car on the same street.
 var MAP_NAME = "manila";
 
 var MAP_WIDTH = 1024;
-
 var MAP_HEIGHT = 768;
+var MAP_COMPACT_WIDTH = 1024;
+var MAP_COMPACT_HEIGHT = 600;
 
 var STREETS = [
   // name, orientation, top, left, width, height
@@ -119,6 +120,9 @@ var CARS = {
   car             : {  type : 'car',      width : 20, height : 40, frustrates_by : 6, score : 1,
       assets      : [ 'car2.png' ] 
     },
+  car3            : {  type : 'car3',      width : 20, height : 40, frustrates_by : 6, score : 1,
+      assets      : [ 'car3.png' ] 
+    },
   taxi            : { type : 'taxi',      width : 20, height : 40, frustrates_by : 5, score : 1,
       assets      : [ 'taxi.png' ] 
     },
@@ -136,6 +140,9 @@ var CARS = {
     },
   bus             : { type : 'bus',       width : 20, height : 60, frustrates_by : 3, speed : 5, score : 4,
       assets      : [ 'bus.png' ] 
+    },
+  truck_veg       : { type : 'truck_veg', width : 20, height : 40, frustrates_by : 3, speed : 5, score : 3,
+      assets      : [ 'truck_veg.png' ] 
     },
   police          : { type : 'police', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4,
       assets      : [ 'carpolice_r.png', 'carpolice_l.png', 'carpolice_u.png', 'carpolice_d.png' ],
@@ -197,13 +204,15 @@ var FRUSTRATIONS = [
 
 
 var CAR_ODDS = [  
-  [ 'car',       40 ], 
+  [ 'car',       20 ], 
+  [ 'car3',      20 ], 
   [ 'taxi',      20 ], 
   [ 'hatch',     20 ], 
   [ 'suv',       15 ], 
   [ 'van',       15 ], 
   [ 'jeepney',   15 ], 
   [ 'bus',       10 ], 
+  [ 'truck_veg', 5  ], 
   [ 'ambulance', 1  ], 
   [ 'police',    1  ], 
   [ 'firetruck', 1  ] 

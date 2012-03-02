@@ -16,6 +16,8 @@ Game = {
   is_pokki             : PLATFORM=='pokki',
   is_web               : PLATFORM=='web',
 
+  is_licensed          : true,
+
   score                : 0,
   frustration          : 0,
   high_score           : 0,
@@ -31,6 +33,10 @@ Game = {
 
   width                : MAP_WIDTH,
   height               : MAP_HEIGHT,
+  ideal_width          : MAP_WIDTH,
+  ideal_height         : MAP_HEIGHT,
+  compact_width        : MAP_COMPACT_WIDTH,
+  compact_height       : MAP_COMPACT_HEIGHT,
 
   enable_canvas        : true, // if set to true, use Canvas to animate. if false, use the DOM.
    
@@ -49,6 +55,8 @@ Game = {
  
   can_adjust_speed     : false,  // clicking or swiping on a car will increase its speed
  
+  enable_hotkeys       : false,
+
   factory              : false,
   streets              : [],     // array of Street objects
   barriers             : {},     // hash of barrier hitboxes
@@ -87,7 +95,8 @@ Game = {
    
   with_sound           : true,     // globally disable all sound
   with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
-  with_soundjs         : true,     // SoundJS, for Web & Pokki build
+  with_soundjs         : false,    // SoundJS, for Web & Pokki build
+  with_soundmanager2   : true,     // pure web version
 
   sound_format         : "." + (PLATFORM=='web' && BrowserDetect.browser=='Firefox' ? SOUND_FORMATS.pokki : SOUND_FORMATS[PLATFORM]),
  
@@ -105,11 +114,11 @@ Game = {
 
   preload : function(auto_start){
 
-    Game.cont = $("#all");
-
-    Game.dom  = $("#game");
-    
-    Game.debug_cont = $("#debugger");
+    Game.cont          = $("#all");
+    Game.dom           = $("#game");
+    Game.intro         = $("#intro");
+    Game.map           = $("#map");
+    Game.debug_cont    = $("#debugger");
 
     if (!Game.debug_visually) { Game.debug_cont.hide(); }
 
@@ -151,6 +160,27 @@ Game = {
 
         if (Game.with_sound) {
           
+          if (Game.with_soundmanager2) {
+
+            soundManager.flashVersion = 9; 
+            soundManager.useHighPerformance = true; // reduces delays 
+             
+            
+            soundManager.flashLoadTimeout = 500; // reduce the default 1 sec delay to 500 ms 
+             
+            soundManager.audioFormats.mp3.required = false; // mp3 is required by default, but we don't want any requirements 
+             
+            soundManager.ontimeout(function(status) { 
+                soundManager.useHTML5Audio = true; 
+                soundManager.preferFlash = false; 
+                soundManager.reboot(); 
+            }); // flash may timeout if not installed or when flashblock is installed  
+             
+            soundManager.onready(function() { 
+              console.log('soundmanager ready');
+            }); 
+          }
+
           _.each(Game.raw_sounds, function(media, key){
             Game.sounds[key] = Game.sounds_dir + media[0] + Game.sound_format;
             Game.loader.addSound( key, Game.sounds_dir + media[0] + Game.sound_format, media[1] );
@@ -172,7 +202,7 @@ Game = {
         Game.loader.addCompletionListener(function(){
           TraffixLoader.stop();
           Game.initialize(auto_start);
-          SoundJS.play('horns_short_2');
+          Game.play_sound('horns_short_2');
         });
       
         Game.loader.start();
@@ -195,35 +225,62 @@ Game = {
 
   detect_resolution : function(){
 
-    Game.ideal_width    = 1024;
-    Game.ideal_height   = 768;
-    Game.compact_width  = 1024;
-    Game.compact_height = 600;
-
     Game.window_width   = $(window).width();
     Game.window_height  = $(window).height();
     Game.screen_width   = window.screen.width;
     Game.screen_height  = window.screen.height;
 
-    // if the window.width and window.height are within 50 pixels of the ideal, we do nothing
-    if (Game.window_width >= Game.ideal_width && Game.window_height >= Game.ideal_height) {
-      Game.width  = Game.ideal_width;
-      Game.height = Game.ideal_height;
+    Game.width          = (Game.window_width  >= Game.ideal_width  - 50 ? Game.ideal_width  : Game.compact_width);
+    Game.height         = (Game.window_height >= Game.ideal_height - 50 ? Game.ideal_height : Game.compact_height);
 
-    } else {
-      // if the screen can actually accomodate our game, but only if full-screened
-      if (Game.screen_width >= Game.ideal_width && Game.screen_height >= Game.ideal_height) {
-        Game.width  = Game.ideal_width;
-        Game.height = Game.ideal_height;
+    // resize our canvases/divs
+    document.getElementById('cars').width = Game.width;
+    document.getElementById('cars').height = Game.height;
+    document.getElementById('bubbles').width = Game.width;
+    document.getElementById('bubbles').height = Game.height;
 
-      } else {
-        Game.width  = Game.compact_width;
-        Game.height = Game.compact_height;  
+    Game.dynamically_center();
 
-      }
+    var detect = function(){
+      console.log('detecting');
+      Game.detect_resolution();
     }
 
-    Game.cont.addClass('width' + Game.width).addClass('height' + Game.height);
+    $(window).resize(_.debounce(detect, 1000));
+    
+  },
+
+  dynamically_center : function(){
+
+    if (Game.window_width < Game.width) {
+      
+      Game.cont.width( Game.window_width );
+      var left = -((Game.width-Game.window_width)/2);
+      Game.intro.css({ marginLeft: left }).width( Game.width );
+      Game.map.css({ left : left });
+      console.log(left);
+
+    } else {
+
+      Game.cont.width( Game.width );
+      Game.intro.css({ marginLeft : 0 }).width( Game.width );
+
+    }
+
+    if (Game.window_height < Game.height) {
+
+      Game.cont.height( Game.window_height );
+      var top = -((Game.height-Game.window_height)/2);
+      Game.intro.css({ marginTop: top }).height( Game.height );
+      Game.map.css({ top : top });
+      console.log(top);
+
+    } else {
+
+      Game.cont.height( Game.height );
+      Game.intro.css({ marginTop : 0 }).height( Game.height );
+
+    }
 
   },
 
@@ -295,7 +352,7 @@ Game = {
         Game.pause();
       });
 
-      $("#credits a.external").click(function(){
+      $("#credits a.external, #pintsized").click(function(){
         pokki.openURLInDefaultBrowser($(this).attr('href'));
       });
     }
@@ -602,10 +659,8 @@ Game = {
     
     Game.log("initializing containers");
 
-    Game.intro           = $("#intro");
     Game.leaderboards    = $("#leaderboards");
     Game.main            = $("#game");
-    Game.map             = $("#map");
     
     Game.credits         = $("#credits");
     Game.messages        = $("#messages");
@@ -1056,29 +1111,39 @@ Game = {
   },
 
   mute : function(){
+    
     $(".bttn.mute").addClass('muted').text('Un-mute');
+    
     Game.with_sound = false;
     Game.muted = true;
+    
     Game.stop_all_sounds();
+
   },
 
   unmute : function(){
+    
     $(".bttn.mute").removeClass('muted').text('Mute');
+    
     Game.with_sound = true;
     Game.muted = false;
-    SoundJS.setMute(false);
+
+    if (Game.with_soundjs) {
+      SoundJS.setMute(false);  
+    } 
+    
     if (Game.started) {
       Game.play_sound_theme();  
     }
   },
 
   play_sound_theme : function(){
-    Game.log('playing sound theme');
+    // Game.log('playing sound theme');
     Game.play_sound('theme', true);  
   },
 
   stop_sound_theme : function(){
-    Game.log('stopping sound theme');
+    // Game.log('stopping sound theme');
     Game.stop_sound('theme');  
   },
 
@@ -1092,8 +1157,8 @@ Game = {
     
     if (Game.with_sound) {
       if (Game.with_phonegap_sound) {
-        if (loop) {
-          Game.loop_sound(sound, volume);
+        if (loop===true && sound=='theme') {
+          Game.loop_sound_theme();
         } else {
           PhoneGap.exec("SoundPlug.play", Game.sounds[sound]);
         }
@@ -1101,7 +1166,7 @@ Game = {
       } else if (Game.with_soundjs) {
 
         if (loop===true) {
-          SoundJS.play( sound, null, 1, true );
+          SoundJS.play( sound, SoundJS.INTERRUPT_NONE, 50, true );
         } else {
           if (interrupt_all===true) {
             SoundJS.play( sound, SoundJS.INTERUPT_ANY );
@@ -1109,24 +1174,33 @@ Game = {
             SoundJS.play( sound, SoundJS.INTERUPT_LATE );
           }
         }
+
+      } else if (Game.with_soundmanager2) {
+
+        if (loop===true) {
+          soundManager.play(sound, {volume:volume, loops:10});
+        } else {
+          soundManager.play(sound, {volume:volume});
+        }
+
       }
     }
   },
 
-  loop_sound : function(sound, volume) {
-    if (Game.with_phonegap_sound) {
+  loop_sound_theme : function() {
+    
+    console.log('looping sound manually');
+
+    if (Game.with_phonegap_sound && !Game.muted) {
       
       Game.sounds[sound].play();
 
       Game.theme_timer = setInterval(function(){ 
-          Game.sounds[sound].play(); 
+          Game.sounds['theme'].play(); 
         }, 72002);
       
-    } else if (Game.with_soundjs) {
-      
-      SoundJS.play(sound, SoundJS.INTERRUPT_NONE, 50, true);
-
     }
+
   },
 
   stop_sound : function(sound) {
@@ -1138,6 +1212,9 @@ Game = {
 
     } else if (Game.with_soundjs) {
       SoundJS.stop(sound);
+
+    } else if (Game.with_soundmanager2) {
+      soundManager.stop(sound);
 
     }
     
@@ -1313,7 +1390,7 @@ Game = {
 
   start_controls : function() {
     
-    var i = 0;
+    var i = 0, j = 0;
 
     $(".stoplight").each(function(idx, el){
       var el     = $(el), 
@@ -1342,6 +1419,31 @@ Game = {
       i+=1;
       
     });
+
+    if (Game.platform!='ios' && Game.enable_hotkeys===true) {
+
+      $(".key").each(function(idx, k){
+        
+        var key = $(k);
+        
+        _.delay(function(){
+          
+          key.
+            animate({ opacity : 1 }, 300).
+            everyTime(500,function(){
+              $(this).toggleClass('frame2');
+            }, 10).
+            oneTime(5000,function(){
+              key.animate({ opacity : 0 },300);
+            });
+
+        }, (j*300));
+        
+        j+=1;
+
+      });  
+    }
+
   },
 
   start_scores : function(){
@@ -2534,10 +2636,12 @@ var Maker = function(){
     }
 
     if (car_hash) {
-      
+            
       var car_name = [self.street.name, self.iterations, 0].join("-"),
           car      = new Car(car_hash);
-    
+      
+      console.log(car_hash.type);
+
       self.street.cars.push( car ); 
 
       car.initialize(car_name, self.street, self.street.orientation);

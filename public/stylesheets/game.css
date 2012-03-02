@@ -36,10 +36,10 @@ body {
 }
 
 
-#all { margin:0 auto; display:block; }
-#all.width1024 { width:1024px; }
-#all.height768 { width:768px; }
-#all.height600 { width:600px; }
+#all { margin:0 auto; display:block; position:absolute; width:1024px; height:768px; }
+#all.width1024 { width:1024px; min-width:800px;  }
+#all.height768 { height:768px; min-height:601px; }
+#all.height600 { height:600px; min-height:500px; }
 
 
 h1, h2, p { color:#333; margin-bottom:0.5em;}
@@ -49,7 +49,7 @@ h2, h3, label, .bttn, #score, #high_score, #timer { font-size:24px; font-family:
 p, .car_score { line-height:1.5; font-family: 'Boogaloo', Times, sans-serif; }
 em { font-style:italic; }
 
-.screen { position:absolute; top:0; left:0; width:1024px; height:768px; display:none; overflow:hidden; margin:0 auto; background-image:url(../images/loader.jpg); }
+.screen { position:absolute; top:0; left:0; width:100%; height:100%; display:none; overflow:hidden; margin:0 auto; background-image:url(../images/loader.jpg); }
 .screen_inner { position:absolute; top:10%; bottom:10%; left:10%; right:10%; width:80%; height:80%; }
 
 #loader.screen { background:#000; display:block; }
@@ -59,7 +59,7 @@ em { font-style:italic; }
 #loading_cars img { position:absolute; height:20px; }
 #loading_container { width:1px; height:1px; display:block; overflow:hidden; opacity:0; }
 
-#intro { display:block; background:url(../images/loader.jpg) no-repeat; z-index:2; }
+#intro { display:block; background:url(../images/loader.jpg) no-repeat; z-index:2; width:100%; height:100%; }
 #intro h1 { position:absolute; text-indent:-2000px; background:url(../images/traffix_logo.png) no-repeat; width:600px; height:250px; top: -50px; left: -60px; z-index:6; }
 a, #intro p strong { color:#fc0; }
 #intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; position:absolute; }
@@ -144,8 +144,10 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #debugger { position:absolute; top:60px; left:10px; width:240px; height:auto; z-index:30; font-size:12px; color:#fff; background:rgba(0,0,0,0.7); padding:10px; }
 #debugger p { color:#fff; font-family: Helvetica; }
 
-#map, .neighborhood, .street, .buildings, .intersection { position:absolute; }
-#map { top:0px; left:0px; width:100%; height:100%; }
+#intro, #map, .neighborhood, .street, .buildings, .intersection { position:absolute; }
+#map { top:0px; left:0px; width:1024px; height:768px; }
+#all.height600 #map { height:600px; }
+
 .neighborhood, .buildings { top:0px; left:0px; background:url(../images/bg.jpg); width:100%; height:100%; }
 .buildings { top:0px; left:0px; background:url(../images/buildings.png); width:100%; height:100%; z-index:12; }
 .street{z-index:14; -webkit-tap-highlight-color: rgba(0,0,0,0)}
@@ -290,14 +292,27 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #credits .screen_inner p a { color:#ff0; }
 #credits .bttn.intro { padding-top:20px; color:#ff0; text-shadow:0 0 7px #000; }
 
-body.pokki #minimize { display:block; }
-body.pokki #toggle_fullscreen { display:block; }
+
+.key { width:95px; height:112px; background:url(../images/keys.png); top: 130px; left:170px; position:absolute; z-index:30; display:block; opacity:0; } 
+.key.frame2 { background-position:-100px 0px; }
+.key.key2 { left:auto; right:180px; background-position:-200px 0px; }
+.key.key2.frame2 { background-position:-300px 0px; }
+.key.key3 { top:550px; left:180px; background-position:0px -120px; }
+.key.key3.frame2 { background-position:-100px -110px; }
+.key.key4 { left:auto; top:550px; right:180px; background-position:-195px -120px; }
+.key.key4.frame2 { background-position:-300px -110px; }
+
+#toggle_fullscreen { background:#000 url(../images/pokki_window_sprite.png); width:18px; height:18px; border-radius:6px; position:absolute; z-index:100;top:5px; right:5px; line-height:1; cursor:pointer; text-decoration:none; text-indent:-1000px; overflow:hidden; background-position:0px 0px; }
+#toggle_fullscreen.cancel_fullscreen { background-position:-18px 0px; }
+
+#pintsized { width:250px; height:75px; background:url(../images/brewed_by_pintsized.png); position:absolute; bottom:-20px; left:30px; text-indent:-2000px; }
+
+body.ios #toggle_fullscreen, body.pokki #toggle_fullscreen { display:none; }
 body.pokki p a:hover {color:#fff;}
 body.pokki #score { top:30px; }
 body.pokki #high_score { top:130px; }
 body.pokki .bttn.post_to_facebook { display:none; }
 body.pokki .new_high_score h2 { font-size:60px; margin-top:40px;}
 body.pokki .bttn.quit { display:none; }
+body.ios .key { display:none; }
 
-#toggle_fullscreen { background:url(images/pokki_window_sprite.png); width:18px; height:18px; position:absolute; z-index:100;top:10px; right:10px; line-height:1; cursor:pointer; text-decoration:none; text-indent:-1000px; overflow:hidden; background-position:0px 0px; }
-#toggle_fullscreen.cancel_fullscreen { background-position:-18px 0px; }
