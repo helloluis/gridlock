@@ -194,15 +194,6 @@ var THOUGHTBUBBLES = [
    'frustration_04'
 ];
 
-var FRUSTRATIONS = [
-  // filename, width, height, offset top, offset left
-  [ 'frustration_01.png', 40, 40, -25, -25 ],
-  [ 'frustration_02.png', 40, 40, -25, -25 ],
-  [ 'frustration_03.png', 40, 40, -25, -25 ],
-  [ 'frustration_04.png', 40, 40, -25, -25 ]
-];
-
-
 var CAR_ODDS = [  
   [ 'car',       20 ], 
   [ 'car3',      20 ], 
@@ -230,35 +221,35 @@ var CAR_ODDS_LEVELS = [
   [ 150, 1.0   ]
 ];
 
-var SOUNDS_DIR = "sounds/";
+var SOUNDS_DIR    = "sounds/";
 
 // all sounds and music
 var SOUNDS = { 
-  horns_short_1 : ["horn1",2],
-  horns_short_2 : ["horn2",2],
-  horns_short_3 : ["horn3",2],
-  horns_short_4 : ["horn4",2],
-  horns_long_1  : ["horn_long1",2],
-  horns_long_2  : ["horn_long2",2],
-  horn_truck    : ["horn_truck",1],
-  countdown     : ["countdown",1],
-  theme         : ["bg",1],
-  explosion     : ["explosion_short",1],
-  frustration   : ["frustration",1],
-  arrived       : ["kaching",8],
-  arrived_2     : ["kaching2",2],
-  arrived_3     : ["kaching3",1],
-  ambulance     : ["ambulance",3],
-  hearse        : ["hearse",1],
-  police        : ["police",3],
-  firetruck     : ["firetruck",3]
+  horns_short_1   : ["horn1",2],
+  horns_short_2   : ["horn2",2],
+  horns_short_3   : ["horn3",2],
+  horns_short_4   : ["horn4",2],
+  horns_long_1    : ["horn_long1",2],
+  horns_long_2    : ["horn_long2",2],
+  horn_truck      : ["horn_truck",1],
+  countdown       : ["countdown",1],
+  theme           : ["bg",1],
+  explosion       : ["explosion_short",1],
+  frustration     : ["frustration",1],
+  arrived         : ["kaching",8],
+  arrived_2       : ["kaching2",2],
+  arrived_3       : ["kaching3",1],
+  ambulance       : ["ambulance",3],
+  hearse          : ["hearse",1],
+  police          : ["police",3],
+  firetruck       : ["firetruck",3]
 };
 
 var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
 
-var NEIGHBORHOOD = [
-  "bg.jpg"
-];
+var NEIGHBORHOOD  = [ "bg.jpg" ];
+
+var BUILDINGS     = [ "buildings.png" ];
 
 var COLLISION_MESSAGES = [
   "Y U NO STOP THEM?",
@@ -392,7 +383,6 @@ var BOSSES = {
 
 };
 
-
 // var BOSS_SEQUENCE = [
 //   [ 'towtruck',  15 ],
 //   [ 'truck',     25 ],
@@ -433,9 +423,40 @@ var BOSS_SEQUENCE = [
   [ 'convoy',   605 ]
 ];
 
+// TODO
 var TUTORIAL = [
   { time : 1, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 1 },
   { time : 3, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 7 },
   { time : 5, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 2 }
 ];
 
+
+// WIP: We're placing all the game variables into a Map object so we can easily
+// switch when we want to give people a different set of gameplay settings
+
+var LEVEL_1 = {
+  id                  : 'easy',
+  name                : 'novice',
+  streets             : STREETS,
+  cars                : CARS,
+  barriers            : BARRIERS,
+  bosses              : BOSSES,
+  boss_sequence       : BOSS_SEQUENCE,
+  intersections       : INTERSECTIONS,
+  stoplights          : STOPLIGHTS,
+  locked              : false,
+  max_cars_per_street : MAX_CARS_PER_STREET,
+  max_speed           : MAX_SPEED,
+  maker_frequency     : MAKER_FREQUENCY,
+  icon                : "map_level_1.png",
+  neighborhood        : NEIGHBORHOOD,
+  buildings           : BUILDINGS,
+  car_odds            : CAR_ODDS,
+  car_odds_levels     : CAR_ODDS_LEVELS
+};
+
+var LEVEL_2 = _.extend(LEVEL_1, {}, true);
+
+var LEVEL_3 = _.extend(LEVEL_1, {}, true);
+
+var LEVELS = [ LEVEL_1, LEVEL_2, LEVEL_3 ];

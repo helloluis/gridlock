@@ -69,6 +69,7 @@ Help = {
     _.delay(function(){
       play.show();
       credits.show();
+      pintsized.show();
       leaders.show();
     }, 2250);
 

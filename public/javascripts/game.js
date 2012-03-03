@@ -56,23 +56,13 @@ Game = {
   can_adjust_speed     : false,  // clicking or swiping on a car will increase its speed
  
   enable_hotkeys       : false,
+  enable_thoughtbubbles : true,
 
   factory              : false,
   streets              : [],     // array of Street objects
   barriers             : {},     // hash of barrier hitboxes
   intersections        : [],     // array of intersection hitboxes
    
-  max_speed            : MAX_SPEED,
-  max_frustration      : 100,
-  enable_thoughtbubbles : true,
-   
-  maker_freq           : MAKER_FREQUENCY,                  // how often does a Maker add a new car to the road
-  max_cars_per_street  : MAX_CARS_PER_STREET,              
-  car_types            : CARS,                             // library of car settings and assets
-  car_odds             : CAR_ODDS,                         // the likelihood that a particular car will be added
-  car_odds_levels      : CAR_ODDS_LEVELS.reverse(),        // modifiers for our car-creation randomness, basically making fewer cars spawn early on in the game
-  car_odds_total       : 0,                                // we populate this array with the car names based on their weights, then randomly select one to generate
-  neighborhood         : NEIGHBORHOOD,                     // graphics used for the neighborhood layers
   car_sprite_layout    : CAR_SPRITE_LAYOUT,
           
   images_dir           : IMAGES_DIR,                       // path to images
@@ -241,12 +231,12 @@ Game = {
 
     Game.dynamically_center();
 
-    var detect = function(){
-      console.log('detecting');
-      Game.detect_resolution();
-    }
+    // var detect = function(){
+    //   console.log('detecting');
+    //   Game.detect_resolution();
+    // }
 
-    $(window).resize(_.debounce(detect, 1000));
+    // $(window).resize(_.debounce(detect, 1000));
     
   },
 
@@ -267,9 +257,9 @@ Game = {
 
     }
 
-    if (Game.window_height < Game.height) {
+    if (Game.window_height <= Game.height-50) {
 
-      Game.cont.height( Game.window_height );
+      Game.cont.height( Game.window_height ).addClass('height600');
       var top = -((Game.height-Game.window_height)/2);
       Game.intro.css({ marginTop: top }).height( Game.height );
       Game.map.css({ top : top });
@@ -277,7 +267,7 @@ Game = {
 
     } else {
 
-      Game.cont.height( Game.height );
+      Game.cont.height( Game.height ).removeClass('height600');
       Game.intro.css({ marginTop : 0 }).height( Game.height );
 
     }
@@ -306,19 +296,19 @@ Game = {
 
     Game.initialize_buttons();
 
-    Game.initialize_bosses();
-
     Game.initialize_sounds();
 
-    Game.initialize_intersections();
+    // Game.initialize_bosses();
 
-    Game.initialize_barriers();
+    // Game.initialize_intersections();
 
-    Game.initialize_factory();
+    // Game.initialize_barriers();
 
-    Game.initialize_streets();
+    // Game.initialize_factory();
+
+    // Game.initialize_streets();
     
-    Game.initialize_controls();
+    // Game.initialize_controls();
 
     Game.initialize_high_score();
 
@@ -778,18 +768,47 @@ Game = {
 
   },
 
+  initialize_level : function(level) {
+
+    this.level                  = level===undefined ? LEVEL_1 : level;
+
+    this.max_speed            = this.level.max_speed,
+    this.max_frustration      = 100,
+     
+    this.maker_freq           = this.level.maker_frequency,              // how often does a Maker add a new car to the road
+    this.max_cars_per_street  = this.level.max_cars_per_street,              
+    this.car_types            = this.level.cars,                         // library of car settings and assets
+    this.car_odds             = this.level.car_odds,                     // the likelihood that a particular car will be added
+    this.car_odds_levels      = this.level.car_odds_levels.reverse(),    // modifiers for our car-creation randomness, basically making fewer cars spawn early on in the game
+    this.car_odds_total       = 0,                                // we populate this array with the car names based on their weights, then randomly select one to generate
+    this.neighborhood         = this.level.neighborhood,                 // graphics used for the neighborhood layers
+
+    this.initialize_factory();
+
+    this.initialize_streets();
+
+    this.initialize_barriers();
+
+    this.initialize_intersections();
+
+    this.initialize_bosses();
+
+    this.initialize_controls();
+
+  },
+
   initialize_factory : function(){
     
     Game.factory = new Factory();
-    Game.factory.initialize(CARS, BOSSES);
+    Game.factory.initialize(Game.level.cars, Game.level.bosses);
 
   },
 
   initialize_streets : function(){
 
-    Game.log("initializing streets", STREETS.length);
+    Game.log("initializing streets", Game.levels.streets.length);
 
-    _.each( STREETS, function(street_data){
+    _.each( Game.levels.streets, function(street_data){
       var street  = new Street();
 
       street.initialize( Game, street_data, Game.car_context );
@@ -800,11 +819,11 @@ Game = {
 
   initialize_barriers : function(){
     
-    Game.log("initializing barriers", BARRIERS.length);
+    Game.log("initializing barriers", Game.levels.barriers.length);
 
     var self  = this;
 
-    _.each(BARRIERS, function(b){
+    _.each( Game.levels.barriers, function(b){
       var t  = b[0].match(/^([^\s]+)\_barrier[\d]$/i),
         hash = {  name         : b[0],
                   top          : b[1], 
@@ -826,9 +845,9 @@ Game = {
 
   initialize_intersections : function(){
     
-    Game.log("initializing intersections", INTERSECTIONS.length);
+    Game.log("initializing intersections", Game.levels.intersections.length);
 
-    _.each(INTERSECTIONS, function(intersection){
+    _.each( Game.levels.intersections, function(intersection){
       Game.intersections.push({
         name   : intersection[0],
         top    : intersection[1],
@@ -845,7 +864,7 @@ Game = {
     Game.log("initializing controls", $(".stoplight").length);
 
     var self = this;
-    self.stoplights = STOPLIGHTS;
+    self.stoplights = Game.levels.stoplights;
 
     // prevent gray overlay when tapping in iOS?
     $('body').live('touchstart', function(e){
@@ -905,6 +924,7 @@ Game = {
       Game.high_score = $.jStorage.get(Game.high_score_key_full, 0);
       Game.high_score_cont.text( Game.high_score );
     }
+
   },
 
   store_high_score : function(new_score) {
@@ -969,10 +989,15 @@ Game = {
     Game.main.show();
 
     Game.exit_intro(function(){
+      
+      Game.initialize_map();
+
       Game.intro.hide();
       Game.stop_sound_theme();
       Game.pause_menus();
+
       Game.start_countdown();
+
     });
     
   },

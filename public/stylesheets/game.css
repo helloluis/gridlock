@@ -40,7 +40,9 @@ body {
 #all.width1024 { width:1024px; min-width:800px;  }
 #all.height768 { height:768px; min-height:601px; }
 #all.height600 { height:600px; min-height:500px; }
-
+#all.height600 #map .neighborhood, #all.height600 #map .buildings { height:600px; }
+#all.height600 #map .neighborhood { background-image:url(../images/bg600.jpg); }
+#all.height600 #map .buildings { background-image:url(../images/buildings600.png); }
 
 h1, h2, p { color:#333; margin-bottom:0.5em;}
 h1 { font-size:64px; font-family: 'Fugaz One', Helvetica, sans-serif; letter-spacing:-2px; text-shadow:0 3px 8px #333; }
@@ -277,8 +279,9 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 .car.boss.hearse.horizontal { width:200px; height:20px; background:url(../images/hearse_l.png); }
 .car.boss.hearse.horizontal.right { background:url(../images/hearse_r.png); }
 
-/******************/
-/******************/
+/**********************/
+/* END VEHICLE STYLES */
+/**********************/
 
 
 .car_score { font-size:25px; position:absolute; z-index:20; opacity : 1; color:#ff0; }
@@ -305,7 +308,7 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #toggle_fullscreen { background:#000 url(../images/pokki_window_sprite.png); width:18px; height:18px; border-radius:6px; position:absolute; z-index:100;top:5px; right:5px; line-height:1; cursor:pointer; text-decoration:none; text-indent:-1000px; overflow:hidden; background-position:0px 0px; }
 #toggle_fullscreen.cancel_fullscreen { background-position:-18px 0px; }
 
-#pintsized { width:250px; height:75px; background:url(../images/brewed_by_pintsized.png); position:absolute; bottom:-20px; left:30px; text-indent:-2000px; }
+#pintsized { width:250px; height:75px; background:url(../images/brewed_by_pintsized.png); position:absolute; bottom:-10px; left:30px; text-indent:-2000px; }
 
 body.ios #toggle_fullscreen, body.pokki #toggle_fullscreen { display:none; }
 body.pokki p a:hover {color:#fff;}
