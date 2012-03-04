@@ -268,20 +268,20 @@ var SOUNDS = {
   horns_short_2   : ["horn2",2],
   horns_short_3   : ["horn3",2],
   horns_short_4   : ["horn4",2],
-  horns_long_1    : ["horn_long1",2],
-  horns_long_2    : ["horn_long2",2],
+  horns_long_1    : ["horn_long1",1],
+  horns_long_2    : ["horn_long2",1],
   horn_truck      : ["horn_truck",1],
   countdown       : ["countdown",1],
   theme           : ["bg",1],
   explosion       : ["explosion_short",1],
   frustration     : ["frustration",1],
-  arrived         : ["kaching",8],
+  arrived         : ["kaching",6],
   arrived_2       : ["kaching2",2],
   arrived_3       : ["kaching3",1],
-  ambulance       : ["ambulance",3],
+  ambulance       : ["ambulance",2],
   hearse          : ["hearse",1],
-  police          : ["police",3],
-  firetruck       : ["firetruck",3]
+  police          : ["police",2],
+  firetruck       : ["firetruck",2]
 };
 
 var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
