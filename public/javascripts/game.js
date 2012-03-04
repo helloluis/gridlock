@@ -990,7 +990,7 @@ Game = {
 
     Game.exit_intro(function(){
       
-      Game.initialize_map();
+      Game.initialize_level();
 
       Game.intro.hide();
       Game.stop_sound_theme();

@@ -36,6 +36,9 @@ a car bumping into another car on the same street.
 
 */
 
+
+/* DEFAULT MAP CONSTANTS */
+
 var MAP_NAME = "manila";
 
 var MAP_WIDTH = 1024;
@@ -60,7 +63,6 @@ var STREETS = [
   ['dexter_right_lane1', "vertical",    0,     706,   20,    768 ],
   ['dexter_right_lane2', "vertical",    0,     728,   20,    768 ]
 ];
-
 
 var BARRIERS = [
   // name, top, left, width, height
@@ -100,6 +102,29 @@ var INTERSECTIONS = [
   [ 'baker chang',  512, 252, 95, 45 ],
   [ 'baker dexter', 512, 652, 95, 45 ],
 ];
+
+
+var STREETS_COMPACT = STREETS;
+
+STREETS_COMPACT[0][2]  = 148;
+STREETS_COMPACT[1][2]  = 165;
+STREETS_COMPACT[2][2]  = 0;
+STREETS_COMPACT[3][2]  = 0;
+STREETS_COMPACT[4][2]  = 0;
+STREETS_COMPACT[5][2]  = 0;
+STREETS_COMPACT[6][2]  = 0;
+STREETS_COMPACT[7][2]  = 0;
+STREETS_COMPACT[8][2]  = 0;
+STREETS_COMPACT[9][2]  = 0;
+STREETS_COMPACT[10][2] = 0;
+STREETS_COMPACT[11][2] = 0;
+STREETS_COMPACT[12][2] = 0;
+STREETS_COMPACT[13][2] = 0;
+
+var BARRIERS_COMPACT = BARRIERS;
+
+var INTERSECTIONS_COMPACT = INTERSECTIONS;
+
 
 // we only need 24 fps coz we're third-world that way
 var FPS = 24;
@@ -392,67 +417,79 @@ var BOSSES = {
 // ];
 
 var BOSS_SEQUENCE = [
-  [ 'towtruck', 45  ],
-  [ 'truck',    75  ],
-  [ 'truck',    105 ],
-  [ 'convoy',   135 ],
-  [ 'convoy',   165 ],
-  [ 'transport',195 ],
-  [ 'convoy',   225 ],
-  [ 'hearse',   255 ],
-  [ 'towtruck', 300 ],
-  [ 'convoy',   315 ],
-  [ 'truck',    330 ],
-  [ 'transport',345 ],
-  [ 'towtruck', 360 ],
-  [ 'truck',    375 ],
-  [ 'convoy',   390 ],
-  [ 'truck',    410 ],
-  [ 'transport',425 ],
-  [ 'towtruck', 440 ],
-  [ 'truck',    455 ],
-  [ 'convoy',   470 ],
-  [ 'transport',485 ],
-  [ 'hearse',   500 ],
-  [ 'convoy',   515 ],
-  [ 'towtruck', 530 ],
-  [ 'truck',    545 ],
-  [ 'convoy',   560 ],
-  [ 'transport',575 ],
-  [ 'truck',    590 ],
-  [ 'convoy',   605 ]
+  [ 'towtruck',  45  ],
+  [ 'truck',     75  ],
+  [ 'truck',     105 ],
+  [ 'convoy',    135 ],
+  [ 'convoy',    165 ],
+  [ 'transport', 195 ],
+  [ 'convoy',    225 ],
+  [ 'hearse',    255 ],
+  [ 'towtruck',  300 ],
+  [ 'convoy',    315 ],
+  [ 'truck',     330 ],
+  [ 'transport', 345 ],
+  [ 'towtruck',  360 ],
+  [ 'truck',     375 ],
+  [ 'convoy',    390 ],
+  [ 'truck',     410 ],
+  [ 'transport', 425 ],
+  [ 'towtruck',  440 ],
+  [ 'truck',     455 ],
+  [ 'convoy',    470 ],
+  [ 'transport', 485 ],
+  [ 'hearse',    500 ],
+  [ 'convoy',    515 ],
+  [ 'towtruck',  530 ],
+  [ 'truck',     545 ],
+  [ 'convoy',    560 ],
+  [ 'transport', 575 ],
+  [ 'truck',     590 ],
+  [ 'convoy',    605 ]
 ];
 
 // TODO
-var TUTORIAL = [
-  { time : 1, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 1 },
-  { time : 3, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 7 },
-  { time : 5, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 2 }
-];
+// var TUTORIAL = [
+//   { time : 1, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 1 },
+//   { time : 3, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 7 },
+//   { time : 5, score : 1, speed : 6, assets : CARS.car.assets[0], maker_id : 2 }
+// ];
+
+/* END DEFAULT MAP CONSTANTS */
 
 
+/*********************************************************************************/
+//
 // WIP: We're placing all the game variables into a Map object so we can easily
 // switch when we want to give people a different set of gameplay settings
+//
+/*********************************************************************************/
 
 var LEVEL_1 = {
-  id                  : 'easy',
-  name                : 'novice',
-  streets             : STREETS,
-  cars                : CARS,
-  barriers            : BARRIERS,
-  bosses              : BOSSES,
-  boss_sequence       : BOSS_SEQUENCE,
-  intersections       : INTERSECTIONS,
-  stoplights          : STOPLIGHTS,
-  locked              : false,
-  max_cars_per_street : MAX_CARS_PER_STREET,
-  max_speed           : MAX_SPEED,
-  maker_frequency     : MAKER_FREQUENCY,
-  icon                : "map_level_1.png",
-  neighborhood        : NEIGHBORHOOD,
-  buildings           : BUILDINGS,
-  car_odds            : CAR_ODDS,
-  car_odds_levels     : CAR_ODDS_LEVELS
+  id                    : 'easy',
+  name                  : 'novice',
+  streets               : STREETS,
+  barriers              : BARRIERS,
+  intersections         : INTERSECTIONS,
+  streets_compact       : STREETS_COMPACT,
+  barriers_compact      : BARRIERS_COMPACT,
+  intersections_compact : INTERSECTIONS_COMPACT,
+  stoplights            : STOPLIGHTS,
+
+  cars                  : CARS,
+  bosses                : BOSSES,
+  boss_sequence         : BOSS_SEQUENCE,
+  neighborhood          : NEIGHBORHOOD,
+  buildings             : BUILDINGS,
+    
+  locked                : false,
+  max_cars_per_street   : MAX_CARS_PER_STREET,
+  max_speed             : MAX_SPEED,
+  maker_frequency       : MAKER_FREQUENCY,
+  icon                  : "map_level_1.png",
+  
+  car_odds              : CAR_ODDS,
+  car_odds_levels       : CAR_ODDS_LEVELS
 };
 
 var LEVEL_2 = _.extend(LEVEL_1, {}, true);
