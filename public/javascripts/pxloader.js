@@ -561,3 +561,47 @@ PxLoader.prototype.addSound = function(id, url, tags, priority) {
     this.add(soundLoader);
     return soundLoader.sound;
 };
+
+
+
+// @depends PxLoader.js
+
+/**
+ * PxLoader plugin to load sound using SoundJS
+ */
+function PxLoaderSoundJS(id, url, instances) {
+    var self = this,
+        loader = null;
+
+    this.tags = undefined;
+    this.priority = undefined;
+    this.sound = { id : id, url : url , instances : instances };
+
+    this.start = function(pxLoader) {
+      // we need the loader ref so we can notify upon completion
+      loader = pxLoader;
+      SoundJS.add(this.sound.id, this.sound.url, this.sound.instances);
+
+    };
+
+    this.checkStatus = function() {
+      if (SoundJS.isLoaded(this.sound.id)) {
+        loader.onLoad(self);
+      } 
+    };
+
+    this.onTimeout = function() {
+        loader.onTimeout(self);
+    };
+
+    this.getName = function() {
+        return url;
+    }
+}
+
+// add a convenience method to PxLoader for adding a sound
+PxLoader.prototype.addSoundJS = function(id, url, instances) {
+  var soundLoader = new PxLoaderSoundJS(id, url, instances);
+  this.add(soundLoader);
+  return soundLoader.sound; // doesn't return the actual Audio element, since SoundJS potentially creates multiple instances per sound
+};

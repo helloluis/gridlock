@@ -66,34 +66,23 @@ var STREETS = [
 
 var BARRIERS = [
   // name, top, left, width, height
-  ['amber_right_barrier1',  260, 237, 15, 50, 'horizontal', 'amber chang',   false, "#fff" ],
-  ['amber_right_barrier2',  260, 637, 15, 50, 'horizontal', 'amber dexter',  false, "#eee" ],
-  ['amber_left_barrier1',   210, 347, 15, 50, 'horizontal', 'amber chang',   false, "#ddd" ],
-  ['amber_left_barrier2',   210, 747, 15, 50, 'horizontal', 'amber dexter',  false, "#ccc" ],
-  ['baker_right_barrier1',  535, 237, 15, 25, 'horizontal', 'baker chang',   false, "#bbb" ],
-  ['baker_right_barrier2',  535, 637, 15, 25, 'horizontal', 'baker dexter',  false, "#aaa" ],
-  ['baker_left_barrier1',   510, 347, 15, 25, 'horizontal', 'baker chang',   false, "#999" ],
-  ['baker_left_barrier2',   510, 747, 15, 25, 'horizontal', 'baker dexter',  false, "#888" ],
-  ['chang_right_barrier1',  308, 310, 50, 15, 'horizontal', 'amber chang',   true,  "#999" ],
-  ['chang_right_barrier2',  558, 310, 50, 15, 'horizontal', 'baker chang',   true,  "#aaa" ],
-  ['chang_left_barrier1',   195, 253, 50, 15, 'horizontal', 'amber chang',   true,  "#bbb" ],
-  ['chang_left_barrier2',   497, 253, 50, 15, 'horizontal', 'baker chang',   true,  "#ccc" ],
-  ['dexter_right_barrier1', 308, 710, 50, 15, 'horizontal', 'amber dexter',  true,  "#ddd" ],
-  ['dexter_right_barrier2', 558, 710, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ],
-  ['dexter_left_barrier1',  195, 655, 50, 15, 'horizontal', 'amber dexter',  true,  "#fff" ],
-  ['dexter_left_barrier2',  497, 655, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ]
+  ['amber_right_barrier1',  260, 237, 15, 50, 'horizontal', 'amber chang',   false, "#fff" ],  // amber right 
+  ['amber_right_barrier2',  260, 637, 15, 50, 'horizontal', 'amber dexter',  false, "#eee" ],  
+  ['amber_left_barrier1',   210, 347, 15, 50, 'horizontal', 'amber chang',   false, "#ddd" ],  // amber left 
+  ['amber_left_barrier2',   210, 747, 15, 50, 'horizontal', 'amber dexter',  false, "#ccc" ],  
+  ['baker_right_barrier1',  535, 237, 15, 25, 'horizontal', 'baker chang',   false, "#bbb" ],  // baker right 
+  ['baker_right_barrier2',  535, 637, 15, 25, 'horizontal', 'baker dexter',  false, "#aaa" ],  
+  ['baker_left_barrier1',   510, 347, 15, 25, 'horizontal', 'baker chang',   false, "#999" ],  // baker left 
+  ['baker_left_barrier2',   510, 747, 15, 25, 'horizontal', 'baker dexter',  false, "#888" ],  
+  ['chang_right_barrier1',  308, 310, 50, 15, 'horizontal', 'amber chang',   true,  "#999" ],  // chang right 
+  ['chang_right_barrier2',  558, 310, 50, 15, 'horizontal', 'baker chang',   true,  "#aaa" ],  
+  ['chang_left_barrier1',   195, 253, 50, 15, 'horizontal', 'amber chang',   true,  "#bbb" ],  // chang left 
+  ['chang_left_barrier2',   497, 253, 50, 15, 'horizontal', 'baker chang',   true,  "#ccc" ],  
+  ['dexter_right_barrier1', 308, 710, 50, 15, 'horizontal', 'amber dexter',  true,  "#ddd" ],  // dexter right 
+  ['dexter_right_barrier2', 558, 710, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ],  
+  ['dexter_left_barrier1',  195, 655, 50, 15, 'horizontal', 'amber dexter',  true,  "#fff" ],  // dexter left 
+  ['dexter_left_barrier2',  497, 655, 50, 15, 'horizontal', 'baker dexter',  true,  "#eee" ]  
 ];
-
-
-// stoplights from left to right, top to bottom
-var STOPLIGHTS = [
-  // [ horizontal barriers ], [ vertical_barriers ]
-  [ [ 'amber_right_barrier1', 'amber_left_barrier1' ], ['chang_right_barrier1',  'chang_left_barrier1']  ],
-  [ [ 'amber_right_barrier2', 'amber_left_barrier2' ], ['dexter_right_barrier1', 'dexter_left_barrier1'] ],
-  [ [ 'baker_right_barrier1', 'baker_left_barrier1' ], ['chang_right_barrier2',  'chang_left_barrier2']  ],
-  [ [ 'baker_right_barrier2', 'baker_left_barrier2' ], ['dexter_right_barrier2', 'dexter_left_barrier2'] ],
-];
-
 
 // intersections from left to right, top to bottom
 var INTERSECTIONS = [
@@ -104,26 +93,51 @@ var INTERSECTIONS = [
 ];
 
 
-var STREETS_COMPACT = STREETS;
+// initialize the COMPACT versions of STREETS, BARRIERS and INTERSECTIONS
 
-STREETS_COMPACT[0][2]  = 148;
-STREETS_COMPACT[1][2]  = 165;
-STREETS_COMPACT[2][2]  = 0;
-STREETS_COMPACT[3][2]  = 0;
-STREETS_COMPACT[4][2]  = 0;
-STREETS_COMPACT[5][2]  = 0;
-STREETS_COMPACT[6][2]  = 0;
-STREETS_COMPACT[7][2]  = 0;
-STREETS_COMPACT[8][2]  = 0;
-STREETS_COMPACT[9][2]  = 0;
-STREETS_COMPACT[10][2] = 0;
-STREETS_COMPACT[11][2] = 0;
-STREETS_COMPACT[12][2] = 0;
-STREETS_COMPACT[13][2] = 0;
+var STREETS_COMPACT = $.extend(true, [], STREETS);
 
-var BARRIERS_COMPACT = BARRIERS;
+STREETS_COMPACT[0][2]  = 148; // amber
+STREETS_COMPACT[1][2]  = 168;
+STREETS_COMPACT[2][2]  = 205;
+STREETS_COMPACT[3][2]  = 225;
+STREETS_COMPACT[4][2]  = 406;  // baker
+STREETS_COMPACT[5][2]  = 428;
 
-var INTERSECTIONS_COMPACT = INTERSECTIONS;
+var BARRIERS_COMPACT = $.extend(true, [], BARRIERS);
+
+BARRIERS_COMPACT[0][1]  = 205; // amber right
+BARRIERS_COMPACT[1][1]  = 205; 
+BARRIERS_COMPACT[2][1]  = 148; // amber left
+BARRIERS_COMPACT[3][1]  = 148; 
+BARRIERS_COMPACT[4][1]  = 428; // baker right
+BARRIERS_COMPACT[5][1]  = 428; 
+BARRIERS_COMPACT[6][1]  = 406; // baker left
+BARRIERS_COMPACT[7][1]  = 406; 
+BARRIERS_COMPACT[8][1]  = 253; // chang right
+BARRIERS_COMPACT[9][1]  = 449; 
+BARRIERS_COMPACT[10][1] = 138; // chang left
+BARRIERS_COMPACT[11][1] = 393; 
+BARRIERS_COMPACT[12][1] = 253; // dexter right
+BARRIERS_COMPACT[13][1] = 449; 
+BARRIERS_COMPACT[14][1] = 138; // dexter left
+BARRIERS_COMPACT[15][1] = 393; 
+
+var INTERSECTIONS_COMPACT = $.extend(true, [], INTERSECTIONS);
+
+INTERSECTIONS_COMPACT[0][1] = 150;
+INTERSECTIONS_COMPACT[1][1] = 150;
+INTERSECTIONS_COMPACT[2][1] = 407;
+INTERSECTIONS_COMPACT[3][1] = 407;
+
+// stoplights from left to right, top to bottom
+var STOPLIGHTS = [
+  // [ horizontal barriers ], [ vertical_barriers ]
+  [ [ 'amber_right_barrier1', 'amber_left_barrier1' ], ['chang_right_barrier1',  'chang_left_barrier1']  ],
+  [ [ 'amber_right_barrier2', 'amber_left_barrier2' ], ['dexter_right_barrier1', 'dexter_left_barrier1'] ],
+  [ [ 'baker_right_barrier1', 'baker_left_barrier1' ], ['chang_right_barrier2',  'chang_left_barrier2']  ],
+  [ [ 'baker_right_barrier2', 'baker_left_barrier2' ], ['dexter_right_barrier2', 'dexter_left_barrier2'] ],
+];
 
 
 // we only need 24 fps coz we're third-world that way

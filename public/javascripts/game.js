@@ -90,8 +90,8 @@ Game = {
   // sound-related settings 
   with_sound           : true,     // globally disable all sound
   with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
-  with_soundjs         : false,    // SoundJS, for Web & Pokki build
-  with_soundmanager2   : true,     // pure web version
+  with_soundjs         : true,     // SoundJS, for Web & Pokki build
+  with_soundmanager2   : false,    // pure web version
 
   sound_format         : "." + (PLATFORM=='web' && BrowserDetect.browser=='Firefox' ? SOUND_FORMATS.pokki : SOUND_FORMATS[PLATFORM]),
  
@@ -172,20 +172,31 @@ Game = {
                 soundManager.reboot(); 
             }); // flash may timeout if not installed or when flashblock is installed  
              
-            soundManager.onready(function() { 
-              console.log('soundmanager ready');
-            }); 
           }
 
           _.each(Game.raw_sounds, function(media, key){
+            
             Game.sounds[key] = Game.sounds_dir + media[0] + Game.sound_format;
-            Game.loader.addSound( key, Game.sounds_dir + media[0] + Game.sound_format, media[1] );
+            
+            if (Game.with_soundjs) {
+              Game.loader.addSoundJS( key, Game.sounds_dir + media[0] + Game.sound_format, media[1] );
+            } else {
+              Game.loader.addSound( key, Game.sounds_dir + media[0] + Game.sound_format, media[1] );  
+            }
+            
           });
 
           Game.sounds.bosses = new Array;
           _.each(Game.bosses, function(boss, idx) {
+            
             Game.sounds[key] = Game.sounds_dir + boss.sound + Game.sound_format;
-            Game.loader.addSound( boss.sound, Game.sounds_dir + boss.sound + Game.sound_format, 2 ); 
+
+            if (Game.with_soundjs) {
+              Game.loader.addSoundJS( boss.sound, Game.sounds_dir + boss.sound + Game.sound_format, 2 ); 
+            } else {
+              Game.loader.addSound( boss.sound, Game.sounds_dir + boss.sound + Game.sound_format, 2 ); 
+            }
+
           });
 
         }
@@ -221,10 +232,12 @@ Game = {
 
   detect_resolution : function(){
 
+    var tolerance = 100;
+
     if (Game.force_resolution) {
       
-      Game.width  = Game.is_compact? ? Game.compact_width  : Game.ideal_width;
-      Game.height = Game.is_compact? ? Game.compact_height : Game.ideal_height;
+      Game.width  = Game.is_compact===true ? Game.compact_width  : Game.ideal_width;
+      Game.height = Game.is_compact===true ? Game.compact_height : Game.ideal_height;
 
     } else {
 
@@ -233,8 +246,8 @@ Game = {
       Game.screen_width   = window.screen.width;
       Game.screen_height  = window.screen.height;
 
-      Game.width          = (Game.window_width  >= Game.ideal_width  - 50 ? Game.ideal_width  : Game.compact_width);
-      Game.height         = (Game.window_height >= Game.ideal_height - 50 ? Game.ideal_height : Game.compact_height);
+      Game.width          = (Game.window_width  >= Game.ideal_width  - tolerance ? Game.ideal_width  : Game.compact_width);
+      Game.height         = (Game.window_height >= Game.ideal_height - tolerance ? Game.ideal_height : Game.compact_height);
 
       // resize our canvases/divs
       document.getElementById('cars').width = Game.width;
@@ -243,17 +256,23 @@ Game = {
       document.getElementById('bubbles').height = Game.height;
       
       // if is_compact is set to true, we replace the streets, barriers and intersections with their compact coordinates
-      Game.is_compact = (Game.window_height < Game.ideal_height - 50);
+      Game.is_compact = (Game.window_height < Game.ideal_height - tolerance);
+
+      if (Game.is_compact) {
+        Game.cont.addClass('height600')
+      } else {
+        Game.cont.removeClass('height600');
+      }
 
       // we can attempt to center the game in the viewport when the window is smaller than the ideal
-      Game.dynamically_center(); 
+      Game.dynamically_center(tolerance); 
 
     }
     
     
   },
 
-  dynamically_center : function(){
+  dynamically_center : function(tolerance){
 
     if (Game.window_width < Game.width) {
       
@@ -261,7 +280,7 @@ Game = {
       var left = -((Game.width-Game.window_width)/2);
       Game.intro.css({ marginLeft: left }).width( Game.width );
       Game.map.css({ left : left });
-      console.log(left);
+      //console.log(left);
 
     } else {
 
@@ -270,17 +289,17 @@ Game = {
 
     }
 
-    if (Game.window_height <= Game.height-50) {
+    if (Game.window_height <= Game.height-tolerance) {
 
-      Game.cont.height( Game.window_height ).addClass('height600');
+      Game.cont.height( Game.window_height );
       var top = -((Game.height-Game.window_height)/2);
       Game.intro.css({ marginTop: top }).height( Game.height );
       Game.map.css({ top : top });
-      console.log(top);
+      //console.log(top);
 
     } else {
 
-      Game.cont.height( Game.height ).removeClass('height600');
+      Game.cont.height( Game.height );
       Game.intro.css({ marginTop : 0 }).height( Game.height );
 
     }
@@ -311,27 +330,11 @@ Game = {
 
     Game.initialize_sounds();
 
-    // Game.initialize_bosses();
-
-    // Game.initialize_intersections();
-
-    // Game.initialize_barriers();
-
-    // Game.initialize_factory();
-
-    // Game.initialize_streets();
-    
-    // Game.initialize_controls();
-
-    // Game.initialize_high_score();
-
     Game.initialize_speed_changer();
 
     Game.initialize_timer();
 
     Game.initialize_tutorial();
-
-    // Game.initialize_bubbles();
 
     if (auto_start===true) {
       Game.start();
@@ -819,9 +822,11 @@ Game = {
 
   initialize_streets : function(){
 
-    Game.log("initializing streets", Game.level.streets.length);
+    Game.log("initializing streets", Game.level.streets.length, Game.level.streets_compact.length);
 
-    _.each( Game.level.streets, function(street_data){
+    var streets = (Game.is_compact ? Game.level.streets_compact : Game.level.streets);
+
+    _.each( streets, function(street_data){
       var street  = new Street();
 
       street.initialize( Game, street_data, Game.car_context );
@@ -834,9 +839,10 @@ Game = {
     
     Game.log("initializing barriers", Game.level.barriers.length);
 
-    var self  = this;
-
-    _.each( Game.level.barriers, function(b){
+    var self     = this,
+        barriers = Game.is_compact ? Game.level.barriers_compact : Game.level.barriers;
+    
+    _.each( barriers, function(b){
       var t  = b[0].match(/^([^\s]+)\_barrier[\d]$/i),
         hash = {  name         : b[0],
                   top          : b[1], 
@@ -855,14 +861,16 @@ Game = {
       }
     });
 
-    console.log(Game.barriers);
+    // console.log(Game.barriers);
   },
 
   initialize_intersections : function(){
     
     Game.log("initializing intersections", Game.level.intersections.length);
 
-    _.each( Game.level.intersections, function(intersection){
+    var intersections = Game.is_compact ? Game.level.intersections_compact : Game.level.intersections;
+
+    _.each( intersections, function(intersection){
       Game.intersections.push({
         name   : intersection[0],
         top    : intersection[1],
@@ -1189,7 +1197,7 @@ Game = {
 
   play_sound : function(sound, loop, volume, interrupt_all) {
     
-    console.log('playing sound', sound, loop);
+    // console.log('playing sound', sound, loop);
 
     if (_.isUndefined(Game.sounds[sound])) { return false; }
 
@@ -1229,7 +1237,7 @@ Game = {
 
   loop_sound_theme : function() {
     
-    console.log('looping sound manually');
+    // console.log('looping sound manually');
 
     if (Game.with_phonegap_sound && !Game.muted) {
       
@@ -2680,7 +2688,7 @@ var Maker = function(){
       var car_name = [self.street.name, self.iterations, 0].join("-"),
           car      = new Car(car_hash);
       
-      console.log(car_hash.type);
+      // console.log(car_hash.type);
 
       self.street.cars.push( car ); 
 

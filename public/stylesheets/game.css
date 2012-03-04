@@ -110,8 +110,8 @@ a, #intro p strong { color:#fc0; }
 .bttn.leaderboards { bottom:20px; right:30px; text-shadow: 0 0 7px #000; }
 .bttn.pause, .bttn.mute, .bttn.quit { background:url(../images/bttn_small.png); width:40px; height:40px; text-indent:-2000px; top:20px; left:20px; }
 .bttn.pause { background-position:-40px 0px; }
-.bttn.quit { left: 100px; }
-.bttn.mute { top:auto; bottom:20px; background-position:-120px 0px; }
+.bttn.quit { left: 180px; }
+.bttn.mute { left: 100px; background-position:-120px 0px; }
 .bttn.mute.muted { background-position:-80px 0px; }
 .bttn.disabled { opacity:0.5; }
 .bttn.speed { bottom:30px; right:20px; color:#fff; }
@@ -202,6 +202,9 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 .intersection.baker { top:510px; height:50px; }
 .intersection.chang { left:250px; width:100px; }
 .intersection.dexter { left:650px; width:100px; }
+
+.height600 .intersection.amber { top:150px; }
+.height600 .intersection.baker { top:405px; }
 
 #overlay { background:rgba(0,0,0,0.7); position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:19; }
 #overlay .bttn { top:40%; left:42%; }
