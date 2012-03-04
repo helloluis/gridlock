@@ -204,11 +204,11 @@ var LOADING_CARS = [
 ];
 
 // width, height, offset top, offset left
-var THOUGHTBUBBLES_DIMENSIONS = [ 40, 40, -25, -25 ];
+var BUBBLES_DIMENSIONS = [ 40, 40, -25, -25 ];
 
-var THOUGHTBUBBLES_SPRITE = "thoughtbubbles.png";
+var BUBBLES_SPRITE = "bubbles.png";
 
-var THOUGHTBUBBLES = [
+var BUBBLES = [
    'ambulance',
    'police',
    'firetruck',
@@ -481,7 +481,7 @@ var LEVEL_1 = {
   boss_sequence         : BOSS_SEQUENCE,
   neighborhood          : NEIGHBORHOOD,
   buildings             : BUILDINGS,
-    
+
   locked                : false,
   max_cars_per_street   : MAX_CARS_PER_STREET,
   max_speed             : MAX_SPEED,

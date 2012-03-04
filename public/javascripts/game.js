@@ -56,7 +56,7 @@ Game = {
   can_adjust_speed     : false,  // clicking or swiping on a car will increase its speed
  
   enable_hotkeys       : false,
-  enable_thoughtbubbles : true,
+  enable_bubbles       : true,
 
   factory              : false,
   streets              : [],     // array of Street objects
@@ -79,10 +79,15 @@ Game = {
   collision_messages   : COLLISION_MESSAGES,
   frustration_messages : FRUSTRATION_MESSAGES,
 
-  is_fullscreen        : false, // only works with pokki platform
+  // display toggles
+  is_compact           : false,    // run detect_resolution(), then toggle this to turn on the compact version of the game
+  is_fullscreen        : false,    // only works with pokki platform
+  force_resolution     : false,    // if we force the resolution, we skip detection. we can use this to force compact mode, e.g.
 
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
-   
+  
+
+  // sound-related settings 
   with_sound           : true,     // globally disable all sound
   with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
   with_soundjs         : false,    // SoundJS, for Web & Pokki build
@@ -92,6 +97,7 @@ Game = {
  
   raw_sounds           : SOUNDS,  // our library of sounds
   sounds               : {},
+
 
   // sometimes we want to defer rendering on some items 
   // until all of the cars have been rendered, e.g., the frustration indicators
@@ -136,7 +142,7 @@ Game = {
           Game.loader.addImage(Game.images_dir + a);
         });
 
-        Game.loader.addImage(Game.images_dir + THOUGHTBUBBLES_SPRITE);
+        Game.loader.addImage(Game.images_dir + BUBBLES_SPRITE);
 
         _.each(OTHERS, function(a){
           Game.loader.addImage(Game.images_dir + a);
@@ -215,28 +221,35 @@ Game = {
 
   detect_resolution : function(){
 
-    Game.window_width   = $(window).width();
-    Game.window_height  = $(window).height();
-    Game.screen_width   = window.screen.width;
-    Game.screen_height  = window.screen.height;
+    if (Game.force_resolution) {
+      
+      Game.width  = Game.is_compact? ? Game.compact_width  : Game.ideal_width;
+      Game.height = Game.is_compact? ? Game.compact_height : Game.ideal_height;
 
-    Game.width          = (Game.window_width  >= Game.ideal_width  - 50 ? Game.ideal_width  : Game.compact_width);
-    Game.height         = (Game.window_height >= Game.ideal_height - 50 ? Game.ideal_height : Game.compact_height);
+    } else {
 
-    // resize our canvases/divs
-    document.getElementById('cars').width = Game.width;
-    document.getElementById('cars').height = Game.height;
-    document.getElementById('bubbles').width = Game.width;
-    document.getElementById('bubbles').height = Game.height;
+      Game.window_width   = $(window).width();
+      Game.window_height  = $(window).height();
+      Game.screen_width   = window.screen.width;
+      Game.screen_height  = window.screen.height;
 
-    Game.dynamically_center();
+      Game.width          = (Game.window_width  >= Game.ideal_width  - 50 ? Game.ideal_width  : Game.compact_width);
+      Game.height         = (Game.window_height >= Game.ideal_height - 50 ? Game.ideal_height : Game.compact_height);
 
-    // var detect = function(){
-    //   console.log('detecting');
-    //   Game.detect_resolution();
-    // }
+      // resize our canvases/divs
+      document.getElementById('cars').width = Game.width;
+      document.getElementById('cars').height = Game.height;
+      document.getElementById('bubbles').width = Game.width;
+      document.getElementById('bubbles').height = Game.height;
+      
+      // if is_compact is set to true, we replace the streets, barriers and intersections with their compact coordinates
+      Game.is_compact = (Game.window_height < Game.ideal_height - 50);
 
-    // $(window).resize(_.debounce(detect, 1000));
+      // we can attempt to center the game in the viewport when the window is smaller than the ideal
+      Game.dynamically_center(); 
+
+    }
+    
     
   },
 
@@ -318,7 +331,7 @@ Game = {
 
     Game.initialize_tutorial();
 
-    // Game.initialize_thoughtbubbles();
+    // Game.initialize_bubbles();
 
     if (auto_start===true) {
       Game.start();
@@ -664,7 +677,7 @@ Game = {
     Game.streets = [];
     Game.score = 0;
     Game.score_cont.text('0');
-    Game.initialize_thoughtbubbles();
+    Game.initialize_bubbles();
     Game.initialize_high_score();
 
     $(".restart").hide();
@@ -1382,27 +1395,27 @@ Game = {
     }
   },
 
-  initialize_thoughtbubbles : function(){
+  initialize_bubbles : function(){
     
-    if (Game.enable_thoughtbubbles) {
+    if (Game.enable_bubbles) {
       
-      Game.log("initializing thoughtbubble assets");
+      Game.log("initializing bubble assets");
 
       Game.frustration = 0;
 
-      Game.thoughtbubble_sprite = new Image();
-      Game.thoughtbubble_sprite.src = IMAGES_DIR + THOUGHTBUBBLES_SPRITE;
+      Game.bubble_sprite = new Image();
+      Game.bubble_sprite.src = IMAGES_DIR + BUBBLES_SPRITE;
       
-      Game.thoughtbubble_assets = {};
-      _.each(THOUGHTBUBBLES, function(t, i){
-        Game.thoughtbubble_assets[t] = {
+      Game.bubble_assets = {};
+      _.each(BUBBLES, function(t, i){
+        Game.bubble_assets[t] = {
             type     : t,
-            width    : THOUGHTBUBBLES_DIMENSIONS[0],
-            height   : THOUGHTBUBBLES_DIMENSIONS[1],
-            off_top  : THOUGHTBUBBLES_DIMENSIONS[2],
-            off_left : THOUGHTBUBBLES_DIMENSIONS[3],
+            width    : BUBBLES_DIMENSIONS[0],
+            height   : BUBBLES_DIMENSIONS[1],
+            off_top  : BUBBLES_DIMENSIONS[2],
+            off_left : BUBBLES_DIMENSIONS[3],
             top      : 0,
-            left     : (THOUGHTBUBBLES_DIMENSIONS[0]*i)
+            left     : (BUBBLES_DIMENSIONS[0]*i)
           };
       });
 
@@ -1796,8 +1809,8 @@ var Car = function(car_hash){
     this.initialize_origins(); 
     this.initialize_intersecting();
     
-    if (Game.enable_thoughtbubbles) {
-      this.initialize_thoughtbubbles();  
+    if (Game.enable_bubbles) {
+      this.initialize_bubbles();  
     }
     
     this.initialize_sounds();
@@ -1946,7 +1959,7 @@ var Car = function(car_hash){
     });
   };
 
-  this.initialize_thoughtbubbles = function(){
+  this.initialize_bubbles = function(){
     this.frustration_thresholds = [
       Math.round(this.ideal_travel_time/2),
       Math.round(this.ideal_travel_time - (this.ideal_travel_time*0.35)),
@@ -1958,7 +1971,7 @@ var Car = function(car_hash){
   // this function does double duty by managing the vehicle's indicators, which could be either
   // the important (!) notification or the frustration (:() icons and sounds,
   // as well as reporting the frustration levels of each vehicle
-  this.show_thoughtbubbles = function(){
+  this.show_bubbles = function(){
     
     var self = this;
     
@@ -1968,10 +1981,10 @@ var Car = function(car_hash){
 
     if (travel < self.frustration_thresholds[0]) {
       
-      if (_.include(_.keys(Game.thoughtbubble_assets), self.type)) {
-        return Game.thoughtbubble_assets[self.type];  
+      if (_.include(_.keys(Game.bubble_assets), self.type)) {
+        return Game.bubble_assets[self.type];  
       } else if (self.important===true) {
-        return Game.thoughtbubble_assets.important;
+        return Game.bubble_assets.important;
       } 
       
     } else if (travel == self.frustration_thresholds[0]) {
@@ -1982,7 +1995,7 @@ var Car = function(car_hash){
     } else if (travel > self.frustration_thresholds[0] && travel < self.frustration_thresholds[1]) {
 
       if (self.moving===false) {
-        return Game.thoughtbubble_assets.frustration_01;
+        return Game.bubble_assets.frustration_01;
       }
 
     } else if (travel == self.frustration_thresholds[1]) {
@@ -1992,13 +2005,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.thoughtbubble_assets.frustration_01;
+        return Game.bubble_assets.frustration_01;
       }
     
     } else if (travel > self.frustration_thresholds[1] && travel < self.frustration_thresholds[2]) {
       
       if (self.moving===false) {
-        return Game.thoughtbubble_assets.frustration_02;  
+        return Game.bubble_assets.frustration_02;  
       }
 
     } else if (travel == self.frustration_thresholds[2]) {
@@ -2010,13 +2023,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.thoughtbubble_assets.frustration_02;
+        return Game.bubble_assets.frustration_02;
       }
 
     } else if (travel > self.frustration_thresholds[2] && travel < self.frustration_thresholds[3]) {
       
       if (self.moving===false) {
-        return Game.thoughtbubble_assets.frustration_03;  
+        return Game.bubble_assets.frustration_03;  
       }
     
     } else if (travel === self.frustration_thresholds[3]) {
@@ -2025,13 +2038,13 @@ var Car = function(car_hash){
       Game.play_sound(horn_name);
 
       if (self.moving===false) {
-        return Game.thoughtbubble_assets.frustration_03;
+        return Game.bubble_assets.frustration_03;
       }
     
     } else if (travel > self.frustration_thresholds[3] && travel < self.ideal_travel_time) {
 
       if (self.moving===false) {
-        return Game.thoughtbubble_assets.frustration_04;
+        return Game.bubble_assets.frustration_04;
       }
       
     } else if (travel === self.ideal_travel_time) {
@@ -2039,7 +2052,7 @@ var Car = function(car_hash){
       Game.end_with_frustration();
 
       if (self.moving===false) {
-        return Game.thoughtbubble_assets.frustration_04;
+        return Game.bubble_assets.frustration_04;
       }
 
     }
@@ -2130,8 +2143,8 @@ var Car = function(car_hash){
     }
     
 
-    if (Game.enable_thoughtbubbles) {
-      if (indicator = self.show_thoughtbubbles()) {
+    if (Game.enable_bubbles) {
+      if (indicator = self.show_bubbles()) {
         
         if (self.indicator != indicator) {
           self.indicator = indicator;
@@ -2150,7 +2163,7 @@ var Car = function(car_hash){
                         (p.lefthand ? p.current_pos.top+p.height-(f.height-f.off_top) : p.current_pos.top+f.off_top );
             
             if (Game.enable_canvas) {
-              bub.drawImage( Game.thoughtbubble_sprite, f.left, f.top, f.width, f.height, left, top, f.width, f.height );   
+              bub.drawImage( Game.bubble_sprite, f.left, f.top, f.width, f.height, left, top, f.width, f.height );   
             
             } else {
               

@@ -88,7 +88,7 @@ a, #intro p strong { color:#fc0; }
 .help_illustration .help_background { width: 270px; height:275px; position:absolute; background:url(../images/bg_help.jpg); top:39px; left:41px; z-index:1; overflow:hidden; }
 .help_illustration canvas { position:absolute; top:39px; left:41px; z-index:2; }
 .help_illustration_frustration { top:150px; right:120px; -webkit-transform:rotate(-2deg); z-index:4; }
-.help_illustration_frustration .frustration { position:absolute; width:40px; height:40px; background:url(../images/thoughtbubbles.png) -160px 0px; visibility:hidden; z-index:3; }
+.help_illustration_frustration .frustration { position:absolute; width:40px; height:40px; background:url(../images/bubbles.png) -160px 0px; visibility:hidden; z-index:3; }
 .help_illustration_frustration .frustration.frustration02 { background-position: -200px 0px; }
 .help_illustration_frustration .frustration.frustration03 { background-position: -240px 0px; }
 .help_illustration_reward { top:350px; right:-80px; -webkit-transform:rotate(4deg); z-index:3; }
