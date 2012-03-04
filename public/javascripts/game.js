@@ -27,8 +27,7 @@ Game = {
   seconds              : 0,     // global timer, in seconds, so only increments once every 1000 millisec
 
   difficulty_increases : true,  // if set to false, we don't make the game harder as time goes on
-  smart_intersections  : true,  // if set to true, cars that get barrier-ed at an intersection will keep on moving forward
-  double_buffering     : true,  // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready
+  smart_intersections  : true,  // if set to true, cars that get barrier-ed at an intersection will keep on moving forward  
   with_bosses          : true,  // enable level bosses
 
   width                : MAP_WIDTH,
@@ -38,8 +37,10 @@ Game = {
   compact_width        : MAP_COMPACT_WIDTH,
   compact_height       : MAP_COMPACT_HEIGHT,
 
-  enable_canvas        : true, // if set to true, use Canvas to animate. if false, use the DOM.
-   
+  enable_canvas        : true,   // if set to true, use Canvas to animate. if false, use the DOM.
+  double_buffering     : true,   // if set to true, we create a virtual canvas where we draw everything first, then copy it on to the actual canvas when the final image is ready 
+  multiple_canvases    : true,   // if set to true, we generate one canvas per street. Note that this will disable Game.double_buffering.
+
   fps                  : FPS,
   timer                : 0,
   
@@ -86,9 +87,8 @@ Game = {
 
   touch_device         : (navigator.platform.indexOf("iPad") != -1), // is this a desktop browser or an iPad?
   
-
   // sound-related settings 
-  with_sound           : true,     // globally disable all sound
+  with_sound           : false,     // globally disable all sound
   with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
   with_soundjs         : true,     // SoundJS, for Web & Pokki build
   with_soundmanager2   : false,    // pure web version
@@ -318,8 +318,6 @@ Game = {
 
     Game.initialize_menus();
 
-    Game.initialize_canvas();
-
     Game.initialize_mobile_behaviours();
 
     Game.initialize_containers();
@@ -411,7 +409,27 @@ Game = {
 
     if (Game.enable_canvas) {
       
-      if (Game.double_buffering) {
+      if (Game.multiple_canvases) {
+
+        Game.canvases = {};
+
+        $(".multi_canvas").each(function(){
+          
+          var name = $(this).attr('id'),
+              el   = document.getElementById(name);
+
+          Game.canvases[name] = { 
+            canvas  : el,
+            context : el.getContext('2d'),
+            width   : $(this).width(),
+            height  : $(this).height(),
+            left    : $(this).offset().left,
+            top     : $(this).offset().top
+          };
+
+        });
+
+      } else if (Game.double_buffering) {
 
         Game.car_canvas  = document.getElementById('cars');
         Game.real_car_context = Game.car_canvas.getContext('2d');
@@ -583,8 +601,14 @@ Game = {
           });
         });
 
-        if (Game.double_buffering) {
+        if (Game.multiple_canvases) {
+
+          // nothing to do here
+
+        } else if (Game.double_buffering) {
+          
           Game.real_car_context.drawImage(Game.virtual_car_canvas, 0, 0);
+
         }
 
         _.each(Game.deferred_renders, function(arr) {
@@ -612,6 +636,10 @@ Game = {
         });
 
       }
+
+      _.each(Game.streets,function(street){
+        street.remove_arrived_cars();
+      })
       
       //new frame
       requestAnimFrame(function(){
@@ -622,12 +650,20 @@ Game = {
   },
 
   clear_canvases : function(){
-    
-    if (Game.double_buffering) {
+
+    if (Game.multiple_canvases) {
+
+      _.each(Game.canvases, function(c,n){
+        c.context.clearRect(0, 0, c.width, c.height);
+      });
+
+    } else if (Game.double_buffering) {
+
       Game.real_car_context.clearRect(0, 0, Game.width, Game.height);    
       Game.car_context.clearRect(0, 0, Game.width, Game.height);    
 
     } else {
+
       Game.car_context.clearRect(0, 0, Game.width, Game.height);    
 
     }
@@ -799,6 +835,8 @@ Game = {
       Game.car_odds_total += odds[1];
     });
 
+    Game.initialize_canvas();
+
     Game.initialize_factory();
 
     Game.initialize_barriers();
@@ -826,6 +864,8 @@ Game = {
 
     var streets = (Game.is_compact ? Game.level.streets_compact : Game.level.streets);
 
+    Game.streets = new Array();
+
     _.each( streets, function(street_data){
       var street  = new Street();
 
@@ -842,6 +882,8 @@ Game = {
     var self     = this,
         barriers = Game.is_compact ? Game.level.barriers_compact : Game.level.barriers;
     
+    Game.barriers = new Array();
+
     _.each( barriers, function(b){
       var t  = b[0].match(/^([^\s]+)\_barrier[\d]$/i),
         hash = {  name         : b[0],
@@ -869,6 +911,8 @@ Game = {
     Game.log("initializing intersections", Game.level.intersections.length);
 
     var intersections = Game.is_compact ? Game.level.intersections_compact : Game.level.intersections;
+
+    Game.intersections = new Array();
 
     _.each( intersections, function(intersection){
       Game.intersections.push({
@@ -930,7 +974,6 @@ Game = {
 
       if (Game.touch_device) {
         elem.tappable(click);
-        // new MBP.fastButton(el, click);
       } else {
         elem.unbind('click').click(click);
       }
@@ -980,7 +1023,7 @@ Game = {
     Game.main.hide();
   },
 
-  start : function(from_intro){
+  start : function(restart){
 
     Game.log("starting countdown now");
 
@@ -1011,17 +1054,26 @@ Game = {
     
     Game.main.show();
 
-    Game.exit_intro(function(){
-      
-      Game.initialize_level();
+    if (restart===true) {
 
-      Game.intro.hide();
       Game.stop_sound_theme();
-      Game.pause_menus();
-
       Game.start_countdown();
 
-    });
+    } else {
+
+      Game.exit_intro(function(){
+      
+        Game.initialize_level();
+
+        Game.intro.hide();
+        Game.stop_sound_theme();
+        Game.pause_menus();
+
+        Game.start_countdown();
+
+      });  
+    }
+    
     
   },
 
@@ -1140,7 +1192,7 @@ Game = {
     
     $(".restart, #messages").hide();
     
-    Game.start();
+    Game.start(true);
 
   },
 
@@ -1522,7 +1574,6 @@ Game = {
         $(".stoplight").css('opacity',0);
         
         if (Game.score>Game.high_score) {
-          // Game.play_sound('new_high_score');
           Game.store_high_score(Game.score);
           Game.show_message( Game.show_new_high_score(Game.score) );
 
@@ -1555,7 +1606,6 @@ Game = {
         $(".stoplight").css('opacity',0);
 
         if (Game.score>Game.high_score) {
-          // Game.play_sound('new_high_score');
           Game.store_high_score(Game.score);
           Game.show_message( Game.show_new_high_score(Game.score) );
 
@@ -1592,7 +1642,7 @@ Game = {
       left : pos.left - 20
     }).
     appendTo("#map").
-    oneTime(3000, function(){
+    oneTime(5000, function(){
       $(this).animate({ opacity : 0 });  
     });
 
@@ -1701,6 +1751,7 @@ var Street = function(){
   this.initialize      = function(game, street, context) {
     this.game          = Game;
     this.name          = street[0];
+    this.base          = street[6];
     this.cars          = new Array;
     this.css_name      = street[0].replace(/\_(right|left)/,'').replace(/\_lane[\d]/,'');
       
@@ -1750,12 +1801,19 @@ var Street = function(){
     this.maker.stop();
   };
 
+  this.remove_arrived_cars = function(){
+    if (this.cars.length) {
+      var self = this;
+      if (arrived_car = _.detect(self.cars, function(c){ return c.arrived===true; })) {
+        self.cars.splice(_.indexOf(self.cars,arrived_car),1);
+      }
+    }
+  };
+
 };
 
 var Car = function(car_hash){
   
-  //console.log(car_hash);
-
   this.width                 = car_hash && car_hash.width                 ? car_hash.width           : 20;
   this.height                = car_hash && car_hash.height                ? car_hash.height          : 35;
   this.color                 = car_hash && car_hash.colors                ? car_hash.colors[Math.floor(Math.random()*car_hash.colors.length)] : 'default';
@@ -1772,6 +1830,7 @@ var Car = function(car_hash){
   this.dom                   = car_hash && car_hash.dom                   ? car_hash.dom             : false;
   this.bubble                = false;
   this.street                = false;
+  this.street_canvas         = false; // used with Game.multiple_canvases
   this.moving                = false;
   
   this.frustration           = 0;
@@ -1788,6 +1847,8 @@ var Car = function(car_hash){
   this.speed                 = car_hash && car_hash.speed ? car_hash.speed : (Math.random()*4)+4; // pixels per frame 
   
   this.intersecting          = {};
+
+  this.arrived               = false;
   
   this.orientation           = 'horizontal';
   this.lefthand              = false;
@@ -1805,12 +1866,13 @@ var Car = function(car_hash){
 
   this.initialize = function(name, street, orientation){
     
-    this.name         = name;
-    this.game         = Game;
-    this.street       = street;
-    this.moving       = true;
-    this.orientation  = orientation;
-    this.lefthand     = street.lefthand;
+    this.name          = name;
+    this.game          = Game;
+    this.street        = street;
+    this.street_canvas = Game.multiple_canvases ? Game.canvases[street.base] : false;
+    this.moving        = true;
+    this.orientation   = orientation;
+    this.lefthand      = street.lefthand;
     
     this.flip_dimensions(this.width, this.height);
     
@@ -1892,8 +1954,6 @@ var Car = function(car_hash){
     if (this.orientation=='horizontal') {
       this.width  = h;
       this.height = w;
-      //console.log('flipping dimensions for', this.type);
-      //if (this.type=='towtruck') { console.log('flipping dimensions', this.width, this.height); }
     }
   };
 
@@ -1915,6 +1975,8 @@ var Car = function(car_hash){
   };
 
   this.initialize_origins = function(){    
+    
+    var self = this;
 
     if (this.orientation == 'horizontal') {
       
@@ -1923,12 +1985,12 @@ var Car = function(car_hash){
           b1 = this.street.top + (Math.random() > 0.5 ? -1 : 1);
 
       if (this.lefthand) {
-        this.origins.left = a2;
-        this.current_pos.left = a2;
+        this.origins.left      = a2;
+        this.current_pos.left  = a2;
         this.destinations.left = a1-this.width;
       } else {
-        this.origins.left = a1-this.width;
-        this.current_pos.left = a1-this.width;
+        this.origins.left      = a1-this.width;
+        this.current_pos.left  = a1-this.width;
         this.destinations.left = a2+this.width;  
       }
       
@@ -1943,12 +2005,12 @@ var Car = function(car_hash){
           b1 = this.street.left + (Math.random() > 0.5 ? -1 : 1);
 
       if (this.lefthand) {
-        this.origins.top = a1-this.height;
-        this.current_pos.top = a1-this.height;
+        this.origins.top      = a1-this.height;
+        this.current_pos.top  = a1-this.height;
         this.destinations.top = a2+this.height;
       } else {
-        this.origins.top = a2+this.height;
-        this.current_pos.top = a2+this.height;
+        this.origins.top      = a2+this.height;
+        this.current_pos.top  = a2+this.height;
         this.destinations.top = a1-this.height;  
       }
       
@@ -1956,6 +2018,11 @@ var Car = function(car_hash){
 
       this.ideal_travel_time = Math.ceil((Math.abs(this.destinations.top-this.origins.top)/this.speed)*this.travel_time_modifier);
       
+    }
+
+    this.rendered_pos = {
+      top  : (Game.multiple_canvases ? (this.current_pos.top  - this.street_canvas.top)  : this.current_pos.top ),
+      left : (Game.multiple_canvases ? (this.current_pos.left - this.street_canvas.left) : this.current_pos.left )
     }
 
   };
@@ -2073,15 +2140,15 @@ var Car = function(car_hash){
     
     var self   = this,
         street = self.street,
-        ctx    = self.street.context,
+        ctx    = Game.multiple_canvases ? self.street_canvas.context : self.street.context,
         bub    = Game.bubble_context;
 
     if (Game.enable_canvas) {
       if (Game.debug===true) {
         ctx.beginPath();
 
-        ctx.rect( self.current_pos.left, 
-              self.current_pos.top, 
+        ctx.rect( self.rendered_pos.left, 
+              self.rendered_pos.top, 
               self.width, 
               self.height );
 
@@ -2103,7 +2170,7 @@ var Car = function(car_hash){
 
           var sx = 0 + (this.width*this.current_frame);
 
-          ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height); 
+          ctx.drawImage(self.image, sx, 0, this.width, this.height, self.rendered_pos.left, self.rendered_pos.top, this.width, this.height); 
 
         } else {
 
@@ -2113,7 +2180,7 @@ var Car = function(car_hash){
             var sx = 0 + (this.height * $.inArray([this.orientation,this.lefthand?'left':'right'].join('-'), Game.car_sprite_layout ));
           }
           
-          ctx.drawImage(self.image, sx, 0, this.width, this.height, self.current_pos.left, self.current_pos.top, this.width, this.height);
+          ctx.drawImage(self.image, sx, 0, this.width, this.height, self.rendered_pos.left, self.rendered_pos.top, this.width, this.height);
 
         }
          
@@ -2135,15 +2202,15 @@ var Car = function(car_hash){
           var bg_pos = 0 + (this.width*this.current_frame);
 
           self.dom.
-            css({ top  : self.current_pos.top, 
-                  left : self.current_pos.left,
+            css({ top  : self.rendered_pos.top, 
+                  left : self.rendered_pos.left,
                   backgroundPosition : "-" + bg_pos + "px 0px" });
 
         } else {
 
           self.dom.
-            css({ top  : self.current_pos.top, 
-                  left : self.current_pos.left });
+            css({ top  : self.rendered_pos.top, 
+                  left : self.rendered_pos.left });
 
         }
       }
@@ -2430,22 +2497,37 @@ var Car = function(car_hash){
     } else {
       
       if (self.orientation=='horizontal') {
+
         if (self.lefthand) {
-          self.current_pos.left-=self.speed*Game.speed;  
+          self.current_pos.left-=self.speed*Game.speed;
         } else {
-          self.current_pos.left+=self.speed*Game.speed;    
+          self.current_pos.left+=self.speed*Game.speed;
         }
+
+        if (self.street_canvas) {
+          self.rendered_pos.left = self.current_pos.left - self.street_canvas.left;
+        } else {
+          self.rendered_pos.left = self.current_pos.left;
+        }
+
       } else {
+        
         if (self.lefthand) {
           self.current_pos.top+=self.speed*Game.speed;  
         } else {
           self.current_pos.top-=self.speed*Game.speed;    
         }
+
+        if (self.street_canvas) {
+          self.rendered_pos.top = self.current_pos.top - self.street_canvas.top;
+        } else {
+          self.rendered_pos.top = self.current_pos.top;
+        }
+
       }
-  
 
       if (self.has_arrived()) {
-        self.arrived();
+        self.arrive();
       }
 
     }
@@ -2473,9 +2555,12 @@ var Car = function(car_hash){
     return true;
   };
 
-  this.arrived = function(){
+  this.arrive = function(){
     
     var idx = this.street.cars.indexOf(this);
+
+    // mark for removal from street.cars array via Street.remove_arrived_cars();
+    this.arrived = true;
     
     if (follower = this.street.cars[(idx+1)]) {
       follower.leader = false;
@@ -2485,9 +2570,6 @@ var Car = function(car_hash){
     if (crit_idx = Game.critical_cars.indexOf(self)) {
       Game.critical_cars.splice(crit_idx,1);
     }
-
-    // remove from street.cars array
-    this.street.cars.splice(idx,1);
 
     if (Game.show_arrived_score) {
       var cur_top  = this.orientation=='horizontal' ? ( this.lefthand ? this.street.top-20 : this.street.top+10 ) : ( this.lefthand ? this.street.height-30 : this.street.top),

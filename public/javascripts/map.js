@@ -47,21 +47,22 @@ var MAP_COMPACT_WIDTH = 1024;
 var MAP_COMPACT_HEIGHT = 600;
 
 var STREETS = [
-  // name, orientation, top, left, width, height
-  ["amber_left_lane1",   "horizontal",  210,   0,     1024,  20 ],
-  ["amber_left_lane2",   "horizontal",  230,   0,     1024,  20 ],
-  ["amber_right_lane1",  "horizontal",  260,   0,     1024,  20 ],
-  ["amber_right_lane2",  "horizontal",  285,   0,     1024,  20 ],
-  ["baker_left",         "horizontal",  512,   0,     1024,  20 ],
-  ["baker_right",        "horizontal",  533,   0,     1024,  20 ],
-  ['chang_left_lane1',   "vertical",    0,     253,   20,    768 ],
-  ['chang_left_lane2',   "vertical",    0,     276,   20,    768 ],
-  ['chang_right_lane1',  "vertical",    0,     306,   20,    768 ],
-  ['chang_right_lane2',  "vertical",    0,     327,   20,    768 ],
-  ['dexter_left_lane1',  "vertical",    0,     653,   20,    768 ],
-  ['dexter_left_lane2',  "vertical",    0,     676,   20,    768 ],
-  ['dexter_right_lane1', "vertical",    0,     706,   20,    768 ],
-  ['dexter_right_lane2', "vertical",    0,     728,   20,    768 ]
+  // name, orientation, top, left, width, height, canvas
+  // the 'canvas' variable is only used when Game.multiple_canvases is set to true
+  ["amber_left_lane1",   "horizontal",  210,   0,     1024,  20,  'amber'  ],
+  ["amber_left_lane2",   "horizontal",  230,   0,     1024,  20,  'amber'  ],
+  ["amber_right_lane1",  "horizontal",  260,   0,     1024,  20,  'amber'  ],
+  ["amber_right_lane2",  "horizontal",  285,   0,     1024,  20,  'amber'  ],
+  ["baker_left",         "horizontal",  512,   0,     1024,  20,  'baker'  ],
+  ["baker_right",        "horizontal",  533,   0,     1024,  20,  'baker'  ],
+  ["chang_left_lane1",   "vertical",    0,     253,   20,    768, 'chang'  ],
+  ["chang_left_lane2",   "vertical",    0,     276,   20,    768, 'chang'  ],
+  ["chang_right_lane1",  "vertical",    0,     306,   20,    768, 'chang'  ],
+  ["chang_right_lane2",  "vertical",    0,     327,   20,    768, 'chang'  ],
+  ["dexter_left_lane1",  "vertical",    0,     653,   20,    768, 'dexter' ],
+  ["dexter_left_lane2",  "vertical",    0,     676,   20,    768, 'dexter' ],
+  ["dexter_right_lane1", "vertical",    0,     706,   20,    768, 'dexter' ],
+  ["dexter_right_lane2", "vertical",    0,     728,   20,    768, 'dexter' ]
 ];
 
 var BARRIERS = [
@@ -431,8 +432,8 @@ var BOSSES = {
 // ];
 
 var BOSS_SEQUENCE = [
-  [ 'towtruck',  45  ],
-  [ 'truck',     75  ],
+  [ 'towtruck',  25  ],
+  [ 'truck',     35  ],
   [ 'truck',     105 ],
   [ 'convoy',    135 ],
   [ 'convoy',    165 ],
