@@ -1054,6 +1054,9 @@ Game = {
     
     Game.main.show();
 
+    $(".explosion").remove();
+    $(".end_game_overlay, .stoplight").hide();
+
     if (restart===true) {
 
       Game.stop_sound_theme();
@@ -1131,7 +1134,7 @@ Game = {
   check_critical : function(){
     Game.dom.stopTime('check_critical').everyTime(1000, 'check_critical', function(){
       if (Game.critical_cars.length>0) {
-        $("#critical").animate({ opacity : 1 },500);
+        $("#critical").css({ display : 'block' }).animate({ opacity : 1 },500);
       } else {
         $("#critical").animate({ opacity : 0 },500);
       }
