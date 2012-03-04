@@ -1,9 +1,17 @@
 {
-   "name": "Traffix!",
-   "version": "1.0",
-   "icon-19x19": "images/icon_19x19.png",
-   "icon-29x29": "images/icon_29x29.png",
-   "icon-42x42": "images/icon_42x42.png",
-   "description": "A traffic control game set in the busy streets of Manila",
-   "popup": "pokki.html"
+  "name": "Traffix",
+  "version": "0.1",
+  "description": "A traffic flow management game set in the busy streets of Manila",
+  "icons": { 
+  	"128": "images/chrome-icon-h.png", 
+  	"48": "images/chrome-icon-m.png", 
+  	"16": "images/chrome-icon-l.png" 
+  },
+  "app" : {
+  	"launch" : {
+  		"local_path" : "index.html"
+  	}
+  },
+  "width" : 1024,
+  "height" : 600
 }
