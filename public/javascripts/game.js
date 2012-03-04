@@ -93,7 +93,7 @@ Game = {
   with_soundjs         : true,     // SoundJS, for Web & Pokki build
   with_soundmanager2   : false,    // pure web version
 
-  sound_format         : "." + (PLATFORM=='web' && BrowserDetect.browser=='Firefox' ? SOUND_FORMATS.pokki : SOUND_FORMATS[PLATFORM]),
+  sound_format         : "." + (PLATFORM=='web' && BrowserDetect.browser=='Chrome' ? SOUND_FORMATS.pokki : SOUND_FORMATS[PLATFORM]),
  
   raw_sounds           : SOUNDS,  // our library of sounds
   sounds               : {},
