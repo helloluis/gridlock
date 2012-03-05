@@ -413,7 +413,7 @@ var BOSSES = {
     important : true, 
     interrupt_all_sounds : true, 
     animating : true, 
-    animation : { step : 2, frames : 24 },
+    animation : { step : 24, frames : 2 },
     sounds    : [ 'hearse' ], 
     assets    : [ "hearse_r.png", 
                   "hearse_l.png", 
@@ -432,6 +432,7 @@ var BOSSES = {
 // ];
 
 var BOSS_SEQUENCE = [
+  [ 'hearse',  35  ],
   [ 'towtruck',  45  ],
   [ 'truck',     75  ],
   [ 'truck',     105 ],
