@@ -432,7 +432,6 @@ var BOSSES = {
 // ];
 
 var BOSS_SEQUENCE = [
-  [ 'hearse',  35  ],
   [ 'towtruck',  45  ],
   [ 'truck',     75  ],
   [ 'truck',     105 ],
