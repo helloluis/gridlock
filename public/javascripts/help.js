@@ -607,7 +607,7 @@ Help = {
 
   stop_all : function(){
     
-    console.log("Stopping all menus");
+    // console.log("Stopping all menus");
     
     this.stop_intersection();
     this.stop_frustration();
