@@ -325,7 +325,7 @@ body.ios #toggle_fullscreen, body.pokki #toggle_fullscreen { display:none; }
 body.pokki p a:hover {color:#fff;}
 body.pokki #score { top:30px; }
 body.pokki #high_score { top:130px; }
-body.pokki .bttn.post_to_facebook { display:none; }
+body.pokki .bttn.post_to_facebook, body.ios .bttn.post_to_facebook { display:none; }
 body.pokki .new_high_score h2 { font-size:60px; margin-top:40px;}
 body.pokki .bttn.quit { display:none; }
 body.ios .key { display:none; }

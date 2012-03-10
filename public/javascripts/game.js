@@ -98,8 +98,8 @@ Game = {
   
   // sound-related settings 
   with_sound           : true,     // globally disable all sound
-  with_phonegap_sound  : false,    // we use the Phonegap sound library for iOS
-  with_soundjs         : true,     // SoundJS, for Web & Pokki build
+  with_phonegap_sound  : true,     // we use the Phonegap sound library for iOS
+  with_soundjs         : false,    // SoundJS, for Web & Pokki build
   with_soundmanager2   : false,    // pure web version
   muted                : false,
 
@@ -1360,11 +1360,11 @@ Game = {
     if (Game.with_phonegap_sound && !Game.muted) {
       
       console.log('playing sound ', sound);
-      Game.sounds[sound].play();
+      Game.sounds['theme'].play();
 
       Game.theme_timer = setInterval(function(){ 
           if (Game.started && !Game.ended && !Game.paused && !Game.muted) {
-            Game.sounds[sound].play();   
+            Game.sounds['theme'].play();   
           } else {
             Game.theme_timer.clearInterval();
           }
@@ -1372,7 +1372,7 @@ Game = {
       
     } else if (Game.with_soundjs) {
       
-      SoundJS.play(sound, SoundJS.INTERRUPT_NONE, 100, true);
+      SoundJS.play('theme', SoundJS.INTERRUPT_NONE, 100, true);
 
     }
 
