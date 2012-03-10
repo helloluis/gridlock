@@ -146,7 +146,7 @@ var FPS = 24;
 
 // once a Maker hits MAX_CARS_PER_STREET, it stops generating new cars until the user
 // has managed to remove some more. 15 is a purely arbitrary number.
-var MAX_CARS_PER_STREET = 15;
+var MAX_CARS_PER_STREET = 20;
 
 // the maximum number of pixels a car moves forward per frame
 var MAX_SPEED = 8; 
@@ -157,48 +157,48 @@ var IMAGES_DIR = "images/";
 
 // all car types
 var CARS = {
-  car             : {  type : 'car',      width : 20, height : 40, frustrates_by : 6, score : 1,
+  car             : {  type : 'car',      width : 20, height : 40, frustrates_by : 6, score : 1, accelerates_by : 0.1,
       assets      : [ 'car2.png' ] 
     },
-  car3            : {  type : 'car3',      width : 20, height : 40, frustrates_by : 6, score : 1,
+  car3            : {  type : 'car3',      width : 20, height : 40, frustrates_by : 6, score : 1, accelerates_by : 0.1,
       assets      : [ 'car3.png' ] 
     },
-  taxi            : { type : 'taxi',      width : 20, height : 40, frustrates_by : 5, score : 1,
+  taxi            : { type : 'taxi',      width : 20, height : 40, frustrates_by : 5, score : 1, accelerates_by : 0.2,
       assets      : [ 'taxi.png' ] 
     },
-  suv             : { type : 'suv',       width : 20, height : 40, frustrates_by : 6, score : 1,
+  suv             : { type : 'suv',       width : 20, height : 40, frustrates_by : 6, score : 1, accelerates_by : 0.1,
       assets      : [ 'suv.png' ]
     },
-  hatch           : { type : 'hatch',     width : 20, height : 35, frustrates_by : 6, score : 1,
+  hatch           : { type : 'hatch',     width : 20, height : 35, frustrates_by : 6, score : 1, accelerates_by : 0.1,
       assets      : [ 'car1.png' ] 
     },
-  jeepney         : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, score : 3,
+  jeepney         : { type : 'jeepney',   width : 20, height : 45, frustrates_by : 5, score : 3, accelerates_by : 0.2,
       assets      : [ 'jeepney.png' ] 
     },
-  van             : { type : 'van',       width : 20, height : 45, frustrates_by : 4, score : 2,
+  van             : { type : 'van',       width : 20, height : 45, frustrates_by : 4, score : 2, accelerates_by : 0.1,
       assets      : [ 'van.png' ] 
     },
-  bus             : { type : 'bus',       width : 20, height : 60, frustrates_by : 3, speed : 5, score : 4,
+  bus             : { type : 'bus',       width : 20, height : 60, frustrates_by : 3, speed : 5, score : 4, accelerates_by : 0.05,
       assets      : [ 'bus.png' ] 
     },
-  truck_veg       : { type : 'truck_veg', width : 20, height : 40, frustrates_by : 3, speed : 5, score : 3,
+  truck_veg       : { type : 'truck_veg', width : 20, height : 40, frustrates_by : 3, speed : 5, score : 3, accelerates_by : 0.05,
       assets      : [ 'truck_veg.png' ] 
     },
-  police          : { type : 'police', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4,
+  police          : { type : 'police', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4, accelerates_by : 0.3,
       assets      : [ 'carpolice_r.png', 'carpolice_l.png', 'carpolice_u.png', 'carpolice_d.png' ],
       animating   : true,
       animation   : { step : 6, frames : 5 },
       important   : true,
       sounds      : [ 'police' ]
     },
-  firetruck       : { type : 'firetruck', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4,
+  firetruck       : { type : 'firetruck', width : 20, height : 40, frustrates_by : 3, speed : 7, score : 4, accelerates_by : 0.3,
       assets      : [ 'firetruck_r.png', 'firetruck_l.png', 'firetruck_u.png', 'firetruck_d.png' ],
       animating   : true,
       animation   : { step : 6, frames : 5 },
       important   : true,
       sounds      : [ 'firetruck' ]
     },
-  ambulance       : { type : 'ambulance', width : 20, height : 45, frustrates_by : 3, speed : 8, score : 5, 
+  ambulance       : { type : 'ambulance', width : 20, height : 45, frustrates_by : 3, speed : 8, score : 5, accelerates_by : 0.3, 
       assets      : [ 'ambulance_r.png', 'ambulance_l.png', 'ambulance_u.png', 'ambulance_d.png' ],
       animating   : true,
       animation   : { step : 6, frames : 5 },
@@ -265,24 +265,24 @@ var SOUNDS_DIR    = "sounds/";
 
 // all sounds and music
 var SOUNDS = { 
-  horns_short_1   : ["horn1",2],
-  horns_short_2   : ["horn2",2],
-  horns_short_3   : ["horn3",2],
-  horns_short_4   : ["horn4",2],
-  horns_long_1    : ["horn_long1",1],
-  horns_long_2    : ["horn_long2",1],
-  horn_truck      : ["horn_truck",1],
-  countdown       : ["countdown",1],
-  theme           : ["bg",1],
-  explosion       : ["explosion_short",1],
-  frustration     : ["frustration",1],
-  arrived         : ["kaching",6],
-  arrived_2       : ["kaching2",2],
-  arrived_3       : ["kaching3",1],
-  ambulance       : ["ambulance",2],
-  hearse          : ["hearse",1],
-  police          : ["police",2],
-  firetruck       : ["firetruck",2]
+  "horns-short-1"   : ["horn1",2],
+  "horns-short-2"   : ["horn2",2],
+  "horns-short-3"   : ["horn3",2],
+  "horns-short-4"   : ["horn4",2],
+  "horns-long-1"    : ["horn_long1",1],
+  "horns-long-2"    : ["horn_long2",1],
+  "horn-truck"      : ["horn_truck",1],
+  "countdown"       : ["countdown",1],
+  "theme"           : ["bg",1],
+  "explosion"       : ["explosion_short",1],
+  "frustration"     : ["frustration",1],
+  "arrived"         : ["kaching",6],
+  "arrived-2"       : ["kaching2",2],
+  "arrived-3"       : ["kaching3",1],
+  "ambulance"       : ["ambulance",2],
+  "hearse"          : ["hearse",1],
+  "police"          : ["police",2],
+  "firetruck"       : ["firetruck",2]
 };
 
 var SOUND_FORMATS = { web : "mp3", ios : "wav", pokki : "ogg" };
@@ -362,6 +362,7 @@ var BOSSES = {
     width     : 20, 
     height    : 80,  
     important : true, 
+    accelerates_by : 0.1,
     sounds    : [], 
     assets    : [ "towtruck.png" ] },
 
@@ -373,6 +374,7 @@ var BOSSES = {
     width     : 20, 
     height    : 100, 
     important : true, 
+    accelerates_by : 0.1,
     sounds    : [ 'horn_truck' ], 
     assets    : [ "truck.png" ] },
 
@@ -386,6 +388,7 @@ var BOSSES = {
     important : true, 
     animating : true, 
     animation : { step : 6, frames : 4 }, 
+    accelerates_by : 0.05,
     sounds    : [], 
     assets    : [ "convoy_r.png", 
                   "convoy_l.png", 
@@ -400,6 +403,7 @@ var BOSSES = {
     width     : 20, 
     height    : 150, 
     important : true, 
+    accelerates_by : 0.05,
     sounds    : [ 'horn_truck' ], 
     assets    : [ "transporter.png" ] },
 
@@ -414,6 +418,7 @@ var BOSSES = {
     interrupt_all_sounds : true, 
     animating : true, 
     animation : { step : 24, frames : 2 },
+    accelerates_by : 0.05,
     sounds    : [ 'hearse' ], 
     assets    : [ "hearse_r.png", 
                   "hearse_l.png", 
