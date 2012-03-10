@@ -33,9 +33,17 @@ table { border-collapse: collapse; border-spacing: 0; }
 body { 
   -webkit-user-select: none;
   user-select: none;
+  background:#9c6f57 url(../images/corkboard_background.jpg);
 }
 
-#all { width:1024px; height:768px; margin:0 auto; display:block; }
+
+#all { margin:0 auto; display:block; position:absolute; width:1024px; height:768px; }
+#all.width1024 { width:1024px; min-width:800px;  }
+#all.height768 { height:768px; min-height:601px; }
+#all.height600 { height:600px; min-height:500px; }
+#all.height600 #map .neighborhood, #all.height600 #map .buildings { height:600px; }
+#all.height600 #map .neighborhood { background-image:url(../images/bg600.jpg); }
+#all.height600 #map .buildings { background-image:url(../images/buildings600.png); }
 
 h1, h2, p { color:#333; margin-bottom:0.5em;}
 h1 { font-size:64px; font-family: 'Fugaz One', Helvetica, sans-serif; letter-spacing:-2px; text-shadow:0 3px 8px #333; }
@@ -44,17 +52,17 @@ h2, h3, label, .bttn, #score, #high_score, #timer { font-size:24px; font-family:
 p, .car_score { line-height:1.5; font-family: 'Boogaloo', Times, sans-serif; }
 em { font-style:italic; }
 
-.screen { position:absolute; top:0; left:0; width:1024px; height:768px; display:none; overflow:hidden; margin:0 auto; background-image:url(../images/loader.jpg); }
+.screen { position:absolute; top:0; left:0; width:100%; height:100%; display:none; overflow:hidden; margin:0 auto; background-image:url(../images/loader.jpg); }
 .screen_inner { position:absolute; top:10%; bottom:10%; left:10%; right:10%; width:80%; height:80%; }
 
-#loader.screen { background:#000; display:block; }
+#loader.screen { display:block; }
 #loader.screen h2.loading { margin-top:250px; text-align:center; color:#fff; font-size:48px; text-shadow:3px 3px 3px #000; }
 #loader.screen h2.loading_percentage { margin-top:0px; text-align:center; color:#fff; font-size:48px; text-shadow:3px 3px 3px #000; }
 #loading_cars { position:absolute; top:400px; left:0px; width:100%; height:30px; overflow:hidden; }
 #loading_cars img { position:absolute; height:20px; }
-#loading_container { width:0; height:0; display:block; overflow:hidden; visibility:hidden; }
+#loading_container { width:1px; height:1px; display:block; overflow:hidden; opacity:0; }
 
-#intro { display:block; background:url(../images/loader.jpg) no-repeat; z-index:2; }
+#intro { display:block; background:url(../images/loader.jpg) no-repeat; z-index:2; width:100%; height:100%; }
 #intro h1 { position:absolute; text-indent:-2000px; background:url(../images/traffix_logo.png) no-repeat; width:600px; height:250px; top: -50px; left: -60px; z-index:6; }
 a, #intro p strong { color:#fc0; }
 #intro section { border-top:1px solid #ccc; padding-top:20px; margin-top:25px; position:absolute; }
@@ -81,7 +89,7 @@ a, #intro p strong { color:#fc0; }
 .help_illustration .help_background { width: 270px; height:275px; position:absolute; background:url(../images/bg_help.jpg); top:39px; left:41px; z-index:1; overflow:hidden; }
 .help_illustration canvas { position:absolute; top:39px; left:41px; z-index:2; }
 .help_illustration_frustration { top:150px; right:120px; -webkit-transform:rotate(-2deg); z-index:4; }
-.help_illustration_frustration .frustration { position:absolute; width:40px; height:40px; background:url(../images/thoughtbubbles.png) -160px 0px; visibility:hidden; z-index:3; }
+.help_illustration_frustration .frustration { position:absolute; width:40px; height:40px; background:url(../images/bubbles.png) -160px 0px; visibility:hidden; z-index:3; }
 .help_illustration_frustration .frustration.frustration02 { background-position: -200px 0px; }
 .help_illustration_frustration .frustration.frustration03 { background-position: -240px 0px; }
 .help_illustration_reward { top:350px; right:-80px; -webkit-transform:rotate(4deg); z-index:3; }
@@ -103,8 +111,8 @@ a, #intro p strong { color:#fc0; }
 .bttn.leaderboards { bottom:20px; right:30px; text-shadow: 0 0 7px #000; }
 .bttn.pause, .bttn.mute, .bttn.quit { background:url(../images/bttn_small.png); width:40px; height:40px; text-indent:-2000px; top:20px; left:20px; }
 .bttn.pause { background-position:-40px 0px; }
-.bttn.quit { left: 100px; }
-.bttn.mute { top:auto; bottom:20px; background-position:-120px 0px; }
+.bttn.quit { left: 180px; }
+.bttn.mute { left: 100px; background-position:-120px 0px; }
 .bttn.mute.muted { background-position:-80px 0px; }
 .bttn.disabled { opacity:0.5; }
 .bttn.speed { bottom:30px; right:20px; color:#fff; }
@@ -130,7 +138,7 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #messages .new_high_score p.bttn { color:#9be; }
  
 
-#score, #high_score { position:absolute; top:10px; right:0px; z-index:20; background:url(../images/score_2.png); width:85px; height:50px; padding:20px 25px; color:#fff; text-align:right; font-size:48px; }
+#score, #high_score { position:absolute; top:10px; right:0px; z-index:20; background:url(../images/score_2.png); width:85px; height:50px; padding:20px 25px; color:#fff; text-align:right; font-size:48px; margin-bottom:10px; }
 #high_score { background-image:url(../images/high_score.png); height:20px; width: 85px; padding:16px 25px 20px; top:120px; font-size:24px; color:#eec; }
 #score.higher_score { color:#ff0; }
 #score.good { color:#9c0; }
@@ -139,8 +147,10 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #debugger { position:absolute; top:60px; left:10px; width:240px; height:auto; z-index:30; font-size:12px; color:#fff; background:rgba(0,0,0,0.7); padding:10px; }
 #debugger p { color:#fff; font-family: Helvetica; }
 
-#map, .neighborhood, .street, .buildings, .intersection { position:absolute; }
-#map { top:0px; left:0px; width:100%; height:100%; }
+#intro, #map, .neighborhood, .street, .buildings, .intersection { position:absolute; }
+#map { top:0px; left:0px; width:1024px; height:768px; }
+#all.height600 #map { height:600px; }
+
 .neighborhood, .buildings { top:0px; left:0px; background:url(../images/bg.jpg); width:100%; height:100%; }
 .buildings { top:0px; left:0px; background:url(../images/buildings.png); width:100%; height:100%; z-index:12; }
 .street{z-index:14; -webkit-tap-highlight-color: rgba(0,0,0,0)}
@@ -163,12 +173,19 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #bubbles { z-index:13; }
 
 /*canvas { border:1px solid #fff; position:absolute; }*/
+.multi_canvas { position:absolute; }
 #amber { top:210px; left:0px; }
 #baker { top:505px; left:0px; }
 #chang { top:0px; left:250px; }
 #dexter { top:0px; left:650px; }
 
-#critical { z-index:13; position:absolute; top:0; left:0; width:1024px; height:768px; background:url(../images/critical.png); opacity:0; }
+.end_game_overlay { z-index:13; position:absolute; top:0; left:0; width:1024px; height:768px; opacity:0; }
+#critical {  background:url(../images/critical.png); }
+#collision { background:url(../images/collision.png); } 
+
+.height600 .end_game_overlay { height:600px; }
+.height600 #critical { background:url(../images/critical_600.png); } 
+.height600 #collision { background:url(../images/collision_600.png); } 
 
 .hitbox { position:absolute; background:#0fc; }
 
@@ -193,6 +210,9 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 .intersection.baker { top:510px; height:50px; }
 .intersection.chang { left:250px; width:100px; }
 .intersection.dexter { left:650px; width:100px; }
+
+.height600 .intersection.amber { top:150px; }
+.height600 .intersection.baker { top:405px; }
 
 #overlay { background:rgba(0,0,0,0.7); position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:19; }
 #overlay .bttn { top:40%; left:42%; }
@@ -270,8 +290,9 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 .car.boss.hearse.horizontal { width:200px; height:20px; background:url(../images/hearse_l.png); }
 .car.boss.hearse.horizontal.right { background:url(../images/hearse_r.png); }
 
-/******************/
-/******************/
+/**********************/
+/* END VEHICLE STYLES */
+/**********************/
 
 
 .car_score { font-size:25px; position:absolute; z-index:20; opacity : 1; color:#ff0; }
@@ -285,11 +306,27 @@ div#messages { position:absolute; top:250px; left:0px; text-align:center; width:
 #credits .screen_inner p a { color:#ff0; }
 #credits .bttn.intro { padding-top:20px; color:#ff0; text-shadow:0 0 7px #000; }
 
-body.pokki #minimize { display:block; }
-body.pokki #toggle_fullscreen { display:block; }
+
+.key { width:95px; height:112px; background:url(../images/keys.png); top: 130px; left:170px; position:absolute; z-index:30; display:block; opacity:0; } 
+.key.frame2 { background-position:-100px 0px; }
+.key.key2 { left:auto; right:180px; background-position:-200px 0px; }
+.key.key2.frame2 { background-position:-300px 0px; }
+.key.key3 { top:550px; left:180px; background-position:0px -120px; }
+.key.key3.frame2 { background-position:-100px -110px; }
+.key.key4 { left:auto; top:550px; right:180px; background-position:-195px -120px; }
+.key.key4.frame2 { background-position:-300px -110px; }
+
+#toggle_fullscreen { background:#000 url(../images/pokki_window_sprite.png); width:18px; height:18px; border-radius:6px; position:absolute; z-index:100;top:5px; right:5px; line-height:1; cursor:pointer; text-decoration:none; text-indent:-1000px; overflow:hidden; background-position:0px 0px; }
+#toggle_fullscreen.cancel_fullscreen { background-position:-18px 0px; }
+
+#pintsized { width:250px; height:75px; background:url(../images/brewed_by_pintsized.png); position:absolute; bottom:-10px; left:30px; text-indent:-2000px; }
+
+body.ios #toggle_fullscreen, body.pokki #toggle_fullscreen { display:none; }
 body.pokki p a:hover {color:#fff;}
 body.pokki #score { top:30px; }
 body.pokki #high_score { top:130px; }
 body.pokki .bttn.post_to_facebook { display:none; }
 body.pokki .new_high_score h2 { font-size:60px; margin-top:40px;}
 body.pokki .bttn.quit { display:none; }
+body.ios .key { display:none; }
+

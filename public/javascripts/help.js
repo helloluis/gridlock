@@ -24,7 +24,7 @@ Help = {
   animate_in : function(callback){
     
     var self    = this,
-        dom     = $("#intro").css({ top : 1024 }),
+        dom     = $("#intro").css({ opacity : 0 }),
         logo    = $("h1", dom).css({ top : 400, left : -700 }),
         cap1    = $(".caption_intersection", dom).css({ top : 850, left : -200 }),
         cap2    = $(".caption_frustration", dom).css({ top : 850, left : 400 }),
@@ -35,9 +35,10 @@ Help = {
         score   = $(".high_score_cont", dom).hide(),
         play    = $(".start_game", dom).hide(),
         credits = $(".credits", dom).hide(),
+        pintsized = $("#pintsized", dom).hide(),
         leaders = $(".leaderboards", dom).hide();
 
-    dom.animate({ top : 0 });
+    dom.animate({ opacity : 1 });
 
     _.delay(function(){
       logo.animate({ top : -50, left : 110 });  
@@ -68,6 +69,7 @@ Help = {
     _.delay(function(){
       play.show();
       credits.show();
+      pintsized.show();
       leaders.show();
     }, 2250);
 
@@ -95,6 +97,7 @@ Help = {
     $(".high_score_cont", dom).hide(),
     $(".start_game", dom).hide(),
     $(".credits", dom).hide(),
+    $("#pintsized", dom).hide(),
     $(".leaderboards", dom).hide();
 
     if (callback!==undefined) {
@@ -484,6 +487,8 @@ Help = {
 
     self.reward.loops = new Array;
 
+    self.reward.loops = new Array;
+
     self.reward.dom.
       queue('reward', function(next){
         
@@ -602,7 +607,7 @@ Help = {
 
   stop_all : function(){
     
-    console.log("Stopping all menus");
+    // console.log("Stopping all menus");
     
     this.stop_intersection();
     this.stop_frustration();

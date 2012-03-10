@@ -18,15 +18,145 @@
   <title>Traffix!</title>
 
   <link rel="stylesheet" href="stylesheets/game.css"/>
- 
+
+  <script>
+    var BrowserDetect = {
+    init: function () {
+      this.browser = this.searchString(this.dataBrowser) || "An unknown browser";
+      this.version = this.searchVersion(navigator.userAgent)
+        || this.searchVersion(navigator.appVersion)
+        || "an unknown version";
+      this.OS = this.searchString(this.dataOS) || "an unknown OS";
+    },
+    searchString: function (data) {
+      for (var i=0;i<data.length;i++) {
+        var dataString = data[i].string;
+        var dataProp = data[i].prop;
+        this.versionSearchString = data[i].versionSearch || data[i].identity;
+        if (dataString) {
+          if (dataString.indexOf(data[i].subString) != -1)
+            return data[i].identity;
+        }
+        else if (dataProp)
+          return data[i].identity;
+      }
+    },
+    searchVersion: function (dataString) {
+      var index = dataString.indexOf(this.versionSearchString);
+      if (index == -1) return;
+      return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
+    },
+    dataBrowser: [
+      {
+        string: navigator.userAgent,
+        subString: "Chrome",
+        identity: "Chrome"
+      },
+      {   string: navigator.userAgent,
+        subString: "OmniWeb",
+        versionSearch: "OmniWeb/",
+        identity: "OmniWeb"
+      },
+      {
+        string: navigator.vendor,
+        subString: "Apple",
+        identity: "Safari",
+        versionSearch: "Version"
+      },
+      {
+        prop: window.opera,
+        identity: "Opera",
+        versionSearch: "Version"
+      },
+      {
+        string: navigator.vendor,
+        subString: "iCab",
+        identity: "iCab"
+      },
+      {
+        string: navigator.vendor,
+        subString: "KDE",
+        identity: "Konqueror"
+      },
+      {
+        string: navigator.userAgent,
+        subString: "Firefox",
+        identity: "Firefox"
+      },
+      {
+        string: navigator.vendor,
+        subString: "Camino",
+        identity: "Camino"
+      },
+      {   // for newer Netscapes (6+)
+        string: navigator.userAgent,
+        subString: "Netscape",
+        identity: "Netscape"
+      },
+      {
+        string: navigator.userAgent,
+        subString: "MSIE",
+        identity: "Explorer",
+        versionSearch: "MSIE"
+      },
+      {
+        string: navigator.userAgent,
+        subString: "Gecko",
+        identity: "Mozilla",
+        versionSearch: "rv"
+      },
+      {     // for older Netscapes (4-)
+        string: navigator.userAgent,
+        subString: "Mozilla",
+        identity: "Netscape",
+        versionSearch: "Mozilla"
+      }
+    ],
+    dataOS : [
+      {
+        string: navigator.platform,
+        subString: "Win",
+        identity: "Windows"
+      },
+      {
+        string: navigator.platform,
+        subString: "Mac",
+        identity: "Mac"
+      },
+      {
+           string: navigator.userAgent,
+           subString: "iPhone",
+           identity: "iPhone/iPod"
+        },
+      {
+        string: navigator.platform,
+        subString: "Linux",
+        identity: "Linux"
+      }
+    ]
+
+  };
+  BrowserDetect.init();
+  </script>
+  
   <script src="javascripts/modernizr.js"></script>
+  <script src="javascripts/debug.js"></script>
+  <script src="javascripts/jquery-1.7.1.min.js"></script>
   <script src="javascripts/underscore.js"></script>
   <script src="javascripts/map.js"></script>
   <script src="javascripts/sound.js"></script>
+<<<<<<< HEAD
   <script src="javascripts/loader.js"></script>
   <!--<script src="javascripts/pokkiBrowser.js"></script>-->
   <script>
     PLATFORM = 'ios';
+=======
+  <script src="javascripts/soundmanager2-nodebug-jsmin.js"></script>
+  <script src="javascripts/pxloader.js"></script>
+
+  <script>
+    PLATFORM = 'web';
+>>>>>>> master
     APP_URL  = "http://traffix.infinite.ly";
     APP_ID   = "192448444187818";
   </script>
@@ -50,10 +180,12 @@
 
 <body>
 
+<div id="fb-root"></div>
+<script src='http://connect.facebook.net/en_US/all.js'></script>
+
 <div id="all">
 
-  <!-- <div id="fb-root"></div>
-  <script src='http://connect.facebook.net/en_US/all.js'></script> -->
+  <div id="toggle_fullscreen" title="Fullscreen"></div>
 
   <div id="debugger"></div>
 
@@ -94,7 +226,8 @@
       </div>
 
       <h2 class="bttn start_game">Play!</h2>
-      <h3 class="bttn credits">Credits</h3>
+      <a href="http://pintsized.co" title="Visit us at http://pintsized.co" target="_blank" id="pintsized">Lovingly Brewed by Pintsized Games</a>
+      <!-- <h3 class="bttn credits">Credits</h3> -->
       <!-- <h3 class="bttn leaderboards">Leaderboards</h3> -->
       <div class="high_score_cont">
         <label>High Score</label> 
@@ -114,7 +247,8 @@
 
   <div id="game" class="screen" style="display:none">
 
-    <div id="critical"></div>
+    <div id="critical" class="end_game_overlay"></div>
+    <div id="collision" class="end_game_overlay"></div>
 
     <div id="overlay" style="display:none">
       <h2 class="bttn resume">Resume?</h2>
@@ -126,7 +260,6 @@
     <h2 class="bttn restart">Try Again</h2>
   
     <div id="messages"><h1>Starting ...</h1></div>
-
     
     <div id="score" title="Score" style="right:-135px">0</div>
     <div id="high_score" class="high_score" title="High Score" style="right:-135px">0</div>
@@ -142,8 +275,17 @@
 
       <canvas id="cars" width="1024" height="768"></canvas>
       <canvas id="bubbles" width="1024" height="768"></canvas>
+      <canvas id="amber" class="multi_canvas" width="1024" height="105"></canvas>
+      <canvas id="baker" class="multi_canvas" width="1024" height="55"></canvas>
+      <canvas id="chang" class="multi_canvas" width="100" height="768"></canvas>
+      <canvas id="dexter" class="multi_canvas" width="100" height="768"></canvas>
       
       <div class="buildings"></div>
+
+      <div class="key"></div>
+      <div class="key key2"></div>
+      <div class="key key3"></div>
+      <div class="key key4"></div>
 
     </div>
     
@@ -160,7 +302,6 @@
 
 </div>
 
-<script src="javascripts/jquery-1.7.1.min.js"></script>
 <script src="javascripts/jgestures.min.js"></script>
 <script src="javascripts/jquery.tappable.js"></script>
 <script src="javascripts/jstorage.js"></script>
